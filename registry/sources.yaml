@@ -8,7 +8,22 @@ sources:
     notes:
       - Discovery source only.
       - Never install directly from listing pages.
-
+  - id: github-direct
+    kind: repo
+    url: https://github.com/
+    discoveryOnly: false
+    trustLevel: canonical-upstream
+    owner: external
+    notes:
+      - Approved acquisition source for pinned repositories, tags, and commits.
+  - id: governance-repo
+    kind: repo
+    url: https://github.com/visonalhal/agent-governance
+    discoveryOnly: false
+    trustLevel: governance-repo
+    owner: self
+    notes:
+      - Canonical source for imported local bootstrap artifacts.
   - id: skills-sh
     kind: catalog
     url: https://skills.sh/
@@ -18,12 +33,3 @@ sources:
     notes:
       - Discovery source only.
       - Resolve every approved capability back to a canonical upstream repo.
-
-  - id: github-direct
-    kind: repo
-    url: https://github.com/
-    discoveryOnly: false
-    trustLevel: canonical-upstream
-    owner: external
-    notes:
-      - Approved acquisition source for pinned repositories, tags, and commits.

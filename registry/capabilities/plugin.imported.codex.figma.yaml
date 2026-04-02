@@ -1,0 +1,53 @@
+id: plugin.imported.codex.figma
+name: figma
+assetKind: plugin
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    plugin:
+      pluginId: figma@openai-curated
+      enabled: true
+      installedRecords: []
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/packages/codex-figma
+install:
+  strategy: copy
+  artifactName: codex-figma
+  sourcePath: assets/packages/codex-figma
+  manifest:
+    importedFrom: codex-plugin-cache
+    pluginId: figma@openai-curated
+    localPath: /Users/halvinshen/.codex/.tmp/plugins/plugins/figma
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: MIT
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime plugin execution
+  notes:
+    - Imported from the local Codex plugin configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 77da225c98682719203be238c5f722a52d424f8b383209a059840eecac5ea189
+tags:
+  - bootstrap-import
+  - codex-plugin

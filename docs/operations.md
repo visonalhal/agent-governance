@@ -9,6 +9,7 @@
 5. Run `pnpm governance publish`.
 6. Run `pnpm governance render`.
 7. Run `pnpm governance sync --runtime codex`, `claude`, or `cursor`.
+8. If the workstation already has curated global state you want to adopt, run `pnpm governance import-local`.
 
 ## Intake
 
@@ -59,6 +60,18 @@ Current native targets:
 - Codex: `~/.codex/config.toml`
 - Cursor: `~/.cursor/mcp.json` and `~/.cursor/skills`
 - Claude: `~/.claude/settings.json`, `~/.claude/plugins/known_marketplaces.json`, `~/.claude/plugins/installed_plugins.json`
+
+## Import Local State
+
+`pnpm governance import-local`
+
+This command:
+
+- copies the current local shared skill cache and active managed runtime entries into `assets/`
+- redacts imported secrets into `~/.config/agent-governance/local/<machineId>.yaml`
+- publishes and renders the imported state
+- seeds local managed-state files so the adopted entries stop colliding as unmanaged config
+- syncs the imported state back through the normal governed pipeline
 
 ## Rollback
 

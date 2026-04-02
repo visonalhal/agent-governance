@@ -1,0 +1,50 @@
+id: skill.imported.design-implementation-reviewer
+name: design-implementation-reviewer
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/design-implementation-reviewer
+install:
+  strategy: copy
+  artifactName: design-implementation-reviewer
+  sourcePath: assets/skills/design-implementation-reviewer
+  manifest:
+    importedFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/design-implementation-reviewer
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 68bdcda0354e9abde677f576af554ae9304d9d1e6486605b1210d123d3117673
+tags:
+  - bootstrap-import
+  - shared-skill

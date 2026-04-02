@@ -1,0 +1,50 @@
+id: skill.imported.create-design-system-rules
+name: create-design-system-rules
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/create-design-system-rules
+install:
+  strategy: copy
+  artifactName: create-design-system-rules
+  sourcePath: assets/skills/create-design-system-rules
+  manifest:
+    importedFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/create-design-system-rules
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: d6043b42474f54b855b0a0394032eb7443945adaa33893eac6d3968f94822d31
+tags:
+  - bootstrap-import
+  - shared-skill

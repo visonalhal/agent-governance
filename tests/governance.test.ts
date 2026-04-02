@@ -10,12 +10,14 @@ import {
   auditGovernance,
   changeCapabilityLifecycle,
   ingestCapability,
+  loadBootstrap,
   publishGovernance,
   renderGovernance,
   resolveContext,
   reviewCapability,
   syncGovernance,
 } from "../src/governance.js";
+import { importLocalMachineState } from "../src/local-import.js";
 
 const REPO_ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const FIXED_REVIEW_DATE = "2026-04-02T00:00:00.000Z";
@@ -399,6 +401,250 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("imports current local machine state into the repo and adopts it as managed", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await fs.mkdir(path.join(sandbox.cacheRoot, "skills"), { recursive: true });
+      await fs.cp(
+        path.join(REPO_ROOT, "tests", "fixtures", "assets", "sample-skill"),
+        path.join(sandbox.cacheRoot, "skills", "sample-skill"),
+        { recursive: true }
+      );
+      await fs.writeFile(
+        path.join(sandbox.cacheRoot, ".skill-lock.json"),
+        JSON.stringify(
+          {
+            version: 3,
+            skills: {
+              "sample-skill": {
+                source: "example/sample-skill",
+                sourceType: "github",
+                sourceUrl: "https://github.com/example/sample-skill.git",
+                skillPath: "skills/sample-skill/SKILL.md",
+                skillFolderHash: "samplehash",
+                installedAt: FIXED_REVIEW_DATE,
+                updatedAt: FIXED_REVIEW_DATE,
+              },
+            },
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      await fs.mkdir(path.join(sandbox.home, ".codex", ".tmp", "plugins", "plugins"), {
+        recursive: true,
+      });
+      await fs.cp(
+        path.join(REPO_ROOT, "tests", "fixtures", "assets", "sample-plugin"),
+        path.join(sandbox.home, ".codex", ".tmp", "plugins", "plugins", "sample-plugin"),
+        { recursive: true }
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".codex", "config.toml"),
+        [
+          'model = "gpt-5.4"',
+          'model_reasoning_effort = "high"',
+          "",
+          '[plugins."sample-plugin@governed-marketplace"]',
+          "enabled = true",
+          "",
+          "[mcp_servers.figma]",
+          'url = "https://mcp.figma.com/mcp"',
+          "",
+        ].join("\n"),
+        "utf8"
+      );
+
+      await fs.writeFile(
+        path.join(sandbox.home, ".cursor", "mcp.json"),
+        JSON.stringify(
+          {
+            mcpServers: {
+              github: {
+                command: "npx",
+                args: ["-y", "@modelcontextprotocol/server-github"],
+                env: {
+                  GITHUB_TOKEN: "cursor-secret",
+                },
+              },
+            },
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      const claudePluginRoot = path.join(
+        sandbox.home,
+        ".claude",
+        "plugins",
+        "marketplaces",
+        "sample-marketplace"
+      );
+      await fs.mkdir(path.join(claudePluginRoot, ".claude-plugin"), { recursive: true });
+      await fs.writeFile(
+        path.join(claudePluginRoot, ".claude-plugin", "plugin.json"),
+        JSON.stringify(
+          {
+            name: "sample-plugin",
+            version: "1.0.0",
+            license: "MIT",
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "settings.json"),
+        JSON.stringify(
+          {
+            model: "claude-sonnet-4.5",
+            enabledPlugins: {
+              "sample-plugin@sample-marketplace": true,
+            },
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "plugins", "known_marketplaces.json"),
+        JSON.stringify(
+          {
+            "sample-marketplace": {
+              source: {
+                source: "github",
+                repo: "example/sample-plugin",
+              },
+              installLocation: claudePluginRoot,
+              lastUpdated: FIXED_REVIEW_DATE,
+            },
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "plugins", "installed_plugins.json"),
+        JSON.stringify(
+          {
+            version: 2,
+            plugins: {
+              "sample-plugin@sample-marketplace": [
+                {
+                  scope: "user",
+                  installPath: path.join(
+                    sandbox.home,
+                    ".claude",
+                    "plugins",
+                    "cache",
+                    "sample-marketplace",
+                    "sample-plugin",
+                    "1.0.0"
+                  ),
+                  version: "1.0.0",
+                  installedAt: FIXED_REVIEW_DATE,
+                  lastUpdated: FIXED_REVIEW_DATE,
+                  gitCommitSha: "sample123",
+                },
+              ],
+            },
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      const bootstrap = await loadBootstrap(sandbox.bootstrapPath);
+      const summary = await importLocalMachineState({
+        root: sandbox.root,
+        bootstrap,
+        machineId: sandbox.machineId,
+        reviewer: "Bootstrap Reviewer",
+      });
+
+      expect(summary.skillCount).toBe(1);
+      expect(summary.pluginCount).toBe(2);
+      expect(summary.mcpCount).toBe(2);
+      expect(summary.syncedRuntimes).toEqual(["codex", "cursor", "claude"]);
+
+      expect(
+        await exists(path.join(sandbox.root, "registry", "capabilities", "skill.imported.sample-skill.yaml"))
+      ).toBe(true);
+      expect(
+        await exists(
+          path.join(sandbox.root, "registry", "capabilities", "plugin.imported.codex.sample-plugin.yaml")
+        )
+      ).toBe(true);
+      expect(
+        await exists(
+          path.join(sandbox.root, "registry", "capabilities", "plugin.imported.claude.sample-plugin.yaml")
+        )
+      ).toBe(true);
+      expect(
+        await exists(path.join(sandbox.root, "registry", "capabilities", "mcp.imported.cursor.github.yaml"))
+      ).toBe(true);
+
+      const importedCursorMcp = await fs.readFile(
+        path.join(sandbox.root, "registry", "capabilities", "mcp.imported.cursor.github.yaml"),
+        "utf8"
+      );
+      expect(importedCursorMcp).toContain("${SECRET:IMPORTED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN}");
+      expect(importedCursorMcp).not.toContain("cursor-secret");
+
+      const localSecrets = YAML.parse(
+        await fs.readFile(sandbox.localSecretsFile, "utf8")
+      ) as {
+        secrets: Record<string, string>;
+      };
+      expect(localSecrets.secrets.IMPORTED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN).toBe("cursor-secret");
+
+      expect(await exists(path.join(sandbox.cacheRoot, "skills", "sample-skill", "SKILL.md"))).toBe(true);
+      expect(
+        await exists(path.join(sandbox.cacheRoot, "packages", "codex-sample-plugin", ".codex-plugin", "plugin.json"))
+      ).toBe(true);
+      expect(
+        await exists(
+          path.join(sandbox.cacheRoot, "packages", "claude-sample-plugin", ".claude-plugin", "plugin.json")
+        )
+      ).toBe(true);
+
+      const cursorConfig = JSON.parse(
+        await fs.readFile(path.join(sandbox.home, ".cursor", "mcp.json"), "utf8")
+      ) as {
+        mcpServers: Record<string, { env?: Record<string, string> }>;
+      };
+      expect(cursorConfig.mcpServers.github?.env?.GITHUB_TOKEN).toBe("cursor-secret");
+
+      const codexState = JSON.parse(
+        await fs.readFile(
+          path.join(sandbox.home, ".config", "agent-governance", "state", sandbox.machineId, "codex.json"),
+          "utf8"
+        )
+      ) as {
+        managedPluginIds: string[];
+      };
+      expect(codexState.managedPluginIds).toEqual(["sample-plugin@governed-marketplace"]);
+
+      const sources = YAML.parse(
+        await fs.readFile(path.join(sandbox.root, "registry", "sources.yaml"), "utf8")
+      ) as {
+        sources: Array<{ id: string }>;
+      };
+      expect(sources.sources.some((source) => source.id === "governance-repo")).toBe(true);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
   it("fails sync when a required secret is missing", async () => {
     const sandbox = await createSandbox();
 
@@ -656,6 +902,7 @@ async function createSandbox() {
   await fs.mkdir(path.join(home, ".config", "agent-governance", "state", machineId), {
     recursive: true,
   });
+  await fs.mkdir(cacheRoot, { recursive: true });
   await fs.mkdir(path.join(home, ".codex"), { recursive: true });
   await fs.mkdir(path.join(home, ".cursor", "skills-cursor"), { recursive: true });
   await fs.mkdir(path.join(home, ".claude", "plugins"), { recursive: true });

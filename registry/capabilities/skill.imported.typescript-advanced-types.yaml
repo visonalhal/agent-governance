@@ -1,0 +1,50 @@
+id: skill.imported.typescript-advanced-types
+name: typescript-advanced-types
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/typescript-advanced-types
+install:
+  strategy: copy
+  artifactName: typescript-advanced-types
+  sourcePath: assets/skills/typescript-advanced-types
+  manifest:
+    importedFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/typescript-advanced-types
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 9a6c19b3251593eaa800c157f669d3a890132dd3f4f828f4dd41bcef0150237d
+tags:
+  - bootstrap-import
+  - shared-skill

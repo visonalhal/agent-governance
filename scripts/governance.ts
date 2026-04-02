@@ -11,6 +11,7 @@ import {
   reviewCapability,
   syncGovernance,
 } from "../src/governance.js";
+import { importLocalMachineState } from "../src/local-import.js";
 
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
@@ -192,6 +193,21 @@ async function main() {
       return;
     }
 
+    case "import-local": {
+      const bootstrap = requireBootstrap(context.bootstrap, values.bootstrap);
+      const machineId = values.machine ?? bootstrap.machineId;
+      const summary = await importLocalMachineState({
+        root: context.root,
+        bootstrap,
+        machineId,
+        ...(values.reviewer ? { reviewer: values.reviewer } : {}),
+      });
+      console.log(
+        `Imported ${summary.skillCount} skills, ${summary.pluginCount} plugins, and ${summary.mcpCount} MCPs from local machine state.`
+      );
+      return;
+    }
+
     case "deprecate":
       await changeCapabilityLifecycle(
         context.root,
@@ -248,6 +264,7 @@ Commands:
   render      Render shared cache and machine/runtime desired state
   sync        Sync a managed runtime from rendered desired state
   audit       Check for lock drift, stale reviews, and optional upstream drift
+  import-local Capture current local global state into the repo and adopt it as managed
   deprecate   Mark a capability deprecated
   block       Mark a capability blocked
 

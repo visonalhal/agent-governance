@@ -1,0 +1,67 @@
+id: plugin.imported.claude.ui-ux-pro-max
+name: ui-ux-pro-max
+assetKind: plugin
+runtimeTargets:
+  - claude
+runtimeBindings:
+  claude:
+    plugin:
+      pluginId: ui-ux-pro-max@ui-ux-pro-max-skill
+      enabled: true
+      knownMarketplace:
+        marketplaceId: ui-ux-pro-max-skill
+        installLocation: ${CACHE_ROOT}/packages/claude-ui-ux-pro-max
+        lastUpdated: 2026-03-13T02:38:00.342Z
+        sha: 07f4ef3
+        source:
+          repo: nextlevelbuilder/ui-ux-pro-max-skill
+          source: github
+      installedRecords:
+        - gitCommitSha: 07f4ef3
+          installedAt: 2026-03-13T02:38:03.782Z
+          installPath: ${CACHE_ROOT}/packages/claude-ui-ux-pro-max
+          lastUpdated: 2026-03-13T02:38:03.782Z
+          scope: user
+          version: 07f4ef3
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/packages/claude-ui-ux-pro-max
+install:
+  strategy: copy
+  artifactName: claude-ui-ux-pro-max
+  sourcePath: assets/packages/claude-ui-ux-pro-max
+  manifest:
+    importedFrom: claude-plugin-marketplace
+    pluginId: ui-ux-pro-max@ui-ux-pro-max-skill
+    localPath: /Users/halvinshen/.claude/plugins/marketplaces/ui-ux-pro-max-skill
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: MIT
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime plugin execution
+  notes:
+    - Imported from the local Claude plugin configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 5876980eb84a8cc027a29bb054e344b29e78f16e45b5967d0f55da1d7fcd126b
+tags:
+  - bootstrap-import
+  - claude-plugin

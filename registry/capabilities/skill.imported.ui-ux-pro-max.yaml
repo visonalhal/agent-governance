@@ -1,0 +1,50 @@
+id: skill.imported.ui-ux-pro-max
+name: ui-ux-pro-max
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/ui-ux-pro-max
+install:
+  strategy: copy
+  artifactName: ui-ux-pro-max
+  sourcePath: assets/skills/ui-ux-pro-max
+  manifest:
+    importedFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/ui-ux-pro-max
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d
+tags:
+  - bootstrap-import
+  - shared-skill

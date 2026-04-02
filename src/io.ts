@@ -114,6 +114,10 @@ export async function computeDirectoryDigest(sourcePath: string) {
   return hash.digest("hex");
 }
 
+export function computeValueDigest(value: unknown) {
+  return createHash("sha256").update(stableJson(value)).digest("hex");
+}
+
 export async function listTopLevelEntries(targetDir: string) {
   if (!(await pathExists(targetDir))) {
     return [];

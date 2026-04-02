@@ -1,0 +1,50 @@
+id: skill.imported.receiving-code-review
+name: receiving-code-review
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/receiving-code-review
+install:
+  strategy: copy
+  artifactName: receiving-code-review
+  sourcePath: assets/skills/receiving-code-review
+  manifest:
+    importedFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/receiving-code-review
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30
+tags:
+  - bootstrap-import
+  - shared-skill

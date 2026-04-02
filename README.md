@@ -23,6 +23,7 @@ The flow is always:
 ## Repository Layout
 
 - `registry/`: discovery sources and canonical capability records
+- `assets/`: source-controlled managed skills and packages used as repo-owned source assets
 - `policies/`: admission, risk, and deprecation policies
 - `runtimes/`: runtime adapter profiles with portable path templates
 - `machines/`: machine-specific runtime enablement and overrides
@@ -59,6 +60,7 @@ Secrets and machine-local overrides stay outside Git:
 - `pnpm governance publish`
 - `pnpm governance render`
 - `pnpm governance sync --runtime <runtime>`
+- `pnpm governance import-local`
 - `pnpm governance audit`
 - `pnpm governance deprecate`
 - `pnpm governance block`

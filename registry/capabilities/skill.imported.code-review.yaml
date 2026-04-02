@@ -1,0 +1,56 @@
+id: skill.imported.code-review
+name: code-review
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/code-review
+install:
+  strategy: copy
+  artifactName: code-review
+  sourcePath: assets/skills/code-review
+  manifest:
+    importedFrom: shared-skill-cache
+    source: supercent-io/skills-template
+    sourceType: github
+    sourceUrl: https://github.com/supercent-io/skills-template.git
+    skillPath: .agent-skills/code-review/SKILL.md
+    skillFolderHash: 9390e9d698596a2da37fa525ce51908955309224
+    installedAt: 2026-03-06T06:25:33.972Z
+    updatedAt: 2026-03-06T06:25:33.972Z
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: ac61353e7ec0c8b98660accf0c9688bf5183044b7fa1ee1e189c680ff1a083c6
+tags:
+  - bootstrap-import
+  - shared-skill

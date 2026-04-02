@@ -1,0 +1,56 @@
+id: skill.imported.playwright-best-practices
+name: playwright-best-practices
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/playwright-best-practices
+install:
+  strategy: copy
+  artifactName: playwright-best-practices
+  sourcePath: assets/skills/playwright-best-practices
+  manifest:
+    importedFrom: shared-skill-cache
+    source: currents-dev/playwright-best-practices-skill
+    sourceType: github
+    sourceUrl: https://github.com/currents-dev/playwright-best-practices-skill.git
+    skillPath: SKILL.md
+    skillFolderHash: ef329e7e65149918e1ff0eed2cf7d2e6e6f9eb5b
+    installedAt: 2026-03-28T01:31:26.115Z
+    updatedAt: 2026-03-28T01:31:26.115Z
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: f19838929d2126a896ba3626b589cd7a47c4d1c6a5527609e46f5ebf69691aa2
+tags:
+  - bootstrap-import
+  - shared-skill

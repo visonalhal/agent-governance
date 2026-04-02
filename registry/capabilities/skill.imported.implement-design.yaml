@@ -1,0 +1,56 @@
+id: skill.imported.implement-design
+name: implement-design
+assetKind: skill
+runtimeTargets:
+  - codex
+runtimeBindings:
+  codex:
+    skill:
+      syncMode: cache-only
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/implement-design
+install:
+  strategy: copy
+  artifactName: implement-design
+  sourcePath: assets/skills/implement-design
+  manifest:
+    importedFrom: shared-skill-cache
+    source: figma/mcp-server-guide
+    sourceType: github
+    sourceUrl: https://github.com/figma/mcp-server-guide.git
+    skillPath: skills/implement-design/SKILL.md
+    skillFolderHash: 51523284d53fb7815acb784c7e347ffd5418c4f4
+    installedAt: 2026-03-06T06:29:43.112Z
+    updatedAt: 2026-03-06T06:29:43.112Z
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T08:50:04.453Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 2e87927b93592fbc1cf48a58d6359d2894ad5e7611f7e824233bf4f6bb84db61
+tags:
+  - bootstrap-import
+  - shared-skill
