@@ -1,0 +1,19 @@
+machineId: halvin-macbook-pro
+description: Personal macOS workstation for governed Codex, Claude, and Cursor sync.
+workspaceRoot: /Users/halvinshen/Documents/workspace/halvin-workspace
+enabledRuntimes:
+  - codex
+  - claude
+  - cursor
+pathVars: {}
+runtimeTargets:
+  codex:
+    nativeFiles: {}
+    cacheBindings: {}
+  claude:
+    nativeFiles: {}
+    cacheBindings: {}
+  cursor:
+    nativeFiles: {}
+    cacheBindings: {}
+runtimeOverrides: {}

@@ -1,0 +1,17 @@
+policy:
+  name: curated-intake
+  description: >-
+    Discovery catalogs may suggest candidates, but only reviewed, pinned, and
+    explicitly approved capabilities can be published and synced.
+  lifecycle:
+    - candidate
+    - under_review
+    - approved
+    - published
+    - deprecated
+    - blocked
+  rules:
+    - Capabilities from discovery catalogs must map to a canonical upstream source.
+    - T2 and T3 capabilities require a completed review record before approval.
+    - Published capabilities must include ref pinning and a content digest.
+    - Runtime sync must only operate on published capabilities.

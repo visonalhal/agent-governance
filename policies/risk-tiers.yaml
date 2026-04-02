@@ -1,0 +1,20 @@
+riskTiers:
+  - id: T0
+    description: Pure docs or templates with no script execution.
+    requiresReviewRecord: false
+    requiresPinnedHashBeforeApproval: false
+
+  - id: T1
+    description: Reads local context without network access or credentials.
+    requiresReviewRecord: true
+    requiresPinnedHashBeforeApproval: false
+
+  - id: T2
+    description: Executes scripts or uses network access.
+    requiresReviewRecord: true
+    requiresPinnedHashBeforeApproval: true
+
+  - id: T3
+    description: Touches credentials, high-privilege systems, or auto-update paths.
+    requiresReviewRecord: true
+    requiresPinnedHashBeforeApproval: true

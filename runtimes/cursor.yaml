@@ -1,0 +1,26 @@
+runtimeId: cursor
+supportedAssetKinds:
+  - skill
+  - plugin
+  - mcp
+nativeFiles:
+  - name: mcpConfig
+    template: ${HOME}/.cursor/mcp.json
+  - name: userSkillsDir
+    template: ${HOME}/.cursor/skills
+  - name: userSkillsManifest
+    template: ${HOME}/.cursor/skills/.agent-governance-manifest.json
+cacheBindings:
+  - name: skillsDir
+    template: ${CACHE_ROOT}/skills
+  - name: packagesDir
+    template: ${CACHE_ROOT}/packages
+  - name: manifestsDir
+    template: ${CACHE_ROOT}/manifests
+mergeStrategy: cursor-json
+ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/cursor.json
+profileMode: managed
+notes:
+  - Governed custom skills sync into ~/.cursor/skills.
+  - The built-in ~/.cursor/skills-cursor directory remains reserved for Cursor internals.
+  - Only governed MCP servers are merged into ~/.cursor/mcp.json.

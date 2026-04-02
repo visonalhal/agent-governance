@@ -1,0 +1,19 @@
+runtimeId: gemini
+supportedAssetKinds:
+  - skill
+  - plugin
+  - mcp
+nativeFiles: []
+cacheBindings:
+  - name: skillsDir
+    template: ${CACHE_ROOT}/skills
+  - name: packagesDir
+    template: ${CACHE_ROOT}/packages
+  - name: manifestsDir
+    template: ${CACHE_ROOT}/manifests
+mergeStrategy: noop
+ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/gemini.json
+profileMode: review_only
+notes:
+  - Runtime profile exists for governance review only.
+  - Gemini stays out of managed sync in phase 1.

@@ -1,0 +1,9 @@
+policy:
+  name: managed-deprecation
+  description: >-
+    Deprecated capabilities stay in registry history but are excluded from new
+    published outputs and sync operations.
+  rules:
+    - Deprecated capabilities may remain in lock history for rollback.
+    - Blocked capabilities must never appear in published outputs.
+    - Runtime sync removes previously managed deprecated or blocked assets.

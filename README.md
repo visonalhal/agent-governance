@@ -1,0 +1,77 @@
+# Agent Governance
+
+`agent-governance` is the single source of truth for personal, cross-model governance of `skills`, `plugins`, and `MCP` integrations.
+
+The repo stores audited capability metadata, runtime adapter profiles, machine profiles, and deterministic locks. Local runtimes keep their own native config files, but they are rendered and synced from this repo instead of being hand-maintained.
+
+## Operating Model
+
+The system is split into three layers:
+
+- True source: this repo under `halvin-workspace/agent-governance`
+- Shared artifact cache: `~/.agents`, which stores shared `skills/`, `packages/`, and `manifests/`
+- Runtime native config: `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.claude/settings.json`, and related plugin manifests
+
+The flow is always:
+
+1. `ingest` or edit a capability in `registry/capabilities`
+2. `review` and `approve` it
+3. `publish` the global resolution lock
+4. `render` for a machine profile
+5. `sync` one managed runtime into its native config
+
+## Repository Layout
+
+- `registry/`: discovery sources and canonical capability records
+- `policies/`: admission, risk, and deprecation policies
+- `runtimes/`: runtime adapter profiles with portable path templates
+- `machines/`: machine-specific runtime enablement and overrides
+- `locks/`: deterministic global lock plus historical snapshots
+- `generated/`: rendered shared-cache output and machine desired state
+- `scripts/`: CLI entrypoints
+- `src/`: TypeScript implementation
+- `docs/`: operational guides and templates
+
+## Bootstrap
+
+The repo is discovered through a local bootstrap file:
+
+`~/.config/agent-governance/bootstrap.yaml`
+
+Example:
+
+```yaml
+repoPath: /Users/halvinshen/Documents/workspace/halvin-workspace/agent-governance
+machineId: halvin-macbook-pro
+cacheRoot: /Users/halvinshen/.agents
+localSecretsFile: /Users/halvinshen/.config/agent-governance/local/halvin-macbook-pro.yaml
+```
+
+Secrets and machine-local overrides stay outside Git:
+
+`~/.config/agent-governance/local/<machineId>.yaml`
+
+## Commands
+
+- `pnpm governance ingest`
+- `pnpm governance review`
+- `pnpm governance approve`
+- `pnpm governance publish`
+- `pnpm governance render`
+- `pnpm governance sync --runtime <runtime>`
+- `pnpm governance audit`
+- `pnpm governance deprecate`
+- `pnpm governance block`
+
+Use `--bootstrap` to point at a non-default bootstrap file, and `--machine` to render or sync a specific machine profile.
+
+## Managed Runtimes
+
+- `codex`: managed
+  Codex keeps governed plugins and MCP servers in `~/.codex/config.toml`, while shared skills remain in `~/.agents/skills`.
+- `cursor`: managed
+  Cursor gets governed MCP servers in `~/.cursor/mcp.json` and governed custom skills in `~/.cursor/skills`.
+- `claude`: managed
+  Claude gets governed `enabledPlugins`, `known_marketplaces`, and `installed_plugins` records.
+- `gemini`: review_only
+  The profile exists in the registry but phase 1 does not sync it.

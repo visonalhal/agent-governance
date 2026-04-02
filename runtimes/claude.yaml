@@ -1,0 +1,26 @@
+runtimeId: claude
+supportedAssetKinds:
+  - skill
+  - plugin
+  - mcp
+nativeFiles:
+  - name: settings
+    template: ${HOME}/.claude/settings.json
+  - name: knownMarketplaces
+    template: ${HOME}/.claude/plugins/known_marketplaces.json
+  - name: installedPlugins
+    template: ${HOME}/.claude/plugins/installed_plugins.json
+cacheBindings:
+  - name: skillsDir
+    template: ${CACHE_ROOT}/skills
+  - name: packagesDir
+    template: ${CACHE_ROOT}/packages
+  - name: manifestsDir
+    template: ${CACHE_ROOT}/manifests
+mergeStrategy: claude-json
+ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/claude.json
+profileMode: managed
+notes:
+  - Governed plugin enablement is merged into Claude settings.
+  - Marketplace and installed-plugin records are merged into Claude plugin manifests.
+  - Sync never downloads artifacts from the network; it only references repo or shared-cache content.

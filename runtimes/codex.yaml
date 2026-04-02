@@ -1,0 +1,22 @@
+runtimeId: codex
+supportedAssetKinds:
+  - skill
+  - plugin
+  - mcp
+nativeFiles:
+  - name: config
+    template: ${HOME}/.codex/config.toml
+cacheBindings:
+  - name: skillsDir
+    template: ${CACHE_ROOT}/skills
+  - name: packagesDir
+    template: ${CACHE_ROOT}/packages
+  - name: manifestsDir
+    template: ${CACHE_ROOT}/manifests
+mergeStrategy: codex-toml
+ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/codex.json
+profileMode: managed
+notes:
+  - Shared skills live in the shared artifact cache at ~/.agents/skills.
+  - Only governed plugin and MCP entries are merged into ~/.codex/config.toml.
+  - Non-governed model and reasoning settings remain untouched.

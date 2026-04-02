@@ -1,0 +1,4 @@
+repoPath: /absolute/path/to/halvin-workspace/agent-governance
+machineId: your-machine-id
+cacheRoot: /absolute/path/to/.agents
+localSecretsFile: /absolute/path/to/.config/agent-governance/local/your-machine-id.yaml

@@ -1,0 +1,29 @@
+sources:
+  - id: awesome-skills
+    kind: catalog
+    url: https://awesome-skills.com/
+    discoveryOnly: true
+    trustLevel: untrusted-catalog
+    owner: external
+    notes:
+      - Discovery source only.
+      - Never install directly from listing pages.
+
+  - id: skills-sh
+    kind: catalog
+    url: https://skills.sh/
+    discoveryOnly: true
+    trustLevel: untrusted-catalog
+    owner: external
+    notes:
+      - Discovery source only.
+      - Resolve every approved capability back to a canonical upstream repo.
+
+  - id: github-direct
+    kind: repo
+    url: https://github.com/
+    discoveryOnly: false
+    trustLevel: canonical-upstream
+    owner: external
+    notes:
+      - Approved acquisition source for pinned repositories, tags, and commits.
