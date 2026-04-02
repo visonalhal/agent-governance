@@ -30,7 +30,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-04-02T08:50:04.453Z
+  reviewedAt: 2026-04-02T09:15:33.096Z
   license: UNKNOWN
   executesScripts: false
   networkAccess: false
@@ -44,7 +44,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d
+  digest: 19e405e5f71129a13b7fe755433327209ce4d42954d7e38592d542714714eb0b
 tags:
   - bootstrap-import
   - shared-skill

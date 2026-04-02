@@ -61,6 +61,16 @@ Current native targets:
 - Cursor: `~/.cursor/mcp.json` and `~/.cursor/skills`
 - Claude: `~/.claude/settings.json`, `~/.claude/plugins/known_marketplaces.json`, `~/.claude/plugins/installed_plugins.json`
 
+## Source Priority
+
+When something exists in more than one place, the precedence is:
+
+1. This repo under `assets/`, `registry/`, and `locks/`
+2. Rendered output under `generated/`
+3. Runtime-native config and shared cache on the local machine
+
+Do not treat `generated/` or runtime-native files as the place to make durable edits.
+
 ## Import Local State
 
 `pnpm governance import-local`
@@ -68,10 +78,14 @@ Current native targets:
 This command:
 
 - copies the current local shared skill cache and active managed runtime entries into `assets/`
+- dereferences imported symlinks so the repo stores real files instead of machine-private links
+- skips invalid local skills that do not include `SKILL.md`
 - redacts imported secrets into `~/.config/agent-governance/local/<machineId>.yaml`
 - publishes and renders the imported state
 - seeds local managed-state files so the adopted entries stop colliding as unmanaged config
 - syncs the imported state back through the normal governed pipeline
+
+Use `import-local` to adopt existing workstation state. After adoption, edit the repo instead of editing `~/.agents` or runtime-native config files by hand.
 
 ## Rollback
 

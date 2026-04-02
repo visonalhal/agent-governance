@@ -202,8 +202,12 @@ async function main() {
         machineId,
         ...(values.reviewer ? { reviewer: values.reviewer } : {}),
       });
+      const skippedSuffix =
+        summary.skippedSkills.length > 0
+          ? ` Skipped ${summary.skippedSkills.length} invalid skills.`
+          : "";
       console.log(
-        `Imported ${summary.skillCount} skills, ${summary.pluginCount} plugins, and ${summary.mcpCount} MCPs from local machine state.`
+        `Imported ${summary.skillCount} skills, ${summary.pluginCount} plugins, and ${summary.mcpCount} MCPs from local machine state.${skippedSuffix}`
       );
       return;
     }

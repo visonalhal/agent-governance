@@ -28,7 +28,10 @@ import {
   computeDirectoryDigest,
   copyDirectory,
   ensureDir,
+  listAbsoluteSymlinks,
   listFiles,
+  listTopLevelEntries,
+  normalizePosix,
   pathExists,
   readJsonFile,
   readText,
@@ -329,13 +332,11 @@ export async function publishGovernance(root: string) {
     throw new Error(publishErrors.join("\n"));
   }
 
-  for (const capability of publishable) {
-    if (capability.install.strategy === "copy" && capability.install.sourcePath) {
-      const assetPath = resolveAssetPath(root, capability.install.sourcePath);
-      if (!(await pathExists(assetPath))) {
-        throw new Error(`${capability.id}: install.sourcePath does not exist at ${assetPath}.`);
-      }
-    }
+  const assetErrors = (
+    await Promise.all(publishable.map((capability) => validateCopyInstallAsset(root, capability)))
+  ).flat();
+  if (assetErrors.length > 0) {
+    throw new Error(assetErrors.join("\n"));
   }
 
   for (const capability of publishable) {
@@ -371,6 +372,7 @@ export async function renderGovernance(options: {
   bootstrap: BootstrapRecord;
   lockFile?: string;
 }) {
+  await pruneGeneratedRoot(options.root);
   const repo = await loadRepo(options.root);
   const machine = getMachineOrThrow(repo, options.machineId);
   const lock = await readResolutionLock(
@@ -514,6 +516,8 @@ export async function auditGovernance(root: string, options: AuditOptions) {
         findings.push(drift);
       }
     }
+
+    findings.push(...(await validateCopyInstallAsset(root, capability)));
   }
 
   return findings;
@@ -521,7 +525,10 @@ export async function auditGovernance(root: string, options: AuditOptions) {
 
 export async function buildCapabilityReport(capability: CapabilityRecord, repo: RepoState) {
   const approvalErrors = validateCapabilityForApproval(repo, capability);
-  const publishErrors = validateCapabilityForPublish(repo, capability);
+  const publishErrors = [
+    ...validateCapabilityForPublish(repo, capability),
+    ...(await validateCopyInstallAsset(repo.root, capability)),
+  ];
   return {
     capabilityId: capability.id,
     lifecycleState: capability.lifecycleState,
@@ -638,6 +645,20 @@ async function buildSharedCacheManifest(root: string, lock: ResolutionLock) {
     parsed
   );
   return parsed;
+}
+
+async function pruneGeneratedRoot(root: string) {
+  const generatedRoot = path.join(root, "generated");
+  await ensureDir(generatedRoot);
+
+  const allowedEntries = new Set(["README.md", "machines", "shared-cache"]);
+  const entries = await listTopLevelEntries(generatedRoot);
+  for (const entry of entries) {
+    if (allowedEntries.has(entry.name)) {
+      continue;
+    }
+    await removePath(entry.path);
+  }
 }
 
 function buildRenderedRuntimeState(args: {
@@ -853,6 +874,47 @@ function validateCapabilityForPublish(repo: RepoState, capability: CapabilityRec
   if (capability.install.strategy === "copy" && !capability.install.sourcePath) {
     errors.push(`${capability.id}: copy strategy requires install.sourcePath.`);
   }
+  return errors;
+}
+
+async function validateCopyInstallAsset(root: string, capability: CapabilityRecord) {
+  if (capability.install.strategy !== "copy") {
+    return [];
+  }
+
+  const errors: string[] = [];
+  if (!capability.install.sourcePath) {
+    errors.push(`${capability.id}: copy strategy requires install.sourcePath.`);
+    return errors;
+  }
+
+  const assetPath = resolveAssetPath(root, capability.install.sourcePath);
+  if (!(await pathExists(assetPath))) {
+    errors.push(`${capability.id}: install.sourcePath does not exist at ${assetPath}.`);
+    return errors;
+  }
+
+  if (capability.assetKind === "skill") {
+    const skillEntryPath = path.join(assetPath, "SKILL.md");
+    if (!(await pathExists(skillEntryPath))) {
+      errors.push(
+        `${capability.id}: skill assets must include SKILL.md at ${normalizePosix(
+          path.join(capability.install.sourcePath, "SKILL.md")
+        )}.`
+      );
+    }
+  }
+
+  const absoluteSymlinks = await listAbsoluteSymlinks(assetPath);
+  for (const symlinkPath of absoluteSymlinks) {
+    const relativePath = normalizePosix(path.relative(assetPath, symlinkPath));
+    errors.push(
+      `${capability.id}: copy asset contains absolute symlink ${normalizePosix(
+        path.join(capability.install.sourcePath, relativePath)
+      )}.`
+    );
+  }
+
   return errors;
 }
 

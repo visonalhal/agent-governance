@@ -134,6 +134,51 @@ export async function listTopLevelEntries(targetDir: string) {
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
+export async function copyDirectoryResolved(sourceDir: string, targetDir: string) {
+  await ensureDir(path.dirname(targetDir));
+  await fs.cp(sourceDir, targetDir, {
+    recursive: true,
+    force: true,
+    dereference: true,
+    filter: (entryPath) => {
+      const name = path.basename(entryPath);
+      return name !== ".git" && name !== ".DS_Store";
+    },
+  });
+}
+
+export async function listAbsoluteSymlinks(targetPath: string) {
+  if (!(await pathExists(targetPath))) {
+    return [];
+  }
+
+  const collected: string[] = [];
+
+  async function walk(currentPath: string): Promise<void> {
+    const stat = await fs.lstat(currentPath);
+    if (stat.isSymbolicLink()) {
+      const linkTarget = await fs.readlink(currentPath);
+      if (path.isAbsolute(linkTarget)) {
+        collected.push(currentPath);
+      }
+      return;
+    }
+
+    if (!stat.isDirectory()) {
+      return;
+    }
+
+    const dirents = await fs.readdir(currentPath, { withFileTypes: true });
+    const sorted = [...dirents].sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of sorted) {
+      await walk(path.join(currentPath, entry.name));
+    }
+  }
+
+  await walk(targetPath);
+  return collected;
+}
+
 async function walkFiles(rootDir: string): Promise<string[]> {
   const collected: string[] = [];
 

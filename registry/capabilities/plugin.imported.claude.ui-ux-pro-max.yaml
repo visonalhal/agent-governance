@@ -47,7 +47,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-04-02T08:50:04.453Z
+  reviewedAt: 2026-04-02T09:15:33.096Z
   license: MIT
   executesScripts: true
   networkAccess: true
@@ -61,7 +61,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 5876980eb84a8cc027a29bb054e344b29e78f16e45b5967d0f55da1d7fcd126b
+  digest: d8128fcdae42320e5164eef2b97f11116109b6dba3974bbb448b036dcdc0d05d
 tags:
   - bootstrap-import
   - claude-plugin

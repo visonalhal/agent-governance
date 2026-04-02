@@ -22,16 +22,13 @@ The flow is always:
 
 ## Repository Layout
 
-- `registry/`: discovery sources and canonical capability records
-- `assets/`: source-controlled managed skills and packages used as repo-owned source assets
-- `policies/`: admission, risk, and deprecation policies
-- `runtimes/`: runtime adapter profiles with portable path templates
-- `machines/`: machine-specific runtime enablement and overrides
-- `locks/`: deterministic global lock plus historical snapshots
-- `generated/`: rendered shared-cache output and machine desired state
-- `scripts/`: CLI entrypoints
-- `src/`: TypeScript implementation
-- `docs/`: operational guides and templates
+- `assets/`, `registry/`, and `locks/` are the repo-owned source of truth.
+- `generated/` is derived output only and is rebuilt by `render`.
+- `machines/` and `runtimes/` define where rendered state lands.
+- `src/` and `scripts/` implement the governance engine.
+- `tests/` and `docs/` hold verification and operational guidance.
+
+See `docs/repo-structure.md` for the canonical directory guide.
 
 ## Bootstrap
 

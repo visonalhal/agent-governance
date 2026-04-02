@@ -574,6 +574,7 @@ describe.sequential("agent governance", () => {
       expect(summary.skillCount).toBe(1);
       expect(summary.pluginCount).toBe(2);
       expect(summary.mcpCount).toBe(2);
+      expect(summary.skippedSkills).toEqual([]);
       expect(summary.syncedRuntimes).toEqual(["codex", "cursor", "claude"]);
 
       expect(
@@ -645,6 +646,125 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("dereferences imported assets and skips invalid local skills during import-local", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const validSkillDir = path.join(sandbox.cacheRoot, "skills", "linked-skill");
+      await fs.mkdir(validSkillDir, { recursive: true });
+      await fs.writeFile(
+        path.join(validSkillDir, "SKILL.md"),
+        "# Linked Skill\n\nA valid skill fixture.\n",
+        "utf8"
+      );
+
+      const externalSkillNote = path.join(sandbox.home, "external-skill-note.md");
+      await fs.writeFile(externalSkillNote, "external skill note\n", "utf8");
+      await fs.symlink(externalSkillNote, path.join(validSkillDir, "notes.md"));
+
+      const invalidSkillDir = path.join(sandbox.cacheRoot, "skills", "invalid-skill");
+      await fs.mkdir(invalidSkillDir, { recursive: true });
+      await fs.writeFile(path.join(invalidSkillDir, "README.md"), "missing skill entry\n", "utf8");
+
+      const codexPluginDir = path.join(
+        sandbox.home,
+        ".codex",
+        ".tmp",
+        "plugins",
+        "plugins",
+        "linked-plugin"
+      );
+      await fs.mkdir(path.join(codexPluginDir, ".codex-plugin"), { recursive: true });
+      await fs.writeFile(
+        path.join(codexPluginDir, ".codex-plugin", "plugin.json"),
+        JSON.stringify(
+          {
+            name: "linked-plugin",
+            version: "1.0.0",
+            license: "MIT",
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+
+      const externalPluginNote = path.join(sandbox.home, "external-plugin-note.txt");
+      await fs.writeFile(externalPluginNote, "external plugin note\n", "utf8");
+      await fs.symlink(externalPluginNote, path.join(codexPluginDir, "notes.txt"));
+
+      await fs.writeFile(
+        path.join(sandbox.home, ".codex", "config.toml"),
+        ['[plugins."linked-plugin@governed-marketplace"]', "enabled = true", ""].join("\n"),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".cursor", "mcp.json"),
+        JSON.stringify({ mcpServers: {} }, null, 2),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "settings.json"),
+        JSON.stringify(
+          {
+            enabledPlugins: {},
+          },
+          null,
+          2
+        ),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "plugins", "known_marketplaces.json"),
+        JSON.stringify({}, null, 2),
+        "utf8"
+      );
+      await fs.writeFile(
+        path.join(sandbox.home, ".claude", "plugins", "installed_plugins.json"),
+        JSON.stringify({ version: 2, plugins: {} }, null, 2),
+        "utf8"
+      );
+
+      const bootstrap = await loadBootstrap(sandbox.bootstrapPath);
+      const summary = await importLocalMachineState({
+        root: sandbox.root,
+        bootstrap,
+        machineId: sandbox.machineId,
+        reviewer: "Bootstrap Reviewer",
+        syncRuntimes: false,
+      });
+
+      expect(summary.skillCount).toBe(1);
+      expect(summary.pluginCount).toBe(1);
+      expect(summary.mcpCount).toBe(0);
+      expect(summary.skippedSkills).toEqual(["invalid-skill"]);
+      expect(summary.syncedRuntimes).toEqual([]);
+
+      const importedSkillNote = path.join(
+        sandbox.root,
+        "assets",
+        "skills",
+        "linked-skill",
+        "notes.md"
+      );
+      const importedPluginNote = path.join(
+        sandbox.root,
+        "assets",
+        "packages",
+        "codex-linked-plugin",
+        "notes.txt"
+      );
+
+      expect((await fs.lstat(importedSkillNote)).isSymbolicLink()).toBe(false);
+      expect((await fs.lstat(importedPluginNote)).isSymbolicLink()).toBe(false);
+      expect(await fs.readFile(importedSkillNote, "utf8")).toBe("external skill note\n");
+      expect(await fs.readFile(importedPluginNote, "utf8")).toBe("external plugin note\n");
+      expect(await exists(path.join(sandbox.root, "assets", "skills", "invalid-skill"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
   it("fails sync when a required secret is missing", async () => {
     const sandbox = await createSandbox();
 
@@ -683,6 +803,64 @@ describe.sequential("agent governance", () => {
           bootstrap,
         })
       ).rejects.toThrow("Missing required secret API_TOKEN");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("fails publish when a copy skill asset is missing SKILL.md", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.invalid-skill",
+        runtimeTargets: ["codex"],
+      });
+
+      const invalidSkillDir = path.join(sandbox.root, "tests", "fixtures", "assets", "invalid-skill");
+      await fs.mkdir(invalidSkillDir, { recursive: true });
+      await fs.writeFile(path.join(invalidSkillDir, "README.md"), "missing skill entry\n", "utf8");
+
+      await mutateCapability(sandbox.root, "skill.vendor.invalid-skill", (capability) => {
+        capability.install.sourcePath = "tests/fixtures/assets/invalid-skill";
+      });
+
+      await expect(publishGovernance(sandbox.root)).rejects.toThrow("skill assets must include SKILL.md");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("flags absolute symlinks in copy assets during publish and audit", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.symlink-skill",
+        runtimeTargets: ["codex"],
+      });
+
+      const symlinkSkillDir = path.join(sandbox.root, "tests", "fixtures", "assets", "symlink-skill");
+      await fs.mkdir(symlinkSkillDir, { recursive: true });
+      await fs.writeFile(path.join(symlinkSkillDir, "SKILL.md"), "# Symlink Skill\n", "utf8");
+
+      const externalFile = path.join(sandbox.root, "tests", "fixtures", "assets", "external-note.md");
+      await fs.writeFile(externalFile, "absolute symlink target\n", "utf8");
+      await fs.symlink(externalFile, path.join(symlinkSkillDir, "notes.md"));
+
+      await mutateCapability(sandbox.root, "skill.vendor.symlink-skill", (capability) => {
+        capability.install.sourcePath = "tests/fixtures/assets/symlink-skill";
+      });
+
+      await expect(publishGovernance(sandbox.root)).rejects.toThrow("copy asset contains absolute symlink");
+
+      const findings = await auditGovernance(sandbox.root, {
+        staleDays: 3650,
+        checkUpstream: false,
+      });
+      expect(findings.some((finding) => finding.includes("copy asset contains absolute symlink"))).toBe(
+        true
+      );
     } finally {
       await sandbox.cleanup();
     }
@@ -803,6 +981,36 @@ describe.sequential("agent governance", () => {
 
       expect(await exists(path.join(sandbox.cacheRoot, "skills", "first-skill", "SKILL.md"))).toBe(true);
       expect(await exists(path.join(sandbox.cacheRoot, "skills", "second-skill"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("prunes unexpected generated top-level directories during render", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.generated-cleanup",
+        runtimeTargets: ["codex"],
+      });
+
+      await fs.mkdir(path.join(sandbox.root, "generated", "claude"), { recursive: true });
+      await fs.writeFile(path.join(sandbox.root, "generated", "claude", "stale.txt"), "stale\n", "utf8");
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+
+      expect(await exists(path.join(sandbox.root, "generated", "claude"))).toBe(false);
+      expect(await exists(path.join(sandbox.root, "generated", "shared-cache"))).toBe(true);
+      expect(
+        await exists(path.join(sandbox.root, "generated", "machines", sandbox.machineId, "codex"))
+      ).toBe(true);
     } finally {
       await sandbox.cleanup();
     }

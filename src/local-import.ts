@@ -17,6 +17,7 @@ import {
   sourcesFileSchema,
 } from "./schema.js";
 import {
+  copyDirectoryResolved,
   computeDirectoryDigest,
   computeValueDigest,
   ensureDir,
@@ -53,6 +54,7 @@ type ImportedSummary = {
   capabilityIds: string[];
   mcpCount: number;
   pluginCount: number;
+  skippedSkills: string[];
   secretNames: string[];
   skillCount: number;
   syncedRuntimes: string[];
@@ -114,16 +116,18 @@ export async function importLocalMachineState(options: {
   await removePath(assetsRoot);
   await ensureDir(assetsRoot);
 
+  const sharedSkillImport = await importSharedSkills({
+    bootstrap: options.bootstrap,
+    localSecrets,
+    repoRoot: options.root,
+    repoSource,
+    reviewTimestamp,
+    reviewer,
+  });
   importedCapabilities.push(
-    ...(await importSharedSkills({
-      bootstrap: options.bootstrap,
-      localSecrets,
-      repoRoot: options.root,
-      repoSource,
-      reviewTimestamp,
-      reviewer,
-    }))
+    ...sharedSkillImport.capabilities
   );
+  const skippedSkills = sharedSkillImport.skippedSkills;
 
   importedCapabilities.push(
     ...(await importCodexRuntimeState({
@@ -190,6 +194,7 @@ export async function importLocalMachineState(options: {
     skillCount: importedCapabilities.filter((capability) => capability.assetKind === "skill").length,
     pluginCount: importedCapabilities.filter((capability) => capability.assetKind === "plugin").length,
     mcpCount: importedCapabilities.filter((capability) => capability.assetKind === "mcp").length,
+    skippedSkills,
     secretNames: Object.keys(localSecrets.secrets).sort(),
     syncedRuntimes,
   };
@@ -205,7 +210,10 @@ async function importSharedSkills(args: {
 }) {
   const skillsRoot = path.join(args.bootstrap.cacheRoot, "skills");
   if (!(await pathExists(skillsRoot))) {
-    return [];
+    return {
+      capabilities: [],
+      skippedSkills: [],
+    };
   }
 
   const lockFile = await readOptionalJson<SkillLockFile>(
@@ -213,6 +221,7 @@ async function importSharedSkills(args: {
     {}
   );
   const capabilities: CapabilityRecord[] = [];
+  const skippedSkills: string[] = [];
   const skillEntries = await listTopLevelEntries(skillsRoot);
 
   for (const entry of skillEntries) {
@@ -220,6 +229,7 @@ async function importSharedSkills(args: {
       continue;
     }
     if (!(await pathExists(path.join(entry.path, "SKILL.md")))) {
+      skippedSkills.push(entry.name);
       continue;
     }
 
@@ -290,7 +300,10 @@ async function importSharedSkills(args: {
     );
   }
 
-  return capabilities;
+  return {
+    capabilities,
+    skippedSkills,
+  };
 }
 
 async function importCodexRuntimeState(args: {
@@ -1001,13 +1014,5 @@ function resolveHomeDir() {
 }
 
 async function copyImportedDirectory(sourceDir: string, targetDir: string) {
-  await ensureDir(path.dirname(targetDir));
-  await fs.cp(sourceDir, targetDir, {
-    recursive: true,
-    force: true,
-    filter: (entryPath) => {
-      const name = path.basename(entryPath);
-      return name !== ".git" && name !== ".DS_Store";
-    },
-  });
+  await copyDirectoryResolved(sourceDir, targetDir);
 }
