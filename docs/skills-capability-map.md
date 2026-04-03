@@ -36,7 +36,7 @@
 
 ## 当前库存和启用现状
 
-按 `generated/shared-cache/manifests/shared-cache-manifest.json`，当前共享 skill 库里有 **20 个 skills**。
+按 `generated/shared-cache/manifests/shared-cache-manifest.json`，当前共享 skill 库里有 **22 个 skills**。
 
 当前 runtime 启用情况:
 
@@ -218,4 +218,3 @@
 - **做 PM 工作**: `product-manager-toolkit`
 - **做 skill 本身**: `skill-creator`
 - **做实现计划**: `writing-plans`
-

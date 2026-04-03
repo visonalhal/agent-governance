@@ -1,0 +1,53 @@
+id: skill.next-best-practices
+name: next-best-practices
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/next-best-practices
+install:
+  strategy: copy
+  artifactName: next-best-practices
+  sourcePath: assets/skills/next-best-practices
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/next-best-practices
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-03T07:43:08Z
+  license: UNKNOWN
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: true
+  filesystemSideEffects: none
+  notes:
+    - Recovered from the local shared skill cache and normalized into governance-managed assets.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 964b654986d68ad1b050b33ac40806ce6724ce42f456f3f722c0285edd9b9470
+tags:
+  - bootstrap-seeded
+  - shared-skill

@@ -1,0 +1,53 @@
+id: skill.code-review
+name: code-review
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/code-review
+install:
+  strategy: copy
+  artifactName: code-review
+  sourcePath: assets/skills/code-review
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/code-review
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-03T07:43:08Z
+  license: UNKNOWN
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: true
+  filesystemSideEffects: none
+  notes:
+    - Recovered from the local shared skill cache and normalized into governance-managed assets.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 1fe40f338e494139a3bc8324b5493da666a0384ed83e75f49bb8d865ffc0299c
+tags:
+  - bootstrap-seeded
+  - shared-skill
