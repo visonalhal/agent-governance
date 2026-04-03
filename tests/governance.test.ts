@@ -1099,6 +1099,62 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("adopts empty and identical shared cache entries during sync", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.empty-cache-adopt",
+        runtimeTargets: ["codex"],
+      });
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.identical-cache-adopt",
+        runtimeTargets: ["codex"],
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+
+      await fs.mkdir(path.join(sandbox.cacheRoot, "skills", "empty-cache-adopt"), {
+        recursive: true,
+      });
+      await fs.cp(
+        path.join(sandbox.root, "generated", "shared-cache", "skills", "identical-cache-adopt"),
+        path.join(sandbox.cacheRoot, "skills", "identical-cache-adopt"),
+        { recursive: true }
+      );
+
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      expect(
+        await exists(path.join(sandbox.cacheRoot, "skills", "empty-cache-adopt", "SKILL.md"))
+      ).toBe(true);
+      expect(
+        await exists(path.join(sandbox.cacheRoot, "skills", "identical-cache-adopt", "SKILL.md"))
+      ).toBe(true);
+
+      const cacheState = JSON.parse(
+        await fs.readFile(path.join(sandbox.cacheRoot, ".agent-governance-cache-state.json"), "utf8")
+      ) as {
+        managedPaths: string[];
+      };
+      expect(cacheState.managedPaths).toContain("skills/empty-cache-adopt");
+      expect(cacheState.managedPaths).toContain("skills/identical-cache-adopt");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
   it("detects lock drift during audit after registry mutation", async () => {
     const sandbox = await createSandbox();
 

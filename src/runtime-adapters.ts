@@ -2,6 +2,7 @@ import path from "node:path";
 import TOML from "@iarna/toml";
 import type { RenderedRuntimeState } from "./schema.js";
 import {
+  computeDirectoryDigest,
   copyDirectory,
   copyFile,
   ensureDir,
@@ -50,7 +51,11 @@ export async function syncSharedArtifactCache(
     const sourcePath = path.join(generatedSharedCacheDir, relativePath);
     const targetPath = path.join(cacheRoot, relativePath);
 
-    if ((await pathExists(targetPath)) && !previousSet.has(relativePath)) {
+    if (
+      (await pathExists(targetPath)) &&
+      !previousSet.has(relativePath) &&
+      !(await canAdoptUnmanagedCacheEntry(sourcePath, targetPath))
+    ) {
       throw new Error(`Shared cache collision at ${targetPath}.`);
     }
 
@@ -324,6 +329,28 @@ async function collectManagedPaths(rootDir: string) {
   }
 
   return managed.sort();
+}
+
+async function canAdoptUnmanagedCacheEntry(sourcePath: string, targetPath: string) {
+  const sourceStat = await pathStat(sourcePath);
+  const targetStat = await pathStat(targetPath);
+
+  if (!sourceStat || !targetStat || sourceStat !== targetStat) {
+    return false;
+  }
+
+  if (targetStat === "directory") {
+    const existingEntries = await listTopLevelEntries(targetPath);
+    if (existingEntries.length === 0) {
+      return true;
+    }
+  }
+
+  const [sourceDigest, targetDigest] = await Promise.all([
+    computeDirectoryDigest(sourcePath),
+    computeDirectoryDigest(targetPath),
+  ]);
+  return sourceDigest === targetDigest;
 }
 
 async function copyEntry(sourcePath: string, targetPath: string) {
