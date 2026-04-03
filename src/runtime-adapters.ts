@@ -14,6 +14,9 @@ import {
   writeText,
 } from "./io.js";
 
+// Runtime adapters own the final merge into native config files.
+// They protect unmanaged user state by tracking previously governed keys and refusing collisions.
+
 type CacheState = {
   managedPaths: string[];
 };

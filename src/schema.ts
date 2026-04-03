@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+// The schema module is the shared vocabulary for the whole repo.
+// Read this file first when you need to re-establish what the core records mean.
+
 export const lifecycleStates = [
   "candidate",
   "under_review",

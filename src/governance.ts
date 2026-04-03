@@ -55,6 +55,10 @@ import {
 const execFileAsync = promisify(execFile);
 const CACHE_STATE_FILE = ".agent-governance-cache-state.json";
 
+// Main governance lifecycle orchestration lives here:
+// registry authoring -> approval/publish -> machine render -> runtime sync -> audit.
+// Public entrypoints stay near the top of the file; helpers are grouped lower down.
+
 type RepoState = {
   root: string;
   sources: Map<string, SourceRecord>;
@@ -105,6 +109,7 @@ export type AuditOptions = {
   checkUpstream: boolean;
 };
 
+// Repository discovery and loading.
 export async function resolveContext(options: {
   root?: string;
   bootstrapPath?: string;
@@ -543,6 +548,7 @@ export async function loadBootstrap(bootstrapPath: string) {
   return bootstrapSchema.parse(await readYamlFile(bootstrapPath));
 }
 
+// Publish and render helpers.
 function buildResolutionLock(publishedCapabilities: CapabilityRecord[]): ResolutionLock {
   const generatedAt = deriveDeterministicTimestamp(publishedCapabilities);
   return resolutionLockSchema.parse({
@@ -1058,6 +1064,7 @@ function deepMerge(base: unknown, override: unknown): unknown {
   return merged;
 }
 
+// Validation and lookup helpers.
 function validateCapabilityForApproval(repo: RepoState, capability: CapabilityRecord) {
   const errors = validateCapabilityBase(repo, capability);
   const requiresReview = capability.riskTier !== "T0";

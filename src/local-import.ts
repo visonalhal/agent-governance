@@ -47,6 +47,10 @@ const execFileAsync = promisify(execFile);
 const BOOTSTRAP_IMPORT_TAG = "bootstrap-seeded";
 const GOVERNANCE_SOURCE_ID = "governance-repo";
 
+// This file is the adoption path for existing local state.
+// It is intentionally separate from the normal governance lifecycle in src/governance.ts.
+// Day-to-day capability authoring usually does not need to read this file.
+
 type LocalSecretsAccumulator = {
   runtimeLocalOverrides: Record<string, unknown>;
   secrets: Record<string, string>;
@@ -123,6 +127,7 @@ type SkillLockFile = {
   skills?: Record<string, SkillLockRecord>;
 };
 
+// Public bootstrap/import entrypoint.
 export async function importLocalMachineState(options: {
   bootstrap: BootstrapRecord;
   machineId?: string;
@@ -711,6 +716,7 @@ async function importClaudeRuntimeState(args: {
   };
 }
 
+// Capability construction helpers.
 function buildSeededCapability(
   input: SeededCapabilityInput & {
     repoSource: RepoSource;
@@ -868,6 +874,7 @@ async function ensureGovernanceRepoSource(root: string): Promise<RepoSource> {
   };
 }
 
+// Runtime policy and managed-state helpers.
 function buildExistingCapabilityIndex(capabilities: CapabilityRecord[]): ExistingCapabilityIndex {
   const byId = new Map<string, CapabilityRecord>();
   const mcpsByName = new Map<string, CapabilityRecord>();
@@ -1108,6 +1115,7 @@ async function ensurePluginAssetRoot(
   return relativePath;
 }
 
+// Secret extraction and normalization helpers.
 function resolvePluginAssetPath(existingCapability: CapabilityRecord | undefined, pluginName: string) {
   for (const candidate of [
     existingCapability?.install.sourcePath,

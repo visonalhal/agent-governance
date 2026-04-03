@@ -2,6 +2,8 @@
 
 `agent-governance` treats this repo as the authoritative source for governed agent assets and policies. Everything else is either rendered output or machine-local state.
 
+If you want the shortest "how do I read this codebase?" path, read `docs/how-to-read-this-repo.md` first and come back here for directory detail.
+
 ## Source of Truth
 
 - `assets/`

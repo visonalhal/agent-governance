@@ -4,6 +4,8 @@
 
 The repo stores audited capability metadata, abstract capability bindings, runtime adapter profiles, machine profiles, and deterministic locks. Local runtimes keep their own native config files, but they are rendered and synced from this repo instead of being hand-maintained.
 
+If you're trying to get your bearings again, start with `docs/how-to-read-this-repo.md`. It explains the real execution path and which parts of the tree matter most day to day.
+
 ## Operating Model
 
 The system is split into three layers:
@@ -33,6 +35,7 @@ The flow is always:
 - `tests/` and `docs/` hold verification and operational guidance.
 
 See `docs/repo-structure.md` for the canonical directory guide.
+See `docs/how-to-read-this-repo.md` for the fastest reading order back into the codebase.
 
 ## Bootstrap
 
