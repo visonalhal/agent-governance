@@ -20,9 +20,9 @@ This backlog tracks follow-up governance work inside the repo. Each item states 
 
 ### Capability Provenance and Install Manifest Tightening
 
-- Problem: imported manifests still mix provenance hints, runtime details, and historical install metadata with uneven structure.
+- Problem: bootstrap-seeded manifests still mix provenance hints, runtime details, and historical install metadata with uneven structure.
 - Expected result: capability install manifests become easier to read, compare, and validate across skills, plugins, and MCP entries.
-- Done when: imported capability records follow one consistent manifest shape and validation catches missing required provenance fields.
+- Done when: seeded capability records follow one consistent manifest shape and validation catches missing required provenance fields.
 
 ### Project Overlay Workflow
 

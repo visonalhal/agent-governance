@@ -83,14 +83,19 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
 
   const pluginsSection = ensureRecord(parsed, "plugins");
   for (const plugin of runtimeState.plugins) {
-    assertUnmanagedCollision(pluginsSection, plugin.pluginId, managedPluginIds, "Codex plugin");
+    assertUnmanagedCollision(
+      pluginsSection,
+      plugin.nativeRegistration.pluginId,
+      managedPluginIds,
+      "Codex plugin"
+    );
   }
   for (const pluginId of state.managedPluginIds) {
     delete pluginsSection[pluginId];
   }
   for (const plugin of runtimeState.plugins) {
-    pluginsSection[plugin.pluginId] = {
-      enabled: plugin.enabled,
+    pluginsSection[plugin.nativeRegistration.pluginId] = {
+      enabled: plugin.nativeRegistration.enabled,
     };
   }
 
@@ -107,7 +112,7 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
 
   await writeText(configPath, TOML.stringify(parsed));
   await writeJsonFile(statePath, {
-    managedPluginIds: runtimeState.plugins.map((plugin) => plugin.pluginId),
+    managedPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
     managedMcpServerNames: runtimeState.mcps.map((mcp) => mcp.serverName),
   });
 }
@@ -190,7 +195,7 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
   for (const plugin of runtimeState.plugins) {
     assertUnmanagedCollision(
       enabledPlugins,
-      plugin.pluginId,
+      plugin.nativeRegistration.pluginId,
       managedEnabledPluginIds,
       "Claude enabled plugin"
     );
@@ -199,14 +204,14 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
     delete enabledPlugins[pluginId];
   }
   for (const plugin of runtimeState.plugins) {
-    enabledPlugins[plugin.pluginId] = plugin.enabled;
+    enabledPlugins[plugin.nativeRegistration.pluginId] = plugin.nativeRegistration.enabled;
   }
 
   const knownMarketplaces = (await pathExists(knownMarketplacesPath))
     ? await readJsonFile<Record<string, unknown>>(knownMarketplacesPath)
     : {};
   for (const plugin of runtimeState.plugins) {
-    const marketplaceId = asString(plugin.knownMarketplace?.marketplaceId);
+    const marketplaceId = asString(plugin.nativeRegistration.knownMarketplace?.marketplaceId);
     if (marketplaceId) {
       assertUnmanagedCollision(
         knownMarketplaces,
@@ -220,9 +225,9 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
     delete knownMarketplaces[marketplaceId];
   }
   for (const plugin of runtimeState.plugins) {
-    const marketplaceId = asString(plugin.knownMarketplace?.marketplaceId);
-    if (marketplaceId && plugin.knownMarketplace) {
-      knownMarketplaces[marketplaceId] = stripMarketplaceId(plugin.knownMarketplace);
+    const marketplaceId = asString(plugin.nativeRegistration.knownMarketplace?.marketplaceId);
+    if (marketplaceId && plugin.nativeRegistration.knownMarketplace) {
+      knownMarketplaces[marketplaceId] = stripMarketplaceId(plugin.nativeRegistration.knownMarketplace);
     }
   }
 
@@ -231,10 +236,10 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
     : { version: 2, plugins: {} };
   const pluginsSection = ensureRecord(installedPlugins, "plugins");
   for (const plugin of runtimeState.plugins) {
-    if (plugin.installedRecords.length > 0) {
+    if (plugin.nativeRegistration.installedRecords.length > 0) {
       assertUnmanagedCollision(
         pluginsSection,
-        plugin.pluginId,
+        plugin.nativeRegistration.pluginId,
         managedInstalledPluginIds,
         "Claude installed plugin"
       );
@@ -244,8 +249,8 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
     delete pluginsSection[pluginId];
   }
   for (const plugin of runtimeState.plugins) {
-    if (plugin.installedRecords.length > 0) {
-      pluginsSection[plugin.pluginId] = plugin.installedRecords;
+    if (plugin.nativeRegistration.installedRecords.length > 0) {
+      pluginsSection[plugin.nativeRegistration.pluginId] = plugin.nativeRegistration.installedRecords;
     }
   }
 
@@ -253,13 +258,13 @@ export async function syncClaudeRuntime(runtimeState: RenderedRuntimeState) {
   await writeJsonFile(knownMarketplacesPath, knownMarketplaces);
   await writeJsonFile(installedPluginsPath, installedPlugins);
   await writeJsonFile(statePath, {
-    managedEnabledPluginIds: runtimeState.plugins.map((plugin) => plugin.pluginId),
+    managedEnabledPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
     managedMarketplaceIds: runtimeState.plugins
-      .map((plugin) => asString(plugin.knownMarketplace?.marketplaceId))
+      .map((plugin) => asString(plugin.nativeRegistration.knownMarketplace?.marketplaceId))
       .filter((value): value is string => Boolean(value)),
     managedInstalledPluginIds: runtimeState.plugins
-      .filter((plugin) => plugin.installedRecords.length > 0)
-      .map((plugin) => plugin.pluginId),
+      .filter((plugin) => plugin.nativeRegistration.installedRecords.length > 0)
+      .map((plugin) => plugin.nativeRegistration.pluginId),
   });
 }
 

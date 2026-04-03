@@ -1,0 +1,49 @@
+id: mcp.clerk
+name: clerk
+assetKind: mcp
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: registry/capabilities/mcp/clerk.yaml
+install:
+  strategy: manifest
+  artifactName: clerk
+  manifest:
+    seededFrom: /Users/halvinshen/.cursor/mcp.json
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: CONFIG_ONLY
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime MCP process access
+  notes:
+    - Seeded from cursor runtime MCP configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: cfbc26501fff8cee3db6ea7fb88142eba37ad0c1c2a89bd8ac53a749ebc0ee29
+tags:
+  - bootstrap-seeded
+  - cursor-mcp
+bindings:
+  remote-http:
+    mcp:
+      serverName: clerk
+      config:
+        headers: {}
+        url: https://mcp.clerk.com/mcp

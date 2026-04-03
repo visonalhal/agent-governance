@@ -207,7 +207,7 @@ async function main() {
           ? ` Skipped ${summary.skippedSkills.length} invalid skills.`
           : "";
       console.log(
-        `Imported ${summary.skillCount} skills, ${summary.pluginCount} plugins, and ${summary.mcpCount} MCPs from local machine state.${skippedSuffix}`
+        `Seeded ${summary.skillCount} skills, ${summary.pluginCount} plugins, ${summary.pluginBindingCount} plugin bindings, and ${summary.mcpCount} MCPs from local machine state.${skippedSuffix}`
       );
       return;
     }

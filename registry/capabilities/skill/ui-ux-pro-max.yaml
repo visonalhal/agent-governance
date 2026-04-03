@@ -1,0 +1,51 @@
+id: skill.ui-ux-pro-max
+name: ui-ux-pro-max
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/ui-ux-pro-max
+install:
+  strategy: copy
+  artifactName: ui-ux-pro-max
+  sourcePath: assets/skills/ui-ux-pro-max
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/ui-ux-pro-max
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Seeded from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 19e405e5f71129a13b7fe755433327209ce4d42954d7e38592d542714714eb0b
+tags:
+  - bootstrap-seeded
+  - shared-skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir

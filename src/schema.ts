@@ -9,13 +9,23 @@ export const lifecycleStates = [
   "blocked",
 ] as const;
 
-export const assetKinds = ["skill", "plugin", "mcp"] as const;
+export const assetKinds = ["skill", "plugin", "mcp", "command", "agent"] as const;
 export const runtimeProfileModes = ["managed", "review_only"] as const;
 export const refTypes = ["branch", "tag", "commit"] as const;
 export const riskTiers = ["T0", "T1", "T2", "T3"] as const;
+export const skillBindingIds = ["cache", "user-dir"] as const;
+export const mcpBindingIds = ["remote-http", "stdio-command"] as const;
+export const pluginBindingIds = ["package", "marketplace", "external"] as const;
 
 export const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
-  z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)])
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null(),
+    z.array(jsonValueSchema),
+    z.record(z.string(), jsonValueSchema),
+  ])
 );
 
 export const jsonObjectSchema = z.record(z.string(), jsonValueSchema);
@@ -96,19 +106,37 @@ export const runtimeMcpBindingSchema = z.object({
   config: jsonObjectSchema,
 });
 
-export const runtimeBindingSchema = z.object({
+export const legacyRuntimeBindingSchema = z.object({
   skill: runtimeSkillBindingSchema.optional(),
   plugin: runtimePluginBindingSchema.optional(),
   mcp: runtimeMcpBindingSchema.optional(),
 });
 
+export const pluginInstallBindingSchema = z.object({
+  install: installSchema,
+  nativeRegistration: runtimePluginBindingSchema,
+});
+
+export const capabilityBindingSchema = z.object({
+  skill: runtimeSkillBindingSchema.optional(),
+  plugin: pluginInstallBindingSchema.optional(),
+  mcp: runtimeMcpBindingSchema.optional(),
+});
+
+export const pluginEntrypointsSchema = z.object({
+  commands: z.array(z.string().min(1)).default([]),
+  agents: z.array(z.string().min(1)).default([]),
+});
+
 export const capabilitySchema = z.object({
-  id: z.string().regex(/^(skill|plugin|mcp)\.[a-z0-9-]+(?:\.[a-z0-9-]+)+$/),
+  id: z.string().regex(/^(skill|plugin|mcp|command|agent)\.[a-z0-9-]+(?:\.[a-z0-9-]+)*$/),
   name: z.string().min(1),
   assetKind: z.enum(assetKinds),
-  runtimeTargets: z.array(z.string().min(1)).default([]),
-  runtimeBindings: z.record(z.string(), runtimeBindingSchema).default({}),
+  bindings: z.record(z.string().min(1), capabilityBindingSchema).default({}),
   discoverySources: z.array(z.string().min(1)).default([]),
+  includes: z.array(z.string().min(1)).default([]),
+  entrypoints: pluginEntrypointsSchema.optional(),
+  exposes: z.array(z.string().min(1)).default([]),
   canonicalSource: canonicalSourceSchema,
   install: installSchema,
   riskTier: z.enum(riskTiers),
@@ -139,9 +167,33 @@ export const pathBindingSchema = z.object({
   template: z.string().min(1),
 });
 
+export const runtimeBindingDefaultsSchema = z.object({
+  skill: z.array(z.enum(skillBindingIds)).default([]),
+  mcp: z.array(z.enum(mcpBindingIds)).default([]),
+  plugin: z.array(z.enum(pluginBindingIds)).default([]),
+});
+
+export const runtimeBindingPolicySchema = z.object({
+  defaults: runtimeBindingDefaultsSchema.default({
+    skill: [],
+    mcp: [],
+    plugin: [],
+  }),
+  overrides: z.record(z.string(), z.union([z.string().min(1), z.literal("disabled")])).default({}),
+});
+
 export const runtimeSchema = z.object({
   runtimeId: z.string().min(1),
   supportedAssetKinds: z.array(z.enum(assetKinds)).default([]),
+  enabledCapabilities: z.array(z.string().min(1)).default([]),
+  bindingPolicy: runtimeBindingPolicySchema.default({
+    defaults: {
+      skill: [],
+      mcp: [],
+      plugin: [],
+    },
+    overrides: {},
+  }),
   nativeFiles: z.array(pathBindingSchema).default([]),
   cacheBindings: z.array(pathBindingSchema).default([]),
   mergeStrategy: z.enum(["codex-toml", "cursor-json", "claude-json", "noop"]),
@@ -182,8 +234,10 @@ export const lockCapabilitySchema = z.object({
   name: z.string().min(1),
   assetKind: z.enum(assetKinds),
   riskTier: z.enum(riskTiers),
-  runtimeTargets: z.array(z.string()).default([]),
-  runtimeBindings: z.record(z.string(), runtimeBindingSchema).default({}),
+  bindings: z.record(z.string(), capabilityBindingSchema).default({}),
+  includes: z.array(z.string().min(1)).default([]),
+  entrypoints: pluginEntrypointsSchema.optional(),
+  exposes: z.array(z.string().min(1)).default([]),
   canonicalSource: canonicalSourceSchema,
   install: installSchema,
   hash: hashSchema,
@@ -191,13 +245,49 @@ export const lockCapabilitySchema = z.object({
 });
 
 export const resolutionLockSchema = z.object({
-  version: z.literal(2),
+  version: z.literal(3),
   generatedAt: z.string().nullable(),
   capabilities: z.array(lockCapabilitySchema).default([]),
 });
 
+export const legacyLockCapabilitySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  assetKind: z.enum(assetKinds),
+  riskTier: z.enum(riskTiers),
+  runtimeTargets: z.array(z.string()).default([]),
+  runtimeBindings: z.record(z.string(), legacyRuntimeBindingSchema).default({}),
+  includes: z.array(z.string().min(1)).default([]),
+  entrypoints: pluginEntrypointsSchema.optional(),
+  exposes: z.array(z.string().min(1)).default([]),
+  canonicalSource: canonicalSourceSchema,
+  install: installSchema,
+  hash: hashSchema,
+  tags: z.array(z.string()).default([]),
+});
+
+export const legacyLockDistributionSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  runtimeId: z.string().min(1),
+  pluginId: z.string().min(1),
+  canonicalSource: canonicalSourceSchema,
+  install: installSchema,
+  nativeRegistration: runtimePluginBindingSchema,
+  hash: hashSchema,
+  tags: z.array(z.string()).default([]),
+});
+
+export const legacyResolutionLockSchema = z.object({
+  version: z.literal(2),
+  generatedAt: z.string().nullable(),
+  capabilities: z.array(legacyLockCapabilitySchema).default([]),
+  distributions: z.array(legacyLockDistributionSchema).default([]),
+});
+
 export const renderedSkillStateSchema = z.object({
   id: z.string().min(1),
+  bindingId: z.string().min(1),
   artifactName: z.string().min(1),
   cacheRelativePath: z.string().min(1),
   syncMode: z.enum(["cache-only", "user-skill-dir"]),
@@ -205,14 +295,15 @@ export const renderedSkillStateSchema = z.object({
 
 export const renderedPluginStateSchema = z.object({
   id: z.string().min(1),
-  pluginId: z.string().min(1),
-  enabled: z.boolean(),
-  knownMarketplace: jsonObjectSchema.optional(),
-  installedRecords: z.array(jsonObjectSchema).default([]),
+  bindingId: z.string().min(1),
+  artifactName: z.string().min(1),
+  cacheRelativePath: z.string().min(1).optional(),
+  nativeRegistration: runtimePluginBindingSchema,
 });
 
 export const renderedMcpStateSchema = z.object({
   id: z.string().min(1),
+  bindingId: z.string().min(1),
   serverName: z.string().min(1),
   config: jsonObjectSchema,
 });
@@ -243,6 +334,8 @@ export const sharedCacheManifestSchema = z.object({
   packages: z.array(
     z.object({
       id: z.string().min(1),
+      runtimeId: z.string().min(1),
+      bindingId: z.string().min(1),
       artifactName: z.string().min(1),
       sourcePath: z.string().min(1),
       relativePath: z.string().min(1),
@@ -257,5 +350,7 @@ export type MachineRecord = z.infer<typeof machineSchema>;
 export type BootstrapRecord = z.infer<typeof bootstrapSchema>;
 export type LocalSecretsRecord = z.infer<typeof localSecretsSchema>;
 export type ResolutionLock = z.infer<typeof resolutionLockSchema>;
+export type LegacyResolutionLock = z.infer<typeof legacyResolutionLockSchema>;
+export type AnyResolutionLock = ResolutionLock | LegacyResolutionLock;
 export type RenderedRuntimeState = z.infer<typeof renderedRuntimeStateSchema>;
 export type SharedCacheManifest = z.infer<typeof sharedCacheManifestSchema>;

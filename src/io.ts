@@ -74,10 +74,8 @@ export async function listFiles(targetDir: string, suffix: string) {
   if (!(await pathExists(targetDir))) {
     return [];
   }
-  const dirents = await fs.readdir(targetDir, { withFileTypes: true });
-  return dirents
-    .filter((entry) => entry.isFile() && entry.name.endsWith(suffix))
-    .map((entry) => path.join(targetDir, entry.name))
+  return (await walkFiles(targetDir))
+    .filter((entry) => entry.endsWith(suffix))
     .sort();
 }
 

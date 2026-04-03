@@ -1,0 +1,51 @@
+id: skill.tailwindcss-advanced-layouts
+name: tailwindcss-advanced-layouts
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/tailwindcss-advanced-layouts
+install:
+  strategy: copy
+  artifactName: tailwindcss-advanced-layouts
+  sourcePath: assets/skills/tailwindcss-advanced-layouts
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/tailwindcss-advanced-layouts
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Seeded from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 413e7d25a6f2cf49c98011df55d5be9c784330d7a00263d7ca745b28f2c096ee
+tags:
+  - bootstrap-seeded
+  - shared-skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir

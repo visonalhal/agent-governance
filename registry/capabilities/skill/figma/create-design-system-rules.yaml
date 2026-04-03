@@ -1,0 +1,48 @@
+id: skill.figma.create-design-system-rules
+name: figma-create-design-system-rules
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/figma/create-design-system-rules
+install:
+  strategy: copy
+  artifactName: create-design-system-rules
+  sourcePath: assets/skills/figma/create-design-system-rules
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Canonicalized from the OpenAI-curated Figma plugin package.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: figma-skill-create-design-system-rules
+tags:
+  - canonical-skill
+  - figma
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir

@@ -1,71 +1,241 @@
 {
   "capabilities": [
     {
-      "assetKind": "mcp",
+      "assetKind": "agent",
+      "bindings": {},
       "canonicalSource": {
-        "path": "registry/capabilities/mcp.imported.codex.figma.yaml",
+        "path": "assets/agents/figma/figma-code-connect-agent.md",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "1f6fb5891f320248f9778ee1abafe7a7136654957cd5c351fd7ed5983c3d0e1c"
+        "digest": "figma-agent-code-connect"
       },
-      "id": "mcp.imported.codex.figma",
+      "id": "agent.figma.code-connect",
+      "includes": [],
       "install": {
-        "artifactName": "codex-figma",
-        "manifest": {
-          "importedFrom": "/Users/halvinshen/.codex/config.toml"
-        },
-        "strategy": "manifest"
+        "artifactName": "code-connect",
+        "sourcePath": "assets/agents/figma/figma-code-connect-agent.md",
+        "strategy": "copy"
       },
-      "name": "figma (codex)",
-      "riskTier": "T2",
-      "runtimeBindings": {
-        "codex": {
-          "mcp": {
-            "config": {
-              "url": "https://mcp.figma.com/mcp"
-            },
-            "serverName": "figma"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
+      "name": "figma-code-connect-agent",
+      "riskTier": "T1",
       "tags": [
-        "bootstrap-import",
-        "codex-mcp"
+        "canonical-agent",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "agent",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/agents/figma/design-parity-review-agent.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-agent-design-parity-review"
+      },
+      "id": "agent.figma.design-parity-review",
+      "includes": [],
+      "install": {
+        "artifactName": "design-parity-review",
+        "sourcePath": "assets/agents/figma/design-parity-review-agent.md",
+        "strategy": "copy"
+      },
+      "name": "design-parity-review-agent",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-agent",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "agent",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/agents/figma/design-system-rules-agent.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-agent-design-system-rules"
+      },
+      "id": "agent.figma.design-system-rules",
+      "includes": [],
+      "install": {
+        "artifactName": "design-system-rules",
+        "sourcePath": "assets/agents/figma/design-system-rules-agent.md",
+        "strategy": "copy"
+      },
+      "name": "design-system-rules-agent",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-agent",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "agent",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/agents/figma/figma-implementation-agent.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-agent-implementation"
+      },
+      "id": "agent.figma.implementation",
+      "includes": [],
+      "install": {
+        "artifactName": "implementation",
+        "sourcePath": "assets/agents/figma/figma-implementation-agent.md",
+        "strategy": "copy"
+      },
+      "name": "figma-implementation-agent",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-agent",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "command",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/commands/figma/connect-figma-components.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-command-connect-components"
+      },
+      "id": "command.figma.connect-figma-components",
+      "includes": [],
+      "install": {
+        "artifactName": "connect-figma-components",
+        "sourcePath": "assets/commands/figma/connect-figma-components.md",
+        "strategy": "copy"
+      },
+      "name": "connect-figma-components",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-command",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "command",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/commands/figma/create-design-system-rules.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-command-create-design-system-rules"
+      },
+      "id": "command.figma.create-design-system-rules",
+      "includes": [],
+      "install": {
+        "artifactName": "create-design-system-rules",
+        "sourcePath": "assets/commands/figma/create-design-system-rules.md",
+        "strategy": "copy"
+      },
+      "name": "create-design-system-rules",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-command",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "command",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/commands/figma/implement-from-figma.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-command-implement-from-figma"
+      },
+      "id": "command.figma.implement-from-figma",
+      "includes": [],
+      "install": {
+        "artifactName": "implement-from-figma",
+        "sourcePath": "assets/commands/figma/implement-from-figma.md",
+        "strategy": "copy"
+      },
+      "name": "implement-from-figma",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-command",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "command",
+      "bindings": {},
+      "canonicalSource": {
+        "path": "assets/commands/figma/review-design-parity.md",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-command-review-design-parity"
+      },
+      "id": "command.figma.review-design-parity",
+      "includes": [],
+      "install": {
+        "artifactName": "review-design-parity",
+        "sourcePath": "assets/commands/figma/review-design-parity.md",
+        "strategy": "copy"
+      },
+      "name": "review-design-parity",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-command",
+        "figma"
       ]
     },
     {
       "assetKind": "mcp",
-      "canonicalSource": {
-        "path": "registry/capabilities/mcp.imported.cursor.clerk.yaml",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "cfbc26501fff8cee3db6ea7fb88142eba37ad0c1c2a89bd8ac53a749ebc0ee29"
-      },
-      "id": "mcp.imported.cursor.clerk",
-      "install": {
-        "artifactName": "cursor-clerk",
-        "manifest": {
-          "importedFrom": "/Users/halvinshen/.cursor/mcp.json"
-        },
-        "strategy": "manifest"
-      },
-      "name": "clerk (cursor)",
-      "riskTier": "T2",
-      "runtimeBindings": {
-        "cursor": {
+      "bindings": {
+        "remote-http": {
           "mcp": {
             "config": {
               "headers": {},
@@ -75,43 +245,42 @@
           }
         }
       },
-      "runtimeTargets": [
-        "cursor"
-      ],
-      "tags": [
-        "bootstrap-import",
-        "cursor-mcp"
-      ]
-    },
-    {
-      "assetKind": "mcp",
       "canonicalSource": {
-        "path": "registry/capabilities/mcp.imported.cursor.context7.yaml",
+        "path": "registry/capabilities/mcp/clerk.yaml",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "4ed91e90373acc6a92e52f6bdffe08e100f4436de108d7908528070a567eb1a6"
+        "digest": "cfbc26501fff8cee3db6ea7fb88142eba37ad0c1c2a89bd8ac53a749ebc0ee29"
       },
-      "id": "mcp.imported.cursor.context7",
+      "id": "mcp.clerk",
+      "includes": [],
       "install": {
-        "artifactName": "cursor-context7",
+        "artifactName": "clerk",
         "manifest": {
-          "importedFrom": "/Users/halvinshen/.cursor/mcp.json"
+          "seededFrom": "/Users/halvinshen/.cursor/mcp.json"
         },
         "strategy": "manifest"
       },
-      "name": "context7 (cursor)",
-      "riskTier": "T3",
-      "runtimeBindings": {
-        "cursor": {
+      "name": "clerk",
+      "riskTier": "T2",
+      "tags": [
+        "bootstrap-seeded",
+        "cursor-mcp"
+      ]
+    },
+    {
+      "assetKind": "mcp",
+      "bindings": {
+        "remote-http": {
           "mcp": {
             "config": {
               "headers": {
-                "CONTEXT7_API_KEY": "${SECRET:IMPORTED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}"
+                "CONTEXT7_API_KEY": "${SECRET:SEEDED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}"
               },
               "url": "https://mcp.context7.com/mcp"
             },
@@ -119,39 +288,78 @@
           }
         }
       },
-      "runtimeTargets": [
-        "cursor"
-      ],
-      "tags": [
-        "bootstrap-import",
-        "cursor-mcp"
-      ]
-    },
-    {
-      "assetKind": "mcp",
       "canonicalSource": {
-        "path": "registry/capabilities/mcp.imported.cursor.github.yaml",
+        "path": "registry/capabilities/mcp/context7.yaml",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "c256b32cb4154d45126422c3371b18ad48eb97214dc1b082a3e6453d8c8ea9f0"
+        "digest": "4ed91e90373acc6a92e52f6bdffe08e100f4436de108d7908528070a567eb1a6"
       },
-      "id": "mcp.imported.cursor.github",
+      "id": "mcp.context7",
+      "includes": [],
       "install": {
-        "artifactName": "cursor-github",
+        "artifactName": "context7",
         "manifest": {
-          "importedFrom": "/Users/halvinshen/.cursor/mcp.json"
+          "seededFrom": "/Users/halvinshen/.cursor/mcp.json"
         },
         "strategy": "manifest"
       },
-      "name": "github (cursor)",
+      "name": "context7",
       "riskTier": "T3",
-      "runtimeBindings": {
-        "cursor": {
+      "tags": [
+        "bootstrap-seeded",
+        "cursor-mcp"
+      ]
+    },
+    {
+      "assetKind": "mcp",
+      "bindings": {
+        "remote-http": {
+          "mcp": {
+            "config": {
+              "url": "https://mcp.figma.com/mcp"
+            },
+            "serverName": "figma"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "registry/capabilities/mcp/figma.yaml",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1f6fb5891f320248f9778ee1abafe7a7136654957cd5c351fd7ed5983c3d0e1c"
+      },
+      "id": "mcp.figma",
+      "includes": [],
+      "install": {
+        "artifactName": "figma",
+        "manifest": {
+          "seededFrom": "/Users/halvinshen/.codex/config.toml"
+        },
+        "strategy": "manifest"
+      },
+      "name": "figma",
+      "riskTier": "T2",
+      "tags": [
+        "bootstrap-seeded",
+        "codex-mcp"
+      ]
+    },
+    {
+      "assetKind": "mcp",
+      "bindings": {
+        "stdio-command": {
           "mcp": {
             "config": {
               "args": [
@@ -160,128 +368,505 @@
               ],
               "command": "npx",
               "env": {
-                "GITHUB_PERSONAL_ACCESS_TOKEN": "${SECRET:IMPORTED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}"
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}"
               }
             },
             "serverName": "github"
           }
         }
       },
-      "runtimeTargets": [
-        "cursor"
-      ],
+      "canonicalSource": {
+        "path": "registry/capabilities/mcp/github.yaml",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "c256b32cb4154d45126422c3371b18ad48eb97214dc1b082a3e6453d8c8ea9f0"
+      },
+      "id": "mcp.github",
+      "includes": [],
+      "install": {
+        "artifactName": "github",
+        "manifest": {
+          "seededFrom": "/Users/halvinshen/.cursor/mcp.json"
+        },
+        "strategy": "manifest"
+      },
+      "name": "github",
+      "riskTier": "T3",
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "cursor-mcp"
       ]
     },
     {
       "assetKind": "plugin",
-      "canonicalSource": {
-        "path": "assets/packages/claude-ui-ux-pro-max",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "d8128fcdae42320e5164eef2b97f11116109b6dba3974bbb448b036dcdc0d05d"
-      },
-      "id": "plugin.imported.claude.ui-ux-pro-max",
-      "install": {
-        "artifactName": "claude-ui-ux-pro-max",
-        "manifest": {
-          "importedFrom": "claude-plugin-marketplace",
-          "localPath": "/Users/halvinshen/.claude/plugins/marketplaces/ui-ux-pro-max-skill",
-          "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill"
-        },
-        "sourcePath": "assets/packages/claude-ui-ux-pro-max",
-        "strategy": "copy"
-      },
-      "name": "ui-ux-pro-max",
-      "riskTier": "T2",
-      "runtimeBindings": {
-        "claude": {
+      "bindings": {
+        "package": {
           "plugin": {
-            "enabled": true,
-            "installedRecords": [
-              {
-                "gitCommitSha": "07f4ef3",
-                "installedAt": "2026-03-13T02:38:03.782Z",
-                "installPath": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
-                "lastUpdated": "2026-03-13T02:38:03.782Z",
-                "scope": "user",
-                "version": "07f4ef3"
-              }
-            ],
-            "knownMarketplace": {
-              "installLocation": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
-              "lastUpdated": "2026-03-13T02:38:00.342Z",
-              "marketplaceId": "ui-ux-pro-max-skill",
-              "sha": "07f4ef3",
-              "source": {
-                "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
-                "source": "github"
-              }
+            "install": {
+              "artifactName": "codex-figma",
+              "manifest": {
+                "localPath": "/Users/halvinshen/.codex/.tmp/plugins/plugins/figma",
+                "pluginId": "figma@openai-curated",
+                "seededFrom": "codex-plugin-cache"
+              },
+              "sourcePath": "assets/plugins/figma/targets/codex",
+              "strategy": "copy"
             },
-            "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill"
+            "nativeRegistration": {
+              "enabled": true,
+              "installedRecords": [],
+              "pluginId": "figma@openai-curated"
+            }
           }
         }
       },
-      "runtimeTargets": [
-        "claude"
-      ],
-      "tags": [
-        "bootstrap-import",
-        "claude-plugin"
-      ]
-    },
-    {
-      "assetKind": "plugin",
       "canonicalSource": {
-        "path": "assets/packages/codex-figma",
+        "path": "assets/plugins/figma",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "entrypoints": {
+        "agents": [
+          "agent.figma.code-connect",
+          "agent.figma.design-parity-review",
+          "agent.figma.design-system-rules",
+          "agent.figma.implementation"
+        ],
+        "commands": [
+          "command.figma.connect-figma-components",
+          "command.figma.create-design-system-rules",
+          "command.figma.implement-from-figma",
+          "command.figma.review-design-parity"
+        ]
+      },
+      "exposes": [
+        "agent.figma.code-connect",
+        "agent.figma.design-parity-review",
+        "agent.figma.design-system-rules",
+        "agent.figma.implementation",
+        "command.figma.connect-figma-components",
+        "command.figma.create-design-system-rules",
+        "command.figma.implement-from-figma",
+        "command.figma.review-design-parity"
+      ],
       "hash": {
         "algorithm": "sha256",
         "digest": "77da225c98682719203be238c5f722a52d424f8b383209a059840eecac5ea189"
       },
-      "id": "plugin.imported.codex.figma",
+      "id": "plugin.figma",
+      "includes": [
+        "agent.figma.code-connect",
+        "agent.figma.design-parity-review",
+        "agent.figma.design-system-rules",
+        "agent.figma.implementation",
+        "command.figma.connect-figma-components",
+        "command.figma.create-design-system-rules",
+        "command.figma.implement-from-figma",
+        "command.figma.review-design-parity",
+        "mcp.figma",
+        "skill.figma.code-connect-components",
+        "skill.figma.create-design-system-rules",
+        "skill.figma.create-new-file",
+        "skill.figma.generate-design",
+        "skill.figma.generate-library",
+        "skill.figma.implement-design",
+        "skill.figma.use"
+      ],
       "install": {
-        "artifactName": "codex-figma",
+        "artifactName": "figma",
         "manifest": {
-          "importedFrom": "codex-plugin-cache",
-          "localPath": "/Users/halvinshen/.codex/.tmp/plugins/plugins/figma",
-          "pluginId": "figma@openai-curated"
+          "packageTargets": [
+            "codex"
+          ]
         },
-        "sourcePath": "assets/packages/codex-figma",
+        "sourcePath": "assets/plugins/figma",
         "strategy": "copy"
       },
       "name": "figma",
       "riskTier": "T2",
-      "runtimeBindings": {
-        "codex": {
+      "tags": [
+        "canonical-plugin",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "plugin",
+      "bindings": {
+        "marketplace": {
           "plugin": {
-            "enabled": true,
-            "installedRecords": [],
-            "pluginId": "figma@openai-curated"
+            "install": {
+              "artifactName": "claude-ui-ux-pro-max",
+              "manifest": {
+                "localPath": "/Users/halvinshen/.claude/plugins/marketplaces/ui-ux-pro-max-skill",
+                "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill",
+                "seededFrom": "claude-plugin-marketplace"
+              },
+              "sourcePath": "assets/plugins/ui-ux-pro-max/targets/claude",
+              "strategy": "copy"
+            },
+            "nativeRegistration": {
+              "enabled": true,
+              "installedRecords": [
+                {
+                  "gitCommitSha": "07f4ef3",
+                  "installedAt": "2026-03-13T02:38:03.782Z",
+                  "installPath": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
+                  "lastUpdated": "2026-03-13T02:38:03.782Z",
+                  "scope": "user",
+                  "version": "07f4ef3"
+                }
+              ],
+              "knownMarketplace": {
+                "installLocation": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
+                "lastUpdated": "2026-03-13T02:38:00.342Z",
+                "marketplaceId": "ui-ux-pro-max-skill",
+                "sha": "07f4ef3",
+                "source": {
+                  "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+                  "source": "github"
+                }
+              },
+              "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill"
+            }
           }
         }
       },
-      "runtimeTargets": [
-        "codex"
+      "canonicalSource": {
+        "path": "assets/plugins/ui-ux-pro-max",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "d8128fcdae42320e5164eef2b97f11116109b6dba3974bbb448b036dcdc0d05d"
+      },
+      "id": "plugin.ui-ux-pro-max",
+      "includes": [
+        "skill.ui-ux-pro-max"
       ],
+      "install": {
+        "artifactName": "ui-ux-pro-max",
+        "manifest": {
+          "packageTargets": [
+            "claude"
+          ]
+        },
+        "sourcePath": "assets/plugins/ui-ux-pro-max",
+        "strategy": "copy"
+      },
+      "name": "ui-ux-pro-max",
+      "riskTier": "T2",
       "tags": [
-        "bootstrap-import",
-        "codex-plugin"
+        "bootstrap-seeded",
+        "canonical-plugin",
+        "ui-ux"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/code-connect-components",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-code-connect-components"
+      },
+      "id": "skill.figma.code-connect-components",
+      "includes": [],
+      "install": {
+        "artifactName": "code-connect-components",
+        "sourcePath": "assets/skills/figma/code-connect-components",
+        "strategy": "copy"
+      },
+      "name": "figma-code-connect-components",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/create-design-system-rules",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-create-design-system-rules"
+      },
+      "id": "skill.figma.create-design-system-rules",
+      "includes": [],
+      "install": {
+        "artifactName": "create-design-system-rules",
+        "sourcePath": "assets/skills/figma/create-design-system-rules",
+        "strategy": "copy"
+      },
+      "name": "figma-create-design-system-rules",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/create-new-file",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-create-new-file"
+      },
+      "id": "skill.figma.create-new-file",
+      "includes": [],
+      "install": {
+        "artifactName": "create-new-file",
+        "sourcePath": "assets/skills/figma/create-new-file",
+        "strategy": "copy"
+      },
+      "name": "figma-create-new-file",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/generate-design",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-generate-design"
+      },
+      "id": "skill.figma.generate-design",
+      "includes": [],
+      "install": {
+        "artifactName": "generate-design",
+        "sourcePath": "assets/skills/figma/generate-design",
+        "strategy": "copy"
+      },
+      "name": "figma-generate-design",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/generate-library",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-generate-library"
+      },
+      "id": "skill.figma.generate-library",
+      "includes": [],
+      "install": {
+        "artifactName": "generate-library",
+        "sourcePath": "assets/skills/figma/generate-library",
+        "strategy": "copy"
+      },
+      "name": "figma-generate-library",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/implement-design",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-implement-design"
+      },
+      "id": "skill.figma.implement-design",
+      "includes": [],
+      "install": {
+        "artifactName": "implement-design",
+        "sourcePath": "assets/skills/figma/implement-design",
+        "strategy": "copy"
+      },
+      "name": "figma-implement-design",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/figma/use",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "figma-skill-use"
+      },
+      "id": "skill.figma.use",
+      "includes": [],
+      "install": {
+        "artifactName": "use",
+        "sourcePath": "assets/skills/figma/use",
+        "strategy": "copy"
+      },
+      "name": "figma-use",
+      "riskTier": "T1",
+      "tags": [
+        "canonical-skill",
+        "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/playwright-best-practices",
         "ref": "main",
@@ -289,16 +874,18 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "f19838929d2126a896ba3626b589cd7a47c4d1c6a5527609e46f5ebf69691aa2"
       },
-      "id": "skill.imported.playwright-best-practices",
+      "id": "skill.playwright-best-practices",
+      "includes": [],
       "install": {
         "artifactName": "playwright-best-practices",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
           "installedAt": "2026-03-28T01:31:26.115Z",
+          "seededFrom": "shared-skill-cache",
           "skillFolderHash": "ef329e7e65149918e1ff0eed2cf7d2e6e6f9eb5b",
           "skillPath": "SKILL.md",
           "source": "currents-dev/playwright-best-practices-skill",
@@ -311,23 +898,25 @@
       },
       "name": "playwright-best-practices",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/playwright-cli",
         "ref": "main",
@@ -335,39 +924,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "c9d967806fdcd3fb62b06fae693cbf6a41c47e45004e6bc5b5c837a8431bb0ab"
       },
-      "id": "skill.imported.playwright-cli",
+      "id": "skill.playwright-cli",
+      "includes": [],
       "install": {
         "artifactName": "playwright-cli",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/playwright-cli"
+          "localPath": "/Users/halvinshen/.agents/skills/playwright-cli",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/playwright-cli",
         "strategy": "copy"
       },
       "name": "playwright-cli",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/prisma-performance",
         "ref": "main",
@@ -375,39 +968,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "e4e230bf0377adfe44e222c32aa1fc5f56600210f20e403f8d10ba01649e572a"
       },
-      "id": "skill.imported.prisma-performance",
+      "id": "skill.prisma-performance",
+      "includes": [],
       "install": {
         "artifactName": "prisma-performance",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/prisma-performance"
+          "localPath": "/Users/halvinshen/.agents/skills/prisma-performance",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/prisma-performance",
         "strategy": "copy"
       },
       "name": "prisma-performance",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/product-manager-toolkit",
         "ref": "main",
@@ -415,39 +1012,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "0881707318feb56179eb769e9710557645aeb3e4c6170afd79561bf29eed5783"
       },
-      "id": "skill.imported.product-manager-toolkit",
+      "id": "skill.product-manager-toolkit",
+      "includes": [],
       "install": {
         "artifactName": "product-manager-toolkit",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/product-manager-toolkit"
+          "localPath": "/Users/halvinshen/.agents/skills/product-manager-toolkit",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/product-manager-toolkit",
         "strategy": "copy"
       },
       "name": "product-manager-toolkit",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/receiving-code-review",
         "ref": "main",
@@ -455,39 +1056,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30"
       },
-      "id": "skill.imported.receiving-code-review",
+      "id": "skill.receiving-code-review",
+      "includes": [],
       "install": {
         "artifactName": "receiving-code-review",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/receiving-code-review"
+          "localPath": "/Users/halvinshen/.agents/skills/receiving-code-review",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/receiving-code-review",
         "strategy": "copy"
       },
       "name": "receiving-code-review",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/requesting-code-review",
         "ref": "main",
@@ -495,39 +1100,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "246e65cd72a7e360987d94e6c61564ce6d71c6361d1784d529d70e4cbbe8522d"
       },
-      "id": "skill.imported.requesting-code-review",
+      "id": "skill.requesting-code-review",
+      "includes": [],
       "install": {
         "artifactName": "requesting-code-review",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/requesting-code-review"
+          "localPath": "/Users/halvinshen/.agents/skills/requesting-code-review",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/requesting-code-review",
         "strategy": "copy"
       },
       "name": "requesting-code-review",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/skill-creator",
         "ref": "main",
@@ -535,17 +1144,19 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "5431f631d91669a4964e2e0e4597ffb0e148855a1aced1e6c4d8e177560830e4"
       },
-      "id": "skill.imported.skill-creator",
+      "id": "skill.skill-creator",
+      "includes": [],
       "install": {
         "artifactName": "skill-creator",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
           "installedAt": "2026-03-06T06:29:43.324Z",
           "pluginName": "example-skills",
+          "seededFrom": "shared-skill-cache",
           "skillFolderHash": "5c26c1472b98de33a48074ba5d3efe3a727b8e37",
           "skillPath": "skills/skill-creator/SKILL.md",
           "source": "anthropics/skills",
@@ -558,23 +1169,25 @@
       },
       "name": "skill-creator",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/tailwindcss-advanced-layouts",
         "ref": "main",
@@ -582,39 +1195,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "413e7d25a6f2cf49c98011df55d5be9c784330d7a00263d7ca745b28f2c096ee"
       },
-      "id": "skill.imported.tailwindcss-advanced-layouts",
+      "id": "skill.tailwindcss-advanced-layouts",
+      "includes": [],
       "install": {
         "artifactName": "tailwindcss-advanced-layouts",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/tailwindcss-advanced-layouts"
+          "localPath": "/Users/halvinshen/.agents/skills/tailwindcss-advanced-layouts",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/tailwindcss-advanced-layouts",
         "strategy": "copy"
       },
       "name": "tailwindcss-advanced-layouts",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/testing-quality",
         "ref": "main",
@@ -622,39 +1239,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "bad30ac7536b241723057f30bd7f6b98934b0862185b8453528d961497786358"
       },
-      "id": "skill.imported.testing-quality",
+      "id": "skill.testing-quality",
+      "includes": [],
       "install": {
         "artifactName": "testing-quality",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/testing-quality"
+          "localPath": "/Users/halvinshen/.agents/skills/testing-quality",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/testing-quality",
         "strategy": "copy"
       },
       "name": "testing-quality",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/typescript-advanced-types",
         "ref": "main",
@@ -662,39 +1283,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "9a6c19b3251593eaa800c157f669d3a890132dd3f4f828f4dd41bcef0150237d"
       },
-      "id": "skill.imported.typescript-advanced-types",
+      "id": "skill.typescript-advanced-types",
+      "includes": [],
       "install": {
         "artifactName": "typescript-advanced-types",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/typescript-advanced-types"
+          "localPath": "/Users/halvinshen/.agents/skills/typescript-advanced-types",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/typescript-advanced-types",
         "strategy": "copy"
       },
       "name": "typescript-advanced-types",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/ui-ux-pro-max",
         "ref": "main",
@@ -702,39 +1327,43 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "19e405e5f71129a13b7fe755433327209ce4d42954d7e38592d542714714eb0b"
       },
-      "id": "skill.imported.ui-ux-pro-max",
+      "id": "skill.ui-ux-pro-max",
+      "includes": [],
       "install": {
         "artifactName": "ui-ux-pro-max",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
-          "localPath": "/Users/halvinshen/.agents/skills/ui-ux-pro-max"
+          "localPath": "/Users/halvinshen/.agents/skills/ui-ux-pro-max",
+          "seededFrom": "shared-skill-cache"
         },
         "sourcePath": "assets/skills/ui-ux-pro-max",
         "strategy": "copy"
       },
       "name": "ui-ux-pro-max",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/web-design-guidelines",
         "ref": "main",
@@ -742,16 +1371,18 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
       },
-      "id": "skill.imported.web-design-guidelines",
+      "id": "skill.web-design-guidelines",
+      "includes": [],
       "install": {
         "artifactName": "web-design-guidelines",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
           "installedAt": "2026-03-06T06:55:17.427Z",
+          "seededFrom": "shared-skill-cache",
           "skillFolderHash": "3116f3e62dbd02b44a598b1aa690d2a8938e8f89",
           "skillPath": "skills/web-design-guidelines/SKILL.md",
           "source": "vercel-labs/agent-skills",
@@ -764,23 +1395,25 @@
       },
       "name": "web-design-guidelines",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     },
     {
       "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
       "canonicalSource": {
         "path": "assets/skills/writing-plans",
         "ref": "main",
@@ -788,16 +1421,18 @@
         "sourceId": "governance-repo",
         "url": "https://github.com/visonalhal/agent-governance"
       },
+      "exposes": [],
       "hash": {
         "algorithm": "sha256",
         "digest": "8c536ae03ef3ab1fa974c0e50a65d803acddf5d4ee7cac68ab25a39b9e338611"
       },
-      "id": "skill.imported.writing-plans",
+      "id": "skill.writing-plans",
+      "includes": [],
       "install": {
         "artifactName": "writing-plans",
         "manifest": {
-          "importedFrom": "shared-skill-cache",
           "installedAt": "2026-03-06T06:55:18.973Z",
+          "seededFrom": "shared-skill-cache",
           "skillFolderHash": "cf6f5c8813cf0445276129a5f2b443927b50f645",
           "skillPath": "skills/writing-plans/SKILL.md",
           "source": "obra/superpowers",
@@ -810,22 +1445,12 @@
       },
       "name": "writing-plans",
       "riskTier": "T1",
-      "runtimeBindings": {
-        "codex": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        }
-      },
-      "runtimeTargets": [
-        "codex"
-      ],
       "tags": [
-        "bootstrap-import",
+        "bootstrap-seeded",
         "shared-skill"
       ]
     }
   ],
   "generatedAt": "2026-04-02T09:15:33.096Z",
-  "version": 2
+  "version": 3
 }

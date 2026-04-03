@@ -23,7 +23,7 @@ sources:
     trustLevel: governance-repo
     owner: self
     notes:
-      - Canonical source for imported local bootstrap artifacts.
+      - Canonical source for bootstrap-seeded local artifacts.
   - id: skills-sh
     kind: catalog
     url: https://skills.sh/

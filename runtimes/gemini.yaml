@@ -3,6 +3,20 @@ supportedAssetKinds:
   - skill
   - plugin
   - mcp
+enabledCapabilities: []
+bindingPolicy:
+  defaults:
+    skill:
+      - cache
+      - user-dir
+    mcp:
+      - remote-http
+      - stdio-command
+    plugin:
+      - external
+      - package
+      - marketplace
+  overrides: {}
 nativeFiles: []
 cacheBindings:
   - name: skillsDir

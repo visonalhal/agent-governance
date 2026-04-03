@@ -1,30 +1,34 @@
 # Agent Governance
 
-`agent-governance` is the single source of truth for personal, cross-model governance of `skills`, `plugins`, and `MCP` integrations.
+`agent-governance` is the single source of truth for personal, cross-runtime governance of `skills`, `plugins`, `MCP`, `commands`, and `agents`.
 
-The repo stores audited capability metadata, runtime adapter profiles, machine profiles, and deterministic locks. Local runtimes keep their own native config files, but they are rendered and synced from this repo instead of being hand-maintained.
+The repo stores audited capability metadata, abstract capability bindings, runtime adapter profiles, machine profiles, and deterministic locks. Local runtimes keep their own native config files, but they are rendered and synced from this repo instead of being hand-maintained.
 
 ## Operating Model
 
 The system is split into three layers:
 
 - True source: this repo under `halvin-workspace/agent-governance`
-- Shared artifact cache: `~/.agents`, which stores shared `skills/`, `packages/`, and `manifests/`
+- Shared artifact cache: `~/.agents`, which stores shared `skills/`, runtime install `packages/`, and `manifests/`
 - Runtime native config: `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.claude/settings.json`, and related plugin manifests
 
 The flow is always:
 
 1. `ingest` or edit a capability in `registry/capabilities`
-2. `review` and `approve` it
-3. `publish` the global resolution lock
-4. `render` for a machine profile
-5. `sync` one managed runtime into its native config
+2. edit `runtimes/*.yaml` when a runtime needs a different capability activation or binding policy
+3. `review` and `approve` it
+4. `publish` the global resolution lock
+5. `render` for a machine profile
+6. `sync` one managed runtime into its native config
 
 ## Repository Layout
 
 - `assets/`, `registry/`, and `locks/` are the repo-owned source of truth.
+  Canonical assets live under `assets/skills/`, `assets/mcps/` when needed, `assets/commands/`, `assets/agents/`, and `assets/plugins/`.
+  Runtime-specific plugin payloads live under `assets/plugins/<plugin>/targets/<runtime>/`.
 - `generated/` is derived output only and is rebuilt by `render`.
 - `machines/` and `runtimes/` define where rendered state lands.
+- `registry/capabilities/` is organized by `kind[/namespace]/name.yaml`.
 - `src/` and `scripts/` implement the governance engine.
 - `tests/` and `docs/` hold verification and operational guidance.
 

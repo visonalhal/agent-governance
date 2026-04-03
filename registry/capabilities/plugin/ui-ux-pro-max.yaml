@@ -1,0 +1,76 @@
+id: plugin.ui-ux-pro-max
+name: ui-ux-pro-max
+assetKind: plugin
+discoverySources: []
+includes:
+  - skill.ui-ux-pro-max
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/plugins/ui-ux-pro-max
+install:
+  strategy: copy
+  artifactName: ui-ux-pro-max
+  sourcePath: assets/plugins/ui-ux-pro-max
+  manifest:
+    packageTargets:
+      - claude
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: MIT
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime plugin execution
+  notes:
+    - Seeded from the local Claude plugin configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: d8128fcdae42320e5164eef2b97f11116109b6dba3974bbb448b036dcdc0d05d
+tags:
+  - bootstrap-seeded
+  - canonical-plugin
+  - ui-ux
+bindings:
+  marketplace:
+    plugin:
+      install:
+        strategy: copy
+        artifactName: claude-ui-ux-pro-max
+        sourcePath: assets/plugins/ui-ux-pro-max/targets/claude
+        manifest:
+          seededFrom: claude-plugin-marketplace
+          pluginId: ui-ux-pro-max@ui-ux-pro-max-skill
+          localPath: /Users/halvinshen/.claude/plugins/marketplaces/ui-ux-pro-max-skill
+      nativeRegistration:
+        pluginId: ui-ux-pro-max@ui-ux-pro-max-skill
+        enabled: true
+        knownMarketplace:
+          marketplaceId: ui-ux-pro-max-skill
+          installLocation: ${CACHE_ROOT}/packages/claude-ui-ux-pro-max
+          lastUpdated: 2026-03-13T02:38:00.342Z
+          sha: 07f4ef3
+          source:
+            repo: nextlevelbuilder/ui-ux-pro-max-skill
+            source: github
+        installedRecords:
+          - gitCommitSha: 07f4ef3
+            installedAt: 2026-03-13T02:38:03.782Z
+            installPath: ${CACHE_ROOT}/packages/claude-ui-ux-pro-max
+            lastUpdated: 2026-03-13T02:38:03.782Z
+            scope: user
+            version: 07f4ef3

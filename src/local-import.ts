@@ -8,12 +8,14 @@ import type {
   BootstrapRecord,
   CapabilityRecord,
   RenderedRuntimeState,
+  RuntimeRecord,
   SharedCacheManifest,
   SourceRecord,
 } from "./schema.js";
 import {
   capabilitySchema,
   localSecretsSchema,
+  runtimeSchema,
   sourcesFileSchema,
 } from "./schema.js";
 import {
@@ -30,12 +32,19 @@ import {
   readYamlFile,
   removePath,
   writeJsonFile,
+  writeText,
   writeYamlFile,
 } from "./io.js";
-import { capabilityFilePath, publishGovernance, renderGovernance, syncGovernance } from "./governance.js";
+import {
+  capabilityFilePath,
+  loadRepo,
+  publishGovernance,
+  renderGovernance,
+  syncGovernance,
+} from "./governance.js";
 
 const execFileAsync = promisify(execFile);
-const BOOTSTRAP_IMPORT_TAG = "bootstrap-import";
+const BOOTSTRAP_IMPORT_TAG = "bootstrap-seeded";
 const GOVERNANCE_SOURCE_ID = "governance-repo";
 
 type LocalSecretsAccumulator = {
@@ -50,9 +59,10 @@ type RepoSource = {
   url: string;
 };
 
-type ImportedSummary = {
+type SeededSummary = {
   capabilityIds: string[];
   mcpCount: number;
+  pluginBindingCount: number;
   pluginCount: number;
   skippedSkills: string[];
   secretNames: string[];
@@ -60,20 +70,37 @@ type ImportedSummary = {
   syncedRuntimes: string[];
 };
 
-type ImportedCapabilityInput = {
+type ExistingCapabilityIndex = {
+  byId: Map<string, CapabilityRecord>;
+  mcpsByName: Map<string, CapabilityRecord>;
+  pluginsByName: Map<string, CapabilityRecord>;
+  skillsByName: Map<string, CapabilityRecord>;
+};
+
+type SeededCapabilityInput = {
   assetKind: CapabilityRecord["assetKind"];
+  bindings: CapabilityRecord["bindings"];
   canonicalPath: string;
   digest: string;
+  entrypoints?: CapabilityRecord["entrypoints"];
+  exposes?: CapabilityRecord["exposes"];
+  includes?: CapabilityRecord["includes"];
   install: CapabilityRecord["install"];
   name: string;
   permissions: CapabilityRecord["permissions"];
   review: CapabilityRecord["review"];
   riskTier: CapabilityRecord["riskTier"];
-  runtimeBindings: CapabilityRecord["runtimeBindings"];
-  runtimeTargets: string[];
   tags: string[];
   id: string;
 };
+
+type RuntimePolicyAccumulator = Map<
+  string,
+  {
+    enabledCapabilityIds: Set<string>;
+    overrides: Map<string, string | "disabled">;
+  }
+>;
 
 type SecretExtractionContext = {
   prefix: string;
@@ -102,68 +129,86 @@ export async function importLocalMachineState(options: {
   reviewer?: string;
   root: string;
   syncRuntimes?: boolean;
-}): Promise<ImportedSummary> {
+}): Promise<SeededSummary> {
   const machineId = options.machineId ?? options.bootstrap.machineId;
   const reviewer = options.reviewer ?? process.env.USER ?? machineId;
   const reviewTimestamp = new Date().toISOString();
   const assetsRoot = path.join(options.root, "assets");
   const repoSource = await ensureGovernanceRepoSource(options.root);
   const localSecrets = await loadLocalSecretsAccumulator(options.bootstrap.localSecretsFile);
-  const importedCapabilities: CapabilityRecord[] = [];
+  const seededCapabilities = new Map<string, CapabilityRecord>();
+  const runtimePolicies = createRuntimePolicyAccumulator();
+  let pluginBindingCount = 0;
 
-  await removePreviousBootstrapImports(options.root);
-  await removePath(path.join(options.root, "vendor", "imported"));
-  await removePath(assetsRoot);
+  await removePreviousBootstrapSeededArtifacts(options.root);
+  await removePath(path.join(options.root, "vendor", "bootstrap-seeded"));
   await ensureDir(assetsRoot);
+  const existingCapabilities = buildExistingCapabilityIndex((await loadRepo(options.root)).capabilities);
 
   const sharedSkillImport = await importSharedSkills({
     bootstrap: options.bootstrap,
+    existingCapabilities,
     localSecrets,
     repoRoot: options.root,
     repoSource,
     reviewTimestamp,
     reviewer,
   });
-  importedCapabilities.push(
-    ...sharedSkillImport.capabilities
-  );
+  for (const capability of sharedSkillImport.capabilities) {
+    mergeSeededCapability(seededCapabilities, capability);
+  }
+  mergeRuntimePolicies(runtimePolicies, sharedSkillImport.runtimePolicies);
   const skippedSkills = sharedSkillImport.skippedSkills;
 
-  importedCapabilities.push(
-    ...(await importCodexRuntimeState({
-      homeDir: resolveHomeDir(),
-      localSecrets,
-      repoRoot: options.root,
-      repoSource,
-      reviewTimestamp,
-      reviewer,
-    }))
-  );
+  const codexImport = await importCodexRuntimeState({
+    existingCapabilities,
+    homeDir: resolveHomeDir(),
+    localSecrets,
+    repoRoot: options.root,
+    repoSource,
+    reviewTimestamp,
+    reviewer,
+  });
+  for (const capability of codexImport.capabilities) {
+    seedAndMergeCapability(seededCapabilities, existingCapabilities, capability);
+  }
+  mergeRuntimePolicies(runtimePolicies, codexImport.runtimePolicies);
+  pluginBindingCount += codexImport.pluginBindingCount;
 
-  importedCapabilities.push(
-    ...(await importCursorRuntimeState({
-      homeDir: resolveHomeDir(),
-      localSecrets,
-      repoRoot: options.root,
-      repoSource,
-      reviewTimestamp,
-      reviewer,
-    }))
-  );
+  const cursorImport = await importCursorRuntimeState({
+    existingCapabilities,
+    homeDir: resolveHomeDir(),
+    localSecrets,
+    repoRoot: options.root,
+    repoSource,
+    reviewTimestamp,
+    reviewer,
+  });
+  for (const capability of cursorImport.capabilities) {
+    seedAndMergeCapability(seededCapabilities, existingCapabilities, capability);
+  }
+  mergeRuntimePolicies(runtimePolicies, cursorImport.runtimePolicies);
 
-  importedCapabilities.push(
-    ...(await importClaudeRuntimeState({
-      homeDir: resolveHomeDir(),
-      repoRoot: options.root,
-      repoSource,
-      reviewTimestamp,
-      reviewer,
-    }))
-  );
+  const claudeImport = await importClaudeRuntimeState({
+    existingCapabilities,
+    homeDir: resolveHomeDir(),
+    repoRoot: options.root,
+    repoSource,
+    reviewTimestamp,
+    reviewer,
+  });
+  for (const capability of claudeImport.capabilities) {
+    seedAndMergeCapability(seededCapabilities, existingCapabilities, capability);
+  }
+  mergeRuntimePolicies(runtimePolicies, claudeImport.runtimePolicies);
+  pluginBindingCount += claudeImport.pluginBindingCount;
 
-  for (const capability of importedCapabilities.sort((left, right) => left.id.localeCompare(right.id))) {
+  for (const capability of [...seededCapabilities.values()].sort((left, right) =>
+    left.id.localeCompare(right.id)
+  )) {
     await writeYamlFile(capabilityFilePath(options.root, capability.id), capability);
   }
+  await applyRuntimePolicies(options.root, runtimePolicies);
 
   await writeYamlFile(options.bootstrap.localSecretsFile, localSecretsSchema.parse(localSecrets));
 
@@ -191,9 +236,12 @@ export async function importLocalMachineState(options: {
 
   return {
     capabilityIds: lock.capabilities.map((capability) => capability.id),
-    skillCount: importedCapabilities.filter((capability) => capability.assetKind === "skill").length,
-    pluginCount: importedCapabilities.filter((capability) => capability.assetKind === "plugin").length,
-    mcpCount: importedCapabilities.filter((capability) => capability.assetKind === "mcp").length,
+    skillCount: [...seededCapabilities.values()].filter((capability) => capability.assetKind === "skill")
+      .length,
+    pluginCount: [...seededCapabilities.values()].filter((capability) => capability.assetKind === "plugin")
+      .length,
+    pluginBindingCount,
+    mcpCount: [...seededCapabilities.values()].filter((capability) => capability.assetKind === "mcp").length,
     skippedSkills,
     secretNames: Object.keys(localSecrets.secrets).sort(),
     syncedRuntimes,
@@ -202,6 +250,7 @@ export async function importLocalMachineState(options: {
 
 async function importSharedSkills(args: {
   bootstrap: BootstrapRecord;
+  existingCapabilities: ExistingCapabilityIndex;
   localSecrets: LocalSecretsAccumulator;
   repoRoot: string;
   repoSource: RepoSource;
@@ -212,6 +261,7 @@ async function importSharedSkills(args: {
   if (!(await pathExists(skillsRoot))) {
     return {
       capabilities: [],
+      runtimePolicies: createRuntimePolicyAccumulator(),
       skippedSkills: [],
     };
   }
@@ -221,6 +271,7 @@ async function importSharedSkills(args: {
     {}
   );
   const capabilities: CapabilityRecord[] = [];
+  const runtimePolicies = createRuntimePolicyAccumulator();
   const skippedSkills: string[] = [];
   const skillEntries = await listTopLevelEntries(skillsRoot);
 
@@ -234,23 +285,36 @@ async function importSharedSkills(args: {
     }
 
     const artifactName = entry.name;
+    const existingSkill = args.existingCapabilities.skillsByName.get(artifactName);
     const relativeSourcePath = path.join("assets", "skills", artifactName);
     const targetPath = path.join(args.repoRoot, relativeSourcePath);
-    await copyImportedDirectory(entry.path, targetPath);
+    await copySeededDirectory(entry.path, targetPath);
 
     const provenance = lockFile.skills?.[artifactName];
     capabilities.push(
-      buildImportedCapability({
+      buildSeededCapability({
         assetKind: "skill",
+        bindings: {
+          cache: {
+            skill: {
+              syncMode: "cache-only",
+            },
+          },
+          "user-dir": {
+            skill: {
+              syncMode: "user-skill-dir",
+            },
+          },
+        },
         canonicalPath: relativeSourcePath,
         digest: await computeDirectoryDigest(targetPath),
-        id: `skill.imported.${artifactName}`,
+        id: existingSkill?.id ?? `skill.${artifactName}`,
         install: {
           strategy: "copy",
           artifactName,
           sourcePath: normalizePosix(relativeSourcePath),
           manifest: withDefinedValues({
-            importedFrom: "shared-skill-cache",
+            seededFrom: "shared-skill-cache",
             ...(provenance
               ? {
                   source: provenance.source,
@@ -283,30 +347,25 @@ async function importSharedSkills(args: {
           networkAccess: false,
           touchesCredentials: false,
           filesystemSideEffects: "none",
-          notes: ["Imported from the local shared skill cache."],
+          notes: ["Seeded from the local shared skill cache."],
         },
         riskTier: "T1",
-        runtimeBindings: {
-          codex: {
-            skill: {
-              syncMode: "cache-only",
-            },
-          },
-        },
-        runtimeTargets: ["codex"],
         tags: [BOOTSTRAP_IMPORT_TAG, "shared-skill"],
         repoSource: args.repoSource,
       })
     );
+    noteRuntimeSelection(runtimePolicies, "codex", existingSkill?.id ?? `skill.${artifactName}`);
   }
 
   return {
     capabilities,
+    runtimePolicies,
     skippedSkills,
   };
 }
 
 async function importCodexRuntimeState(args: {
+  existingCapabilities: ExistingCapabilityIndex;
   homeDir: string;
   localSecrets: LocalSecretsAccumulator;
   repoRoot: string;
@@ -316,25 +375,39 @@ async function importCodexRuntimeState(args: {
 }) {
   const configPath = path.join(args.homeDir, ".codex", "config.toml");
   if (!(await pathExists(configPath))) {
-    return [];
+    return {
+      capabilities: [] as CapabilityRecord[],
+      pluginBindingCount: 0,
+      runtimePolicies: createRuntimePolicyAccumulator(),
+    };
   }
 
   const parsed = TOML.parse(await readText(configPath)) as TOML.JsonMap;
   const capabilities: CapabilityRecord[] = [];
+  const runtimePolicies = createRuntimePolicyAccumulator();
+  let pluginBindingCount = 0;
 
   for (const [pluginId, rawConfig] of sortedEntries(asRecord(parsed.plugins))) {
     const config = asRecord(rawConfig);
     const parsedPluginId = parsePluginId(pluginId);
     const artifactName = buildPluginArtifactName("codex", parsedPluginId.name);
+    const existingPlugin = args.existingCapabilities.pluginsByName.get(parsedPluginId.name);
+    const canonicalPluginId = existingPlugin?.id ?? `plugin.${parsedPluginId.name}`;
+    const pluginAssetPath = await ensurePluginAssetRoot(args.repoRoot, canonicalPluginId, parsedPluginId.name, {
+      sourceLabel: "Seeded from local plugin configuration",
+      runtimeId: "codex",
+      existingCapability: existingPlugin,
+    });
     const localSourceDir = await firstExistingPath([
       path.join(args.homeDir, ".codex", ".tmp", "plugins", "plugins", parsedPluginId.name),
       path.join(args.homeDir, ".codex", "plugins", parsedPluginId.name),
     ]);
-    const relativeSourcePath = path.join("assets", "packages", artifactName);
+    const relativeSourcePath = path.join(pluginAssetPath, "targets", "codex");
     const install =
       localSourceDir && (await pathExists(path.join(localSourceDir, ".codex-plugin", "plugin.json")))
         ? await buildCopiedInstall(args.repoRoot, relativeSourcePath, localSourceDir, {
-            importedFrom: "codex-plugin-cache",
+            artifactName,
+            seededFrom: "codex-plugin-cache",
             pluginId,
             localPath: localSourceDir,
           })
@@ -342,24 +415,35 @@ async function importCodexRuntimeState(args: {
             strategy: "external" as const,
             artifactName,
             manifest: {
-              importedFrom: "codex-config",
+              seededFrom: "codex-config",
               pluginId,
             },
           };
+    const bindingId = install.strategy === "external" ? "external" : "package";
 
     capabilities.push(
-      buildImportedCapability({
+      buildSeededCapability({
         assetKind: "plugin",
-        canonicalPath:
-          install.strategy === "copy" && install.sourcePath
-            ? install.sourcePath
-            : normalizePosix(path.join("registry", "capabilities", `plugin.imported.codex.${parsedPluginId.name}.yaml`)),
-        digest:
-          install.strategy === "copy" && install.sourcePath
-            ? await computeDirectoryDigest(path.join(args.repoRoot, install.sourcePath))
-            : computeValueDigest({ pluginId, config }),
-        id: `plugin.imported.codex.${parsedPluginId.name}`,
-        install,
+        bindings: {
+          [bindingId]: {
+            plugin: {
+              install,
+              nativeRegistration: {
+                pluginId,
+                enabled: config.enabled !== false,
+                installedRecords: [],
+              },
+            },
+          },
+        },
+        canonicalPath: pluginAssetPath,
+        digest: await computeDirectoryDigest(path.join(args.repoRoot, pluginAssetPath)),
+        id: canonicalPluginId,
+        install: {
+          strategy: "copy",
+          artifactName: parsedPluginId.name,
+          sourcePath: pluginAssetPath,
+        },
         name: parsedPluginId.name,
         permissions: {
           localRead: "scoped",
@@ -376,48 +460,52 @@ async function importCodexRuntimeState(args: {
           networkAccess: true,
           touchesCredentials: false,
           filesystemSideEffects: "runtime plugin execution",
-          notes: ["Imported from the local Codex plugin configuration."],
+          notes: ["Seeded from the local Codex plugin configuration."],
         },
         riskTier: "T2",
-        runtimeBindings: {
-          codex: {
-            plugin: {
-              pluginId,
-              enabled: config.enabled !== false,
-              installedRecords: [],
-            },
-          },
-        },
-        runtimeTargets: ["codex"],
-        tags: [BOOTSTRAP_IMPORT_TAG, "codex-plugin"],
+        tags: [BOOTSTRAP_IMPORT_TAG, "plugin-import"],
         repoSource: args.repoSource,
       })
     );
+    noteRuntimeSelection(runtimePolicies, "codex", canonicalPluginId, bindingId);
+    pluginBindingCount += 1;
   }
 
   for (const [serverName, rawConfig] of sortedEntries(asRecord(parsed.mcp_servers))) {
-    const secretContext = createSecretContext("IMPORTED_CODEX_MCP", args.localSecrets);
+    const secretContext = createSecretContext("SEEDED_CODEX_MCP", args.localSecrets);
     const sanitizedConfig = sanitizeSensitiveValues(rawConfig, [serverName], secretContext);
+    const existingMcp = args.existingCapabilities.mcpsByName.get(serverName);
     capabilities.push(
       buildMcpCapability({
         configPath,
         hasSecrets: secretContext.extracted.size > 0,
-        id: `mcp.imported.codex.${serverName}`,
-        name: serverName,
+        id: existingMcp?.id ?? `mcp.${serverName}`,
         repoSource: args.repoSource,
         reviewTimestamp: args.reviewTimestamp,
         reviewer: args.reviewer,
         runtimeId: "codex",
         sanitizedConfig,
         serverName,
+        tags: existingMcp ? ["mcp-import"] : [BOOTSTRAP_IMPORT_TAG, "mcp-import"],
       })
+    );
+    noteRuntimeSelection(
+      runtimePolicies,
+      "codex",
+      existingMcp?.id ?? `mcp.${serverName}`,
+      bindingIdForMcpConfig(sanitizedConfig)
     );
   }
 
-  return capabilities;
+  return {
+    capabilities,
+    pluginBindingCount,
+    runtimePolicies,
+  };
 }
 
 async function importCursorRuntimeState(args: {
+  existingCapabilities: ExistingCapabilityIndex;
   homeDir: string;
   localSecrets: LocalSecretsAccumulator;
   repoRoot: string;
@@ -427,35 +515,50 @@ async function importCursorRuntimeState(args: {
 }) {
   const configPath = path.join(args.homeDir, ".cursor", "mcp.json");
   if (!(await pathExists(configPath))) {
-    return [];
+    return {
+      capabilities: [] as CapabilityRecord[],
+      runtimePolicies: createRuntimePolicyAccumulator(),
+    };
   }
 
   const parsed = await readJsonFile<Record<string, unknown>>(configPath);
   const capabilities: CapabilityRecord[] = [];
+  const runtimePolicies = createRuntimePolicyAccumulator();
 
   for (const [serverName, rawConfig] of sortedEntries(asRecord(parsed.mcpServers))) {
-    const secretContext = createSecretContext("IMPORTED_CURSOR_MCP", args.localSecrets);
+    const secretContext = createSecretContext("SEEDED_CURSOR_MCP", args.localSecrets);
     const sanitizedConfig = sanitizeSensitiveValues(rawConfig, [serverName], secretContext);
+    const existingMcp = args.existingCapabilities.mcpsByName.get(serverName);
     capabilities.push(
       buildMcpCapability({
         configPath,
         hasSecrets: secretContext.extracted.size > 0,
-        id: `mcp.imported.cursor.${serverName}`,
-        name: serverName,
+        id: existingMcp?.id ?? `mcp.${serverName}`,
         repoSource: args.repoSource,
         reviewTimestamp: args.reviewTimestamp,
         reviewer: args.reviewer,
         runtimeId: "cursor",
         sanitizedConfig,
         serverName,
+        tags: existingMcp ? ["mcp-import"] : [BOOTSTRAP_IMPORT_TAG, "mcp-import"],
       })
+    );
+    noteRuntimeSelection(
+      runtimePolicies,
+      "cursor",
+      existingMcp?.id ?? `mcp.${serverName}`,
+      bindingIdForMcpConfig(sanitizedConfig)
     );
   }
 
-  return capabilities;
+  return {
+    capabilities,
+    runtimePolicies,
+  };
 }
 
 async function importClaudeRuntimeState(args: {
+  existingCapabilities: ExistingCapabilityIndex;
   homeDir: string;
   repoRoot: string;
   repoSource: RepoSource;
@@ -466,7 +569,11 @@ async function importClaudeRuntimeState(args: {
   const knownMarketplacesPath = path.join(args.homeDir, ".claude", "plugins", "known_marketplaces.json");
   const installedPluginsPath = path.join(args.homeDir, ".claude", "plugins", "installed_plugins.json");
   if (!(await pathExists(settingsPath))) {
-    return [];
+    return {
+      capabilities: [] as CapabilityRecord[],
+      pluginBindingCount: 0,
+      runtimePolicies: createRuntimePolicyAccumulator(),
+    };
   }
 
   const settings = await readJsonFile<Record<string, unknown>>(settingsPath);
@@ -490,10 +597,19 @@ async function importClaudeRuntimeState(args: {
   }
 
   const capabilities: CapabilityRecord[] = [];
+  const runtimePolicies = createRuntimePolicyAccumulator();
+  let pluginBindingCount = 0;
   for (const pluginId of [...pluginIds].sort()) {
     const parsedPluginId = parsePluginId(pluginId);
     const knownMarketplace = asRecord(knownMarketplaces[parsedPluginId.marketplaceId ?? ""]);
     const installedRecords = asRecordArray(installedByPlugin[pluginId]);
+    const existingPlugin = args.existingCapabilities.pluginsByName.get(parsedPluginId.name);
+    const canonicalPluginId = existingPlugin?.id ?? `plugin.${parsedPluginId.name}`;
+    const pluginAssetPath = await ensurePluginAssetRoot(args.repoRoot, canonicalPluginId, parsedPluginId.name, {
+      sourceLabel: "Seeded from local plugin configuration",
+      runtimeId: "claude",
+      existingCapability: existingPlugin,
+    });
     const localSourceDir = await resolveClaudePluginDirectory({
       homeDir: args.homeDir,
       installedRecords,
@@ -501,11 +617,12 @@ async function importClaudeRuntimeState(args: {
       marketplaceId: parsedPluginId.marketplaceId,
     });
     const artifactName = buildPluginArtifactName("claude", parsedPluginId.name);
-    const relativeSourcePath = path.join("assets", "packages", artifactName);
+    const relativeSourcePath = path.join(pluginAssetPath, "targets", "claude");
     const install =
       localSourceDir && (await pathExists(path.join(localSourceDir, ".claude-plugin", "plugin.json")))
         ? await buildCopiedInstall(args.repoRoot, relativeSourcePath, localSourceDir, {
-            importedFrom: "claude-plugin-marketplace",
+            artifactName,
+            seededFrom: "claude-plugin-marketplace",
             pluginId,
             localPath: localSourceDir,
           })
@@ -513,25 +630,53 @@ async function importClaudeRuntimeState(args: {
             strategy: "external" as const,
             artifactName,
             manifest: {
-              importedFrom: "claude-settings",
+              seededFrom: "claude-settings",
               pluginId,
               marketplaceId: parsedPluginId.marketplaceId,
             },
           };
+    const bindingId =
+      parsedPluginId.marketplaceId
+        ? "marketplace"
+        : install.strategy === "external"
+          ? "external"
+          : "package";
 
     capabilities.push(
-      buildImportedCapability({
+      buildSeededCapability({
         assetKind: "plugin",
-        canonicalPath:
-          install.strategy === "copy" && install.sourcePath
-            ? install.sourcePath
-            : normalizePosix(path.join("registry", "capabilities", `plugin.imported.claude.${parsedPluginId.name}.yaml`)),
-        digest:
-          install.strategy === "copy" && install.sourcePath
-            ? await computeDirectoryDigest(path.join(args.repoRoot, install.sourcePath))
-            : computeValueDigest({ pluginId, knownMarketplace, installedRecords }),
-        id: `plugin.imported.claude.${parsedPluginId.name}`,
-        install,
+        bindings: {
+          [bindingId]: {
+            plugin: {
+              install,
+              nativeRegistration: {
+                pluginId,
+                enabled: enabledPlugins[pluginId] === true,
+                ...(parsedPluginId.marketplaceId && Object.keys(knownMarketplace).length > 0
+                  ? {
+                      knownMarketplace: {
+                        marketplaceId: parsedPluginId.marketplaceId,
+                        ...knownMarketplace,
+                        installLocation: `\${CACHE_ROOT}/packages/${artifactName}`,
+                      },
+                    }
+                  : {}),
+                installedRecords: installedRecords.map((record) => ({
+                  ...record,
+                  installPath: `\${CACHE_ROOT}/packages/${artifactName}`,
+                })),
+              },
+            },
+          },
+        },
+        canonicalPath: pluginAssetPath,
+        digest: await computeDirectoryDigest(path.join(args.repoRoot, pluginAssetPath)),
+        id: canonicalPluginId,
+        install: {
+          strategy: "copy",
+          artifactName: parsedPluginId.name,
+          sourcePath: pluginAssetPath,
+        },
         name: parsedPluginId.name,
         permissions: {
           localRead: "scoped",
@@ -548,42 +693,26 @@ async function importClaudeRuntimeState(args: {
           networkAccess: true,
           touchesCredentials: false,
           filesystemSideEffects: "runtime plugin execution",
-          notes: ["Imported from the local Claude plugin configuration."],
+          notes: ["Seeded from the local Claude plugin configuration."],
         },
         riskTier: "T2",
-        runtimeBindings: {
-          claude: {
-            plugin: {
-              pluginId,
-              enabled: enabledPlugins[pluginId] === true,
-              ...(parsedPluginId.marketplaceId && Object.keys(knownMarketplace).length > 0
-                ? {
-                    knownMarketplace: {
-                      marketplaceId: parsedPluginId.marketplaceId,
-                      ...knownMarketplace,
-                      installLocation: `\${CACHE_ROOT}/packages/${artifactName}`,
-                    },
-                  }
-                : {}),
-              installedRecords: installedRecords.map((record) => ({
-                ...record,
-                installPath: `\${CACHE_ROOT}/packages/${artifactName}`,
-              })),
-            },
-          },
-        },
-        runtimeTargets: ["claude"],
-        tags: [BOOTSTRAP_IMPORT_TAG, "claude-plugin"],
+        tags: [BOOTSTRAP_IMPORT_TAG, "plugin-import"],
         repoSource: args.repoSource,
       })
     );
+    noteRuntimeSelection(runtimePolicies, "claude", canonicalPluginId, bindingId);
+    pluginBindingCount += 1;
   }
 
-  return capabilities;
+  return {
+    capabilities,
+    pluginBindingCount,
+    runtimePolicies,
+  };
 }
 
-function buildImportedCapability(
-  input: ImportedCapabilityInput & {
+function buildSeededCapability(
+  input: SeededCapabilityInput & {
     repoSource: RepoSource;
   }
 ) {
@@ -591,9 +720,11 @@ function buildImportedCapability(
     id: input.id,
     name: input.name,
     assetKind: input.assetKind,
-    runtimeTargets: input.runtimeTargets,
-    runtimeBindings: input.runtimeBindings,
+    bindings: input.bindings,
     discoverySources: [],
+    includes: input.includes ?? [],
+    ...(input.entrypoints ? { entrypoints: input.entrypoints } : {}),
+    exposes: input.exposes ?? [],
     canonicalSource: {
       sourceId: input.repoSource.id,
       url: input.repoSource.url,
@@ -628,31 +759,45 @@ function buildMcpCapability(args: {
   configPath: string;
   hasSecrets: boolean;
   id: string;
-  name: string;
   repoSource: RepoSource;
   reviewTimestamp: string;
   reviewer: string;
   runtimeId: string;
   sanitizedConfig: unknown;
   serverName: string;
+  tags: string[];
 }) {
-  return buildImportedCapability({
+  const bindingId = bindingIdForMcpConfig(args.sanitizedConfig);
+  return buildSeededCapability({
     assetKind: "mcp",
-    canonicalPath: normalizePosix(path.join("registry", "capabilities", `${args.id}.yaml`)),
+    bindings: {
+      [bindingId]: {
+        mcp: {
+          serverName: args.serverName,
+          config: asRecord(args.sanitizedConfig),
+        },
+      },
+    },
+    canonicalPath: registryCapabilityPathFromId(args.id),
     digest: computeValueDigest({
-      runtimeId: args.runtimeId,
       serverName: args.serverName,
-      config: args.sanitizedConfig,
+      bindingId,
+      binding: {
+        mcp: {
+          serverName: args.serverName,
+          config: asRecord(args.sanitizedConfig),
+        },
+      },
     }),
     id: args.id,
     install: {
       strategy: "manifest",
-      artifactName: `${args.runtimeId}-${args.serverName}`,
+      artifactName: args.serverName,
       manifest: {
-        importedFrom: args.configPath,
+        seededFrom: args.configPath,
       },
     },
-    name: `${args.name} (${args.runtimeId})`,
+    name: args.serverName,
     permissions: {
       localRead: "scoped",
       network: true,
@@ -668,31 +813,29 @@ function buildMcpCapability(args: {
       networkAccess: true,
       touchesCredentials: args.hasSecrets,
       filesystemSideEffects: "runtime MCP process access",
-      notes: [`Imported from ${args.runtimeId} runtime MCP configuration.`],
+      notes: [`Seeded from ${args.runtimeId} runtime MCP configuration.`],
     },
     riskTier: args.hasSecrets ? "T3" : "T2",
-    runtimeBindings: {
-      [args.runtimeId]: {
-        mcp: {
-          serverName: args.serverName,
-          config: asRecord(args.sanitizedConfig),
-        },
-      },
-    },
-    runtimeTargets: [args.runtimeId],
-    tags: [BOOTSTRAP_IMPORT_TAG, `${args.runtimeId}-mcp`],
+    tags: args.tags,
     repoSource: args.repoSource,
   });
 }
 
-async function removePreviousBootstrapImports(root: string) {
+async function removePreviousBootstrapSeededArtifacts(root: string) {
+  const ownedAssetPaths = new Set<string>();
   const capabilityFiles = await listFiles(path.join(root, "registry", "capabilities"), ".yaml");
   for (const filePath of capabilityFiles) {
     const parsed = capabilitySchema.parse(await readYamlFile(filePath));
     if (!parsed.tags.includes(BOOTSTRAP_IMPORT_TAG)) {
       continue;
     }
+    collectBootstrapOwnedAssetPaths(root, ownedAssetPaths, parsed.install.sourcePath);
+    collectBootstrapOwnedAssetPaths(root, ownedAssetPaths, parsed.canonicalSource.path);
     await removePath(filePath);
+  }
+
+  for (const assetPath of [...ownedAssetPaths].sort((left, right) => right.length - left.length)) {
+    await removePath(assetPath);
   }
 }
 
@@ -708,7 +851,7 @@ async function ensureGovernanceRepoSource(root: string): Promise<RepoSource> {
     discoveryOnly: false,
     trustLevel: "governance-repo",
     owner: "self",
-    notes: ["Canonical source for imported local bootstrap artifacts."],
+    notes: ["Canonical source for bootstrap-seeded local artifacts."],
   };
 
   if (!existing) {
@@ -723,6 +866,116 @@ async function ensureGovernanceRepoSource(root: string): Promise<RepoSource> {
     ref: await resolveGovernanceRepoRef(root),
     refType: "branch",
   };
+}
+
+function buildExistingCapabilityIndex(capabilities: CapabilityRecord[]): ExistingCapabilityIndex {
+  const byId = new Map<string, CapabilityRecord>();
+  const mcpsByName = new Map<string, CapabilityRecord>();
+  const pluginsByName = new Map<string, CapabilityRecord>();
+  const skillsByName = new Map<string, CapabilityRecord>();
+
+  for (const capability of capabilities) {
+    byId.set(capability.id, capability);
+    if (capability.assetKind === "mcp") {
+      mcpsByName.set(capability.name, capability);
+    }
+    if (capability.assetKind === "plugin") {
+      pluginsByName.set(capability.name, capability);
+    }
+    if (capability.assetKind === "skill") {
+      skillsByName.set(capability.name, capability);
+    }
+  }
+
+  return {
+    byId,
+    mcpsByName,
+    pluginsByName,
+    skillsByName,
+  };
+}
+
+function createRuntimePolicyAccumulator(): RuntimePolicyAccumulator {
+  return new Map();
+}
+
+function noteRuntimeSelection(
+  runtimePolicies: RuntimePolicyAccumulator,
+  runtimeId: string,
+  capabilityId: string,
+  bindingId?: string
+) {
+  const entry = getOrCreateRuntimePolicy(runtimePolicies, runtimeId);
+  entry.enabledCapabilityIds.add(capabilityId);
+  if (bindingId) {
+    entry.overrides.set(capabilityId, bindingId);
+  }
+}
+
+function mergeRuntimePolicies(target: RuntimePolicyAccumulator, source: RuntimePolicyAccumulator) {
+  for (const [runtimeId, policy] of source) {
+    const targetEntry = getOrCreateRuntimePolicy(target, runtimeId);
+    for (const capabilityId of policy.enabledCapabilityIds) {
+      targetEntry.enabledCapabilityIds.add(capabilityId);
+    }
+    for (const [capabilityId, bindingId] of policy.overrides) {
+      targetEntry.overrides.set(capabilityId, bindingId);
+    }
+  }
+}
+
+function getOrCreateRuntimePolicy(runtimePolicies: RuntimePolicyAccumulator, runtimeId: string) {
+  const existing = runtimePolicies.get(runtimeId);
+  if (existing) {
+    return existing;
+  }
+
+  const next = {
+    enabledCapabilityIds: new Set<string>(),
+    overrides: new Map<string, string | "disabled">(),
+  };
+  runtimePolicies.set(runtimeId, next);
+  return next;
+}
+
+async function applyRuntimePolicies(root: string, runtimePolicies: RuntimePolicyAccumulator) {
+  for (const [runtimeId, policy] of [...runtimePolicies.entries()].sort(([left], [right]) =>
+    left.localeCompare(right)
+  )) {
+    const runtimePath = path.join(root, "runtimes", `${runtimeId}.yaml`);
+    if (!(await pathExists(runtimePath))) {
+      continue;
+    }
+
+    const runtime = runtimeSchema.parse(await readYamlFile(runtimePath));
+    runtime.enabledCapabilities = [
+      ...new Set([...runtime.enabledCapabilities, ...policy.enabledCapabilityIds]),
+    ].sort();
+    runtime.bindingPolicy = {
+      ...runtime.bindingPolicy,
+      overrides: {
+        ...runtime.bindingPolicy.overrides,
+        ...Object.fromEntries([...policy.overrides.entries()].sort(([left], [right]) =>
+          left.localeCompare(right)
+        )),
+      },
+    };
+    await writeYamlFile(runtimePath, runtime);
+  }
+}
+
+function seedAndMergeCapability(
+  seededCapabilities: Map<string, CapabilityRecord>,
+  existingCapabilities: ExistingCapabilityIndex,
+  capability: CapabilityRecord
+) {
+  if (!seededCapabilities.has(capability.id)) {
+    const existing = existingCapabilities.byId.get(capability.id);
+    if (existing && capability.assetKind === "mcp") {
+      seededCapabilities.set(capability.id, existing);
+    }
+  }
+  mergeSeededCapability(seededCapabilities, capability);
 }
 
 async function seedManagedState(
@@ -746,7 +999,7 @@ async function seedManagedState(
     switch (runtimeState.runtimeId) {
       case "codex":
         await writeJsonFile(runtimeState.ownedStateFile, {
-          managedPluginIds: runtimeState.plugins.map((plugin) => plugin.pluginId),
+          managedPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
           managedMcpServerNames: runtimeState.mcps.map((mcp) => mcp.serverName),
         });
         break;
@@ -760,13 +1013,13 @@ async function seedManagedState(
         break;
       case "claude":
         await writeJsonFile(runtimeState.ownedStateFile, {
-          managedEnabledPluginIds: runtimeState.plugins.map((plugin) => plugin.pluginId),
+          managedEnabledPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
           managedMarketplaceIds: runtimeState.plugins
-            .map((plugin) => plugin.knownMarketplace?.marketplaceId)
+            .map((plugin) => plugin.nativeRegistration.knownMarketplace?.marketplaceId)
             .filter((value): value is string => typeof value === "string" && value.length > 0),
           managedInstalledPluginIds: runtimeState.plugins
-            .filter((plugin) => plugin.installedRecords.length > 0)
-            .map((plugin) => plugin.pluginId),
+            .filter((plugin) => plugin.nativeRegistration.installedRecords.length > 0)
+            .map((plugin) => plugin.nativeRegistration.pluginId),
         });
         break;
       default:
@@ -806,16 +1059,66 @@ async function buildCopiedInstall(
   root: string,
   relativeSourcePath: string,
   sourceDir: string,
-  manifest: Record<string, unknown>
+  manifest: Record<string, unknown> & {
+    artifactName?: string;
+  }
 ) {
   const targetPath = path.join(root, relativeSourcePath);
-  await copyImportedDirectory(sourceDir, targetPath);
+  await copySeededDirectory(sourceDir, targetPath);
+  const { artifactName, ...manifestPayload } = manifest;
   return {
     strategy: "copy" as const,
-    artifactName: path.basename(relativeSourcePath),
+    artifactName: artifactName ?? path.basename(relativeSourcePath),
     sourcePath: normalizePosix(relativeSourcePath),
-    manifest,
+    manifest: manifestPayload,
   };
+}
+
+async function ensurePluginAssetRoot(
+  root: string,
+  capabilityId: string,
+  pluginName: string,
+  args: {
+    existingCapability: CapabilityRecord | undefined;
+    runtimeId: string;
+    sourceLabel: string;
+  }
+) {
+  const relativePath = resolvePluginAssetPath(args.existingCapability, pluginName);
+  const targetDir = path.join(root, relativePath);
+  await ensureDir(targetDir);
+  const readmePath = path.join(targetDir, "README.md");
+  if (!(await pathExists(readmePath))) {
+    await writeText(
+      readmePath,
+      [
+        `# ${pluginName}`,
+        "",
+        "Canonical plugin asset managed by agent-governance.",
+        "",
+        `- Canonical capability lives in \`${registryCapabilityPathFromId(capabilityId)}\``,
+        `- Runtime seed: ${args.runtimeId}`,
+        `- Initial seed: ${args.sourceLabel}`,
+        "",
+        "Runtime-specific installation payloads live under targets/<runtime>/.",
+        "",
+      ].join("\n")
+    );
+  }
+  return relativePath;
+}
+
+function resolvePluginAssetPath(existingCapability: CapabilityRecord | undefined, pluginName: string) {
+  for (const candidate of [
+    existingCapability?.install.sourcePath,
+    existingCapability?.canonicalSource.path,
+  ]) {
+    if (candidate && !path.isAbsolute(candidate) && normalizePosix(candidate).startsWith("assets/plugins/")) {
+      return normalizePosix(candidate);
+    }
+  }
+
+  return normalizePosix(path.join("assets", "plugins", pluginName));
 }
 
 async function readPluginLicense(
@@ -922,6 +1225,152 @@ function buildPluginArtifactName(runtimeId: string, name: string) {
   return `${runtimeId}-${name}`.replace(/[^a-zA-Z0-9-]+/g, "-");
 }
 
+function registryCapabilityPathFromId(id: string) {
+  const [kind, ...rest] = id.split(".");
+  const name = rest.at(-1);
+  if (!kind || !name) {
+    throw new Error(`Invalid capability id ${id}.`);
+  }
+  return normalizePosix(path.join("registry", "capabilities", kind, ...rest.slice(0, -1), `${name}.yaml`));
+}
+
+function bindingIdForMcpConfig(config: unknown) {
+  const record = asRecord(config);
+  return typeof record.url === "string" ? "remote-http" : "stdio-command";
+}
+
+function collectBootstrapOwnedAssetPaths(
+  root: string,
+  ownedAssetPaths: Set<string>,
+  sourcePath: string | undefined
+) {
+  if (!sourcePath || path.isAbsolute(sourcePath)) {
+    return;
+  }
+
+  const normalized = normalizePosix(sourcePath);
+  if (!(normalized.startsWith("assets/") || normalized.startsWith("vendor/bootstrap-seeded/"))) {
+    return;
+  }
+
+  ownedAssetPaths.add(path.join(root, normalized));
+}
+
+function mergeSeededCapability(
+  seededCapabilities: Map<string, CapabilityRecord>,
+  capability: CapabilityRecord
+) {
+  const existing = seededCapabilities.get(capability.id);
+  if (!existing) {
+    seededCapabilities.set(capability.id, capability);
+    return;
+  }
+
+  const merged = capabilitySchema.parse({
+    ...existing,
+    bindings: {
+      ...existing.bindings,
+      ...capability.bindings,
+    },
+    includes: [...new Set([...existing.includes, ...capability.includes])].sort(),
+    entrypoints: {
+      commands: [
+        ...new Set([
+          ...(existing.entrypoints?.commands ?? []),
+          ...(capability.entrypoints?.commands ?? []),
+        ]),
+      ].sort(),
+      agents: [
+        ...new Set([
+          ...(existing.entrypoints?.agents ?? []),
+          ...(capability.entrypoints?.agents ?? []),
+        ]),
+      ].sort(),
+    },
+    exposes: [...new Set([...existing.exposes, ...capability.exposes])].sort(),
+    permissions: {
+      localRead: maxLocalRead(existing.permissions.localRead, capability.permissions.localRead),
+      network: existing.permissions.network || capability.permissions.network,
+      credentials: existing.permissions.credentials || capability.permissions.credentials,
+      filesystemWrite: maxFilesystemWrite(
+        existing.permissions.filesystemWrite,
+        capability.permissions.filesystemWrite
+      ),
+    },
+    review: {
+      ...existing.review,
+      reviewer: existing.review.reviewer ?? capability.review.reviewer,
+      reviewedAt: maxReviewedAt(existing.review.reviewedAt, capability.review.reviewedAt),
+      license: existing.review.license ?? capability.review.license,
+      status: existing.review.status === "approved" || capability.review.status === "approved"
+        ? "approved"
+        : existing.review.status,
+      executesScripts:
+        (existing.review.executesScripts ?? false) || (capability.review.executesScripts ?? false),
+      networkAccess:
+        (existing.review.networkAccess ?? false) || (capability.review.networkAccess ?? false),
+      touchesCredentials:
+        (existing.review.touchesCredentials ?? false) ||
+        (capability.review.touchesCredentials ?? false),
+      filesystemSideEffects:
+        existing.review.filesystemSideEffects ?? capability.review.filesystemSideEffects,
+      notes: [...new Set([...existing.review.notes, ...capability.review.notes])],
+    },
+    riskTier: maxRiskTier(existing.riskTier, capability.riskTier),
+    tags: [...new Set([...existing.tags, ...capability.tags])].sort(),
+    hash:
+      existing.assetKind === "mcp"
+        ? {
+            algorithm: "sha256",
+            digest: computeValueDigest({
+              install: existing.install,
+              bindings: {
+                ...existing.bindings,
+                ...capability.bindings,
+              },
+            }),
+          }
+        : existing.hash,
+  });
+
+  seededCapabilities.set(capability.id, merged);
+}
+
+function maxRiskTier(left: CapabilityRecord["riskTier"], right: CapabilityRecord["riskTier"]) {
+  const order: CapabilityRecord["riskTier"][] = ["T0", "T1", "T2", "T3"];
+  return order[Math.max(order.indexOf(left), order.indexOf(right))]!;
+}
+
+function maxLocalRead(
+  left: CapabilityRecord["permissions"]["localRead"],
+  right: CapabilityRecord["permissions"]["localRead"]
+) {
+  const order: CapabilityRecord["permissions"]["localRead"][] = ["none", "scoped", "full"];
+  return order[Math.max(order.indexOf(left), order.indexOf(right))]!;
+}
+
+function maxFilesystemWrite(
+  left: CapabilityRecord["permissions"]["filesystemWrite"],
+  right: CapabilityRecord["permissions"]["filesystemWrite"]
+) {
+  const order: CapabilityRecord["permissions"]["filesystemWrite"][] = [
+    "none",
+    "runtime-only",
+    "full",
+  ];
+  return order[Math.max(order.indexOf(left), order.indexOf(right))]!;
+}
+
+function maxReviewedAt(left?: string, right?: string) {
+  if (!left) {
+    return right;
+  }
+  if (!right) {
+    return left;
+  }
+  return new Date(left).getTime() >= new Date(right).getTime() ? left : right;
+}
+
 function configLooksExecutable(value: unknown) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return false;
@@ -1013,6 +1462,6 @@ function resolveHomeDir() {
   return process.env.HOME ?? os.homedir();
 }
 
-async function copyImportedDirectory(sourceDir: string, targetDir: string) {
+async function copySeededDirectory(sourceDir: string, targetDir: string) {
   await copyDirectoryResolved(sourceDir, targetDir);
 }

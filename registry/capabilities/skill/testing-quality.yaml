@@ -1,0 +1,51 @@
+id: skill.testing-quality
+name: testing-quality
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/testing-quality
+install:
+  strategy: copy
+  artifactName: testing-quality
+  sourcePath: assets/skills/testing-quality
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/testing-quality
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Seeded from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: bad30ac7536b241723057f30bd7f6b98934b0862185b8453528d961497786358
+tags:
+  - bootstrap-seeded
+  - shared-skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir

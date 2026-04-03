@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   approveCapability,
   auditGovernance,
+  capabilityFilePath,
   changeCapabilityLifecycle,
   ingestCapability,
   loadBootstrap,
@@ -572,41 +573,68 @@ describe.sequential("agent governance", () => {
       });
 
       expect(summary.skillCount).toBe(1);
-      expect(summary.pluginCount).toBe(2);
+      expect(summary.pluginCount).toBe(1);
+      expect(summary.pluginBindingCount).toBe(2);
       expect(summary.mcpCount).toBe(2);
       expect(summary.skippedSkills).toEqual([]);
       expect(summary.syncedRuntimes).toEqual(["codex", "cursor", "claude"]);
 
       expect(
-        await exists(path.join(sandbox.root, "registry", "capabilities", "skill.imported.sample-skill.yaml"))
+        await exists(path.join(sandbox.root, "registry", "capabilities", "skill", "sample-skill.yaml"))
       ).toBe(true);
       expect(
-        await exists(
-          path.join(sandbox.root, "registry", "capabilities", "plugin.imported.codex.sample-plugin.yaml")
-        )
+        await exists(path.join(sandbox.root, "registry", "capabilities", "plugin", "sample-plugin.yaml"))
       ).toBe(true);
       expect(
-        await exists(
-          path.join(sandbox.root, "registry", "capabilities", "plugin.imported.claude.sample-plugin.yaml")
-        )
-      ).toBe(true);
-      expect(
-        await exists(path.join(sandbox.root, "registry", "capabilities", "mcp.imported.cursor.github.yaml"))
+        await exists(path.join(sandbox.root, "registry", "capabilities", "mcp", "github.yaml"))
       ).toBe(true);
 
-      const importedCursorMcp = await fs.readFile(
-        path.join(sandbox.root, "registry", "capabilities", "mcp.imported.cursor.github.yaml"),
+      const seededPlugin = YAML.parse(
+        await fs.readFile(
+          path.join(sandbox.root, "registry", "capabilities", "plugin", "sample-plugin.yaml"),
+          "utf8"
+        )
+      ) as {
+        bindings: Record<string, { plugin?: { nativeRegistration?: { pluginId?: string } } }>;
+      };
+      expect(seededPlugin.bindings.package?.plugin?.nativeRegistration?.pluginId).toBe(
+        "sample-plugin@governed-marketplace"
+      );
+      expect(seededPlugin.bindings.marketplace?.plugin?.nativeRegistration?.pluginId).toBe(
+        "sample-plugin@sample-marketplace"
+      );
+
+      const codexRuntime = YAML.parse(
+        await fs.readFile(path.join(sandbox.root, "runtimes", "codex.yaml"), "utf8")
+      ) as {
+        enabledCapabilities: string[];
+        bindingPolicy: { overrides: Record<string, string> };
+      };
+      expect(codexRuntime.enabledCapabilities).toContain("plugin.sample-plugin");
+      expect(codexRuntime.bindingPolicy.overrides["plugin.sample-plugin"]).toBe("package");
+
+      const claudeRuntime = YAML.parse(
+        await fs.readFile(path.join(sandbox.root, "runtimes", "claude.yaml"), "utf8")
+      ) as {
+        enabledCapabilities: string[];
+        bindingPolicy: { overrides: Record<string, string> };
+      };
+      expect(claudeRuntime.enabledCapabilities).toContain("plugin.sample-plugin");
+      expect(claudeRuntime.bindingPolicy.overrides["plugin.sample-plugin"]).toBe("marketplace");
+
+      const seededCursorMcp = await fs.readFile(
+        path.join(sandbox.root, "registry", "capabilities", "mcp", "github.yaml"),
         "utf8"
       );
-      expect(importedCursorMcp).toContain("${SECRET:IMPORTED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN}");
-      expect(importedCursorMcp).not.toContain("cursor-secret");
+      expect(seededCursorMcp).toContain("${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN}");
+      expect(seededCursorMcp).not.toContain("cursor-secret");
 
       const localSecrets = YAML.parse(
         await fs.readFile(sandbox.localSecretsFile, "utf8")
       ) as {
         secrets: Record<string, string>;
       };
-      expect(localSecrets.secrets.IMPORTED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN).toBe("cursor-secret");
+      expect(localSecrets.secrets.SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_TOKEN).toBe("cursor-secret");
 
       expect(await exists(path.join(sandbox.cacheRoot, "skills", "sample-skill", "SKILL.md"))).toBe(true);
       expect(
@@ -646,10 +674,21 @@ describe.sequential("agent governance", () => {
     }
   });
 
-  it("dereferences imported assets and skips invalid local skills during import-local", async () => {
+  it("dereferences seeded assets and skips invalid local skills during import-local", async () => {
     const sandbox = await createSandbox();
 
     try {
+      const canonicalKeeper = path.join(
+        sandbox.root,
+        "assets",
+        "plugins",
+        "curated",
+        "keeper",
+        "README.md"
+      );
+      await fs.mkdir(path.dirname(canonicalKeeper), { recursive: true });
+      await fs.writeFile(canonicalKeeper, "keep me\n", "utf8");
+
       const validSkillDir = path.join(sandbox.cacheRoot, "skills", "linked-skill");
       await fs.mkdir(validSkillDir, { recursive: true });
       await fs.writeFile(
@@ -736,30 +775,34 @@ describe.sequential("agent governance", () => {
 
       expect(summary.skillCount).toBe(1);
       expect(summary.pluginCount).toBe(1);
+      expect(summary.pluginBindingCount).toBe(1);
       expect(summary.mcpCount).toBe(0);
       expect(summary.skippedSkills).toEqual(["invalid-skill"]);
       expect(summary.syncedRuntimes).toEqual([]);
 
-      const importedSkillNote = path.join(
+      const seededSkillNote = path.join(
         sandbox.root,
         "assets",
         "skills",
         "linked-skill",
         "notes.md"
       );
-      const importedPluginNote = path.join(
+      const seededPluginNote = path.join(
         sandbox.root,
         "assets",
-        "packages",
-        "codex-linked-plugin",
+        "plugins",
+        "linked-plugin",
+        "targets",
+        "codex",
         "notes.txt"
       );
 
-      expect((await fs.lstat(importedSkillNote)).isSymbolicLink()).toBe(false);
-      expect((await fs.lstat(importedPluginNote)).isSymbolicLink()).toBe(false);
-      expect(await fs.readFile(importedSkillNote, "utf8")).toBe("external skill note\n");
-      expect(await fs.readFile(importedPluginNote, "utf8")).toBe("external plugin note\n");
+      expect((await fs.lstat(seededSkillNote)).isSymbolicLink()).toBe(false);
+      expect((await fs.lstat(seededPluginNote)).isSymbolicLink()).toBe(false);
+      expect(await fs.readFile(seededSkillNote, "utf8")).toBe("external skill note\n");
+      expect(await fs.readFile(seededPluginNote, "utf8")).toBe("external plugin note\n");
       expect(await exists(path.join(sandbox.root, "assets", "skills", "invalid-skill"))).toBe(false);
+      expect(await fs.readFile(canonicalKeeper, "utf8")).toBe("keep me\n");
     } finally {
       await sandbox.cleanup();
     }
@@ -1120,6 +1163,7 @@ async function createSandbox() {
   await copyIntoSandbox("runtimes/cursor.yaml", repoRoot);
   await copyIntoSandbox("runtimes/claude.yaml", repoRoot);
   await copyIntoSandbox("runtimes/gemini.yaml", repoRoot);
+  await resetSandboxRuntimePolicies(repoRoot);
   await copyIntoSandbox("tests/fixtures/assets/sample-skill", repoRoot);
   await copyIntoSandbox("tests/fixtures/assets/sample-plugin", repoRoot);
 
@@ -1170,7 +1214,7 @@ async function createSandbox() {
   );
   await fs.writeFile(
     path.join(repoRoot, "locks", "resolution.lock.json"),
-    JSON.stringify({ version: 2, generatedAt: null, capabilities: [] }, null, 2),
+    JSON.stringify({ version: 3, generatedAt: null, capabilities: [] }, null, 2),
     "utf8"
   );
   await fs.writeFile(
@@ -1276,6 +1320,19 @@ async function copyIntoSandbox(relativePath: string, repoRoot: string) {
   });
 }
 
+async function resetSandboxRuntimePolicies(repoRoot: string) {
+  for (const runtimeId of ["codex", "cursor", "claude", "gemini"]) {
+    const runtimePath = path.join(repoRoot, "runtimes", `${runtimeId}.yaml`);
+    const runtime = YAML.parse(await fs.readFile(runtimePath, "utf8")) as Record<string, any>;
+    runtime.enabledCapabilities = [];
+    runtime.bindingPolicy = {
+      ...runtime.bindingPolicy,
+      overrides: {},
+    };
+    await fs.writeFile(runtimePath, YAML.stringify(runtime), "utf8");
+  }
+}
+
 async function loadBootstrapFromDefaultPath() {
   const context = await resolveContext();
   if (!context.bootstrap) {
@@ -1333,7 +1390,7 @@ async function preparePluginCapability(
     id: options.id,
     name: options.id.split(".").at(-1) ?? options.id,
     assetKind: "plugin",
-    runtimeTargets: options.runtimeTargets,
+    runtimeTargets: [],
     discoverySources: ["awesome-skills"],
     canonicalSourceId: "github-direct",
     canonicalUrl: "https://github.com/example/sample-plugin",
@@ -1343,10 +1400,6 @@ async function preparePluginCapability(
     sourcePath: "tests/fixtures/assets/sample-plugin",
     riskTier: "T1",
     tags: ["test"],
-  });
-
-  await mutateCapability(root, options.id, (capability) => {
-    capability.runtimeBindings = options.runtimeBindings;
   });
 
   await reviewCapability(root, options.id, {
@@ -1361,6 +1414,36 @@ async function preparePluginCapability(
     hydrateHash: true,
   });
   await approveCapability(root, options.id);
+
+  const [runtimeId, runtimeBinding] =
+    Object.entries(options.runtimeBindings).find(([, binding]) => Boolean((binding as any)?.plugin)) ?? [];
+  if (!runtimeId || !runtimeBinding || !(runtimeBinding as any).plugin) {
+    throw new Error("preparePluginCapability requires one runtime binding with plugin registration.");
+  }
+
+  const bindingId =
+    runtimeId === "claude" && ((runtimeBinding as any).plugin.knownMarketplace?.marketplaceId || (runtimeBinding as any).plugin.marketplaceId)
+      ? "marketplace"
+      : "package";
+
+  await mutateCapability(root, options.id, (capability) => {
+    capability.bindings = {
+      [bindingId]: {
+        plugin: {
+          install: {
+            strategy: "copy",
+            artifactName: "sample-plugin",
+            sourcePath: "tests/fixtures/assets/sample-plugin",
+          },
+          nativeRegistration: (runtimeBinding as any).plugin,
+        },
+      },
+    };
+  });
+
+  await mutateRuntime(root, runtimeId, (runtime) => {
+    runtime.enabledCapabilities = [...new Set([...(runtime.enabledCapabilities ?? []), options.id])].sort();
+  });
 }
 
 async function prepareMcpCapability(
@@ -1388,7 +1471,17 @@ async function prepareMcpCapability(
   });
 
   await mutateCapability(root, options.id, (capability) => {
-    capability.runtimeBindings = options.runtimeBindings;
+    const mcpBinding = Object.values(options.runtimeBindings).find((binding) => Boolean((binding as any)?.mcp)) as
+      | { mcp?: { serverName: string; config: Record<string, unknown> } }
+      | undefined;
+    const bindingId = typeof mcpBinding?.mcp?.config?.url === "string" ? "remote-http" : "stdio-command";
+    capability.bindings = mcpBinding?.mcp
+      ? {
+          [bindingId]: {
+            mcp: mcpBinding.mcp,
+          },
+        }
+      : {};
   });
 
   await reviewCapability(root, options.id, {
@@ -1405,12 +1498,23 @@ async function prepareMcpCapability(
   await approveCapability(root, options.id);
 }
 
+async function mutateRuntime(
+  root: string,
+  runtimeId: string,
+  mutate: (runtime: Record<string, any>) => void
+) {
+  const filePath = path.join(root, "runtimes", `${runtimeId}.yaml`);
+  const runtime = YAML.parse(await fs.readFile(filePath, "utf8")) as Record<string, any>;
+  mutate(runtime);
+  await fs.writeFile(filePath, YAML.stringify(runtime), "utf8");
+}
+
 async function mutateCapability(
   root: string,
   id: string,
   mutate: (capability: Record<string, any>) => void
 ) {
-  const filePath = path.join(root, "registry", "capabilities", `${id}.yaml`);
+  const filePath = capabilityFilePath(root, id);
   const capability = YAML.parse(await fs.readFile(filePath, "utf8")) as Record<string, any>;
   mutate(capability);
   await fs.writeFile(filePath, YAML.stringify(capability), "utf8");

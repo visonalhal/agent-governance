@@ -1,0 +1,42 @@
+id: agent.figma.code-connect
+name: figma-code-connect-agent
+assetKind: agent
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/agents/figma/figma-code-connect-agent.md
+install:
+  strategy: copy
+  artifactName: code-connect
+  sourcePath: assets/agents/figma/figma-code-connect-agent.md
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Canonicalized from the OpenAI-curated Figma plugin package.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: figma-agent-code-connect
+tags:
+  - canonical-agent
+  - figma
+bindings: {}

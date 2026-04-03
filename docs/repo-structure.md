@@ -5,9 +5,12 @@
 ## Source of Truth
 
 - `assets/`
-  Source-controlled skill and package assets that the repo owns and publishes.
+  Source-controlled canonical assets that the repo owns and publishes.
+  Capability assets live under `assets/skills/`, `assets/commands/`, `assets/agents/`, and `assets/plugins/`.
+  Runtime-specific plugin payloads stay colocated under `assets/plugins/<plugin>/targets/<runtime>/`.
 - `registry/`
   Capability records, discovery sources, and governance metadata for every managed item.
+  `registry/capabilities/` is organized by `kind[/namespace]/name.yaml`.
 - `locks/`
   Published resolution lock plus historical snapshots used for deterministic rollback.
 
@@ -47,3 +50,9 @@ When the same concept appears in multiple places, the precedence is:
 3. Local runtime config under `~/.codex`, `~/.cursor`, `~/.claude`, and shared cache state under `~/.agents`
 
 `import-local` is the adoption path for existing local state. It is not the long-term editing surface.
+
+## Governance Model
+
+- `skill`, `mcp`, `command`, `agent`, and `plugin` are first-class capabilities.
+- Capability records stay runtime-agnostic; selectable abstract bindings live on the capability itself.
+- Runtime-specific activation and binding choice live in `runtimes/*.yaml` and the rendered runtime state.

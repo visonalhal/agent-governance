@@ -27,6 +27,7 @@ Discovery sources such as `awesome-skills.com` and `skills.sh` are never used as
 This command:
 
 - validates all approved or published capabilities
+- validates runtime binding policy against the published capability set
 - writes `locks/resolution.lock.json`
 - stores a snapshot under `locks/history/`
 
@@ -78,12 +79,14 @@ Do not treat `generated/` or runtime-native files as the place to make durable e
 This command:
 
 - copies the current local shared skill cache and active managed runtime entries into `assets/`
-- dereferences imported symlinks so the repo stores real files instead of machine-private links
+- stores runtime-specific plugin payloads under `assets/plugins/<plugin>/targets/<runtime>/`
+- dereferences machine-local symlinks so the repo stores real files instead of machine-private links
 - skips invalid local skills that do not include `SKILL.md`
-- redacts imported secrets into `~/.config/agent-governance/local/<machineId>.yaml`
-- publishes and renders the imported state
+- redacts local secrets into `~/.config/agent-governance/local/<machineId>.yaml`
+- publishes and renders the seeded state
 - seeds local managed-state files so the adopted entries stop colliding as unmanaged config
-- syncs the imported state back through the normal governed pipeline
+- syncs the seeded state back through the normal governed pipeline
+- preserves unrelated canonical assets already owned by the repo
 
 Use `import-local` to adopt existing workstation state. After adoption, edit the repo instead of editing `~/.agents` or runtime-native config files by hand.
 

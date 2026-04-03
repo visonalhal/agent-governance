@@ -1,0 +1,96 @@
+id: plugin.figma
+name: figma
+assetKind: plugin
+discoverySources: []
+includes:
+  - agent.figma.code-connect
+  - agent.figma.design-parity-review
+  - agent.figma.design-system-rules
+  - agent.figma.implementation
+  - command.figma.connect-figma-components
+  - command.figma.create-design-system-rules
+  - command.figma.implement-from-figma
+  - command.figma.review-design-parity
+  - mcp.figma
+  - skill.figma.code-connect-components
+  - skill.figma.create-design-system-rules
+  - skill.figma.create-new-file
+  - skill.figma.generate-design
+  - skill.figma.generate-library
+  - skill.figma.implement-design
+  - skill.figma.use
+entrypoints:
+  commands:
+    - command.figma.connect-figma-components
+    - command.figma.create-design-system-rules
+    - command.figma.implement-from-figma
+    - command.figma.review-design-parity
+  agents:
+    - agent.figma.code-connect
+    - agent.figma.design-parity-review
+    - agent.figma.design-system-rules
+    - agent.figma.implementation
+exposes:
+  - agent.figma.code-connect
+  - agent.figma.design-parity-review
+  - agent.figma.design-system-rules
+  - agent.figma.implementation
+  - command.figma.connect-figma-components
+  - command.figma.create-design-system-rules
+  - command.figma.implement-from-figma
+  - command.figma.review-design-parity
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/plugins/figma
+install:
+  strategy: copy
+  artifactName: figma
+  sourcePath: assets/plugins/figma
+  manifest:
+    packageTargets:
+      - codex
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: MIT
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime plugin execution
+  notes:
+    - Canonicalized from the OpenAI-curated Figma plugin package.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 77da225c98682719203be238c5f722a52d424f8b383209a059840eecac5ea189
+tags:
+  - canonical-plugin
+  - figma
+bindings:
+  package:
+    plugin:
+      install:
+        strategy: copy
+        artifactName: codex-figma
+        sourcePath: assets/plugins/figma/targets/codex
+        manifest:
+          seededFrom: codex-plugin-cache
+          pluginId: figma@openai-curated
+          localPath: /Users/halvinshen/.codex/.tmp/plugins/plugins/figma
+      nativeRegistration:
+        pluginId: figma@openai-curated
+        enabled: true
+        installedRecords: []

@@ -1,0 +1,51 @@
+id: skill.product-manager-toolkit
+name: product-manager-toolkit
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/product-manager-toolkit
+install:
+  strategy: copy
+  artifactName: product-manager-toolkit
+  sourcePath: assets/skills/product-manager-toolkit
+  manifest:
+    seededFrom: shared-skill-cache
+    localPath: /Users/halvinshen/.agents/skills/product-manager-toolkit
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Seeded from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 0881707318feb56179eb769e9710557645aeb3e4c6170afd79561bf29eed5783
+tags:
+  - bootstrap-seeded
+  - shared-skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir

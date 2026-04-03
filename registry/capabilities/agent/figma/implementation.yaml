@@ -1,0 +1,42 @@
+id: agent.figma.implementation
+name: figma-implementation-agent
+assetKind: agent
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/agents/figma/figma-implementation-agent.md
+install:
+  strategy: copy
+  artifactName: implementation
+  sourcePath: assets/agents/figma/figma-implementation-agent.md
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Canonicalized from the OpenAI-curated Figma plugin package.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: figma-agent-implementation
+tags:
+  - canonical-agent
+  - figma
+bindings: {}

@@ -1,0 +1,48 @@
+id: mcp.figma
+name: figma
+assetKind: mcp
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: registry/capabilities/mcp/figma.yaml
+install:
+  strategy: manifest
+  artifactName: figma
+  manifest:
+    seededFrom: /Users/halvinshen/.codex/config.toml
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: CONFIG_ONLY
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime MCP process access
+  notes:
+    - Seeded from codex runtime MCP configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 1f6fb5891f320248f9778ee1abafe7a7136654957cd5c351fd7ed5983c3d0e1c
+tags:
+  - bootstrap-seeded
+  - codex-mcp
+bindings:
+  remote-http:
+    mcp:
+      serverName: figma
+      config:
+        url: https://mcp.figma.com/mcp

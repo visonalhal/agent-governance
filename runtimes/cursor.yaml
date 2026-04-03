@@ -3,6 +3,20 @@ supportedAssetKinds:
   - skill
   - plugin
   - mcp
+enabledCapabilities:
+  - mcp.clerk
+  - mcp.context7
+  - mcp.github
+bindingPolicy:
+  defaults:
+    skill:
+      - user-dir
+      - cache
+    mcp:
+      - remote-http
+      - stdio-command
+    plugin: []
+  overrides: {}
 nativeFiles:
   - name: mcpConfig
     template: ${HOME}/.cursor/mcp.json

@@ -3,6 +3,21 @@ supportedAssetKinds:
   - skill
   - plugin
   - mcp
+enabledCapabilities:
+  - plugin.ui-ux-pro-max
+bindingPolicy:
+  defaults:
+    skill:
+      - cache
+      - user-dir
+    mcp:
+      - remote-http
+      - stdio-command
+    plugin:
+      - marketplace
+      - package
+      - external
+  overrides: {}
 nativeFiles:
   - name: settings
     template: ${HOME}/.claude/settings.json

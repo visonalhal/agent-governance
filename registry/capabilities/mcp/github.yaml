@@ -1,0 +1,53 @@
+id: mcp.github
+name: github
+assetKind: mcp
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: registry/capabilities/mcp/github.yaml
+install:
+  strategy: manifest
+  artifactName: github
+  manifest:
+    seededFrom: /Users/halvinshen/.cursor/mcp.json
+riskTier: T3
+permissions:
+  localRead: scoped
+  network: true
+  credentials: true
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: CONFIG_ONLY
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: true
+  filesystemSideEffects: runtime MCP process access
+  notes:
+    - Seeded from cursor runtime MCP configuration.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: c256b32cb4154d45126422c3371b18ad48eb97214dc1b082a3e6453d8c8ea9f0
+tags:
+  - bootstrap-seeded
+  - cursor-mcp
+bindings:
+  stdio-command:
+    mcp:
+      serverName: github
+      config:
+        args:
+          - -y
+          - "@modelcontextprotocol/server-github"
+        command: npx
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}

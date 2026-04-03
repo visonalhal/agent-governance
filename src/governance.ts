@@ -3,8 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import type {
+  AnyResolutionLock,
   BootstrapRecord,
   CapabilityRecord,
+  LegacyResolutionLock,
   LocalSecretsRecord,
   MachineRecord,
   RenderedRuntimeState,
@@ -16,6 +18,7 @@ import type {
 import {
   bootstrapSchema,
   capabilitySchema,
+  legacyResolutionLockSchema,
   localSecretsSchema,
   machineSchema,
   renderedRuntimeStateSchema,
@@ -163,7 +166,7 @@ export async function loadRepo(root: string): Promise<RepoState> {
 }
 
 export function capabilityFilePath(root: string, id: string) {
-  return path.join(root, "registry", "capabilities", `${id}.yaml`);
+  return path.join(root, "registry", "capabilities", ...registryPathSegmentsFromId(id));
 }
 
 export async function ingestCapability(root: string, input: IngestInput) {
@@ -185,25 +188,11 @@ export async function ingestCapability(root: string, input: IngestInput) {
     throw new Error(`Capability already exists: ${input.id}.`);
   }
 
-  const runtimeBindings = Object.fromEntries(
-    input.runtimeTargets.map((runtimeId) => [
-      runtimeId,
-      input.assetKind === "skill"
-        ? {
-            skill: {
-              syncMode: runtimeId === "cursor" ? "user-skill-dir" : "cache-only",
-            },
-          }
-        : {},
-    ])
-  );
-
   const capability = capabilitySchema.parse({
     id: input.id,
     name: input.name,
     assetKind: input.assetKind,
-    runtimeTargets: input.runtimeTargets,
-    runtimeBindings,
+    bindings: defaultBindingsForAssetKind(input.assetKind),
     discoverySources: input.discoverySources,
     canonicalSource: {
       sourceId: input.canonicalSourceId,
@@ -236,6 +225,9 @@ export async function ingestCapability(root: string, input: IngestInput) {
   });
 
   await writeYamlFile(filePath, capability);
+  if (input.runtimeTargets.length > 0) {
+    await enableCapabilityForRuntimes(root, input.id, input.runtimeTargets);
+  }
   return filePath;
 }
 
@@ -320,26 +312,29 @@ export async function changeCapabilityLifecycle(
 
 export async function publishGovernance(root: string) {
   const repo = await loadRepo(root);
-  const publishable = repo.capabilities.filter(
+  const publishableCapabilities = repo.capabilities.filter(
     (capability) =>
       capability.lifecycleState === "approved" || capability.lifecycleState === "published"
   );
 
-  const publishErrors = publishable.flatMap((capability) =>
+  const publishErrors = publishableCapabilities.flatMap((capability) =>
     validateCapabilityForPublish(repo, capability)
   );
-  if (publishErrors.length > 0) {
-    throw new Error(publishErrors.join("\n"));
+  const runtimeErrors = [...repo.runtimes.values()].flatMap((runtime) =>
+    validateRuntimeConfig(repo, runtime)
+  );
+  if (publishErrors.length > 0 || runtimeErrors.length > 0) {
+    throw new Error([...publishErrors, ...runtimeErrors].join("\n"));
   }
 
   const assetErrors = (
-    await Promise.all(publishable.map((capability) => validateCopyInstallAsset(root, capability)))
+    await Promise.all(publishableCapabilities.map((capability) => validateCopyInstallAsset(root, capability)))
   ).flat();
   if (assetErrors.length > 0) {
     throw new Error(assetErrors.join("\n"));
   }
 
-  for (const capability of publishable) {
+  for (const capability of publishableCapabilities) {
     if (capability.lifecycleState === "approved") {
       await writeYamlFile(
         capabilityFilePath(root, capability.id),
@@ -352,10 +347,10 @@ export async function publishGovernance(root: string) {
   }
 
   const refreshedRepo = await loadRepo(root);
-  const published = refreshedRepo.capabilities.filter(
+  const publishedCapabilities = refreshedRepo.capabilities.filter(
     (capability) => capability.lifecycleState === "published"
   );
-  const lock = buildResolutionLock(published);
+  const lock = buildResolutionLock(publishedCapabilities);
   const lockPath = path.join(root, "locks", "resolution.lock.json");
   await writeText(lockPath, stableJson(lock));
 
@@ -379,8 +374,8 @@ export async function renderGovernance(options: {
     options.lockFile ?? path.join(options.root, "locks", "resolution.lock.json")
   );
 
-  await rebuildSharedCache(options.root, lock);
-  const sharedCacheManifest = await buildSharedCacheManifest(options.root, lock);
+  await rebuildSharedCache(options.root, lock, repo, machine);
+  const sharedCacheManifest = await buildSharedCacheManifest(options.root, lock, repo, machine);
 
   const generatedMachineRoot = path.join(options.root, "generated", "machines", machine.machineId);
   await removePath(generatedMachineRoot);
@@ -485,8 +480,10 @@ export async function syncGovernance(options: {
 
 export async function auditGovernance(root: string, options: AuditOptions) {
   const repo = await loadRepo(root);
-  const published = repo.capabilities.filter((capability) => capability.lifecycleState === "published");
-  const generatedLock = buildResolutionLock(published);
+  const publishedCapabilities = repo.capabilities.filter(
+    (capability) => capability.lifecycleState === "published"
+  );
+  const generatedLock = buildResolutionLock(publishedCapabilities);
   const onDiskLock = await readResolutionLock(path.join(root, "locks", "resolution.lock.json"));
   const findings: string[] = [];
 
@@ -520,6 +517,8 @@ export async function auditGovernance(root: string, options: AuditOptions) {
     findings.push(...(await validateCopyInstallAsset(root, capability)));
   }
 
+  findings.push(...[...repo.runtimes.values()].flatMap((runtime) => validateRuntimeConfig(repo, runtime)));
+
   return findings;
 }
 
@@ -544,19 +543,21 @@ export async function loadBootstrap(bootstrapPath: string) {
   return bootstrapSchema.parse(await readYamlFile(bootstrapPath));
 }
 
-function buildResolutionLock(published: CapabilityRecord[]): ResolutionLock {
-  const generatedAt = deriveDeterministicTimestamp(published);
+function buildResolutionLock(publishedCapabilities: CapabilityRecord[]): ResolutionLock {
+  const generatedAt = deriveDeterministicTimestamp(publishedCapabilities);
   return resolutionLockSchema.parse({
-    version: 2,
+    version: 3,
     generatedAt,
-    capabilities: published
+    capabilities: publishedCapabilities
       .map((capability) => ({
         id: capability.id,
         name: capability.name,
         assetKind: capability.assetKind,
         riskTier: capability.riskTier,
-        runtimeTargets: [...capability.runtimeTargets].sort(),
-        runtimeBindings: capability.runtimeBindings,
+        bindings: capability.bindings,
+        includes: [...capability.includes].sort(),
+        ...(capability.entrypoints ? { entrypoints: capability.entrypoints } : {}),
+        exposes: [...capability.exposes].sort(),
         canonicalSource: capability.canonicalSource,
         install: capability.install,
         hash: capability.hash,
@@ -566,7 +567,12 @@ function buildResolutionLock(published: CapabilityRecord[]): ResolutionLock {
   });
 }
 
-async function rebuildSharedCache(root: string, lock: ResolutionLock) {
+async function rebuildSharedCache(
+  root: string,
+  lock: AnyResolutionLock,
+  repo: RepoState,
+  machine: MachineRecord
+) {
   const sharedCacheRoot = path.join(root, "generated", "shared-cache");
   await removePath(sharedCacheRoot);
   await ensureDir(path.join(sharedCacheRoot, "skills"));
@@ -579,19 +585,11 @@ async function rebuildSharedCache(root: string, lock: ResolutionLock) {
     if (!capability.install.sourcePath) {
       continue;
     }
-
-    const category =
-      capability.assetKind === "skill"
-        ? "skills"
-        : capability.assetKind === "plugin"
-          ? "packages"
-          : null;
-
-    if (!category) {
+    if (capability.assetKind !== "skill") {
       continue;
     }
 
-    const relativePath = path.join(category, capability.install.artifactName);
+    const relativePath = path.join("skills", capability.install.artifactName);
     const existing = claimedPaths.get(relativePath);
     if (existing && existing !== capability.id) {
       throw new Error(`Artifact cache collision: ${existing} and ${capability.id} both map to ${relativePath}.`);
@@ -602,9 +600,33 @@ async function rebuildSharedCache(root: string, lock: ResolutionLock) {
     const targetPath = path.join(sharedCacheRoot, relativePath);
     await copyDirectory(sourcePath, targetPath);
   }
+
+  for (const pkg of collectSharedCachePackages(lock, repo, machine)) {
+    if (!pkg.sourcePath) {
+      continue;
+    }
+
+    const relativePath = path.join("packages", pkg.artifactName);
+    const existing = claimedPaths.get(relativePath);
+    if (existing && existing !== pkg.id) {
+      throw new Error(
+        `Artifact cache collision: ${existing} and ${pkg.id} both map to ${relativePath}.`
+      );
+    }
+    claimedPaths.set(relativePath, pkg.id);
+
+    const sourcePath = resolveAssetPath(root, pkg.sourcePath);
+    const targetPath = path.join(sharedCacheRoot, relativePath);
+    await copyDirectory(sourcePath, targetPath);
+  }
 }
 
-async function buildSharedCacheManifest(root: string, lock: ResolutionLock) {
+async function buildSharedCacheManifest(
+  root: string,
+  lock: AnyResolutionLock,
+  repo: RepoState,
+  machine: MachineRecord
+) {
   const manifest: SharedCacheManifest = {
     generatedAt: lock.generatedAt,
     skills: [],
@@ -626,14 +648,17 @@ async function buildSharedCacheManifest(root: string, lock: ResolutionLock) {
       continue;
     }
 
-    if (capability.assetKind === "plugin") {
-      manifest.packages.push({
-        id: capability.id,
-        artifactName: capability.install.artifactName,
-        sourcePath: capability.install.sourcePath,
-        relativePath: path.join("packages", capability.install.artifactName),
-      });
-    }
+  }
+
+  for (const pkg of collectSharedCachePackages(lock, repo, machine)) {
+    manifest.packages.push({
+      id: pkg.id,
+      runtimeId: pkg.runtimeId,
+      bindingId: pkg.bindingId,
+      artifactName: pkg.artifactName,
+      sourcePath: pkg.sourcePath,
+      relativePath: path.join("packages", pkg.artifactName),
+    });
   }
 
   manifest.skills.sort((left, right) => left.id.localeCompare(right.id));
@@ -665,7 +690,7 @@ function buildRenderedRuntimeState(args: {
   runtime: RuntimeRecord;
   machine: MachineRecord;
   bootstrap: BootstrapRecord;
-  lock: ResolutionLock;
+  lock: AnyResolutionLock;
   vars: Record<string, string>;
 }) {
   const machineTarget = args.machine.runtimeTargets[args.runtime.runtimeId];
@@ -695,50 +720,10 @@ function buildRenderedRuntimeState(args: {
     mcps: [] as RenderedRuntimeState["mcps"],
   };
 
-  for (const capability of args.lock.capabilities) {
-    if (!capability.runtimeTargets.includes(args.runtime.runtimeId)) {
-      continue;
-    }
-    const binding = capability.runtimeBindings[args.runtime.runtimeId];
-    if (!binding) {
-      continue;
-    }
-
-    if (binding.skill) {
-      baseState.skills.push({
-        id: capability.id,
-        artifactName: capability.install.artifactName,
-        cacheRelativePath: path.join("skills", capability.install.artifactName),
-        syncMode: binding.skill.syncMode,
-      });
-    }
-
-    if (binding.plugin) {
-      baseState.plugins.push({
-        id: capability.id,
-        pluginId: binding.plugin.pluginId,
-        enabled: binding.plugin.enabled,
-        ...(binding.plugin.knownMarketplace
-          ? {
-              knownMarketplace: resolveTemplates(binding.plugin.knownMarketplace, args.vars, {}, false) as Record<
-                string,
-                unknown
-              >,
-            }
-          : {}),
-        installedRecords: resolveTemplates(binding.plugin.installedRecords, args.vars, {}, false) as Array<
-          Record<string, unknown>
-        >,
-      });
-    }
-
-    if (binding.mcp) {
-      baseState.mcps.push({
-        id: capability.id,
-        serverName: binding.mcp.serverName,
-        config: resolveTemplates(binding.mcp.config, args.vars, {}, false) as Record<string, unknown>,
-      });
-    }
+  if (isLegacyResolutionLock(args.lock)) {
+    populateRenderedRuntimeStateFromLegacy(baseState, args.runtime.runtimeId, args.lock, args.vars);
+  } else {
+    populateRenderedRuntimeStateFromBindings(baseState, args.runtime, args.lock, args.vars);
   }
 
   baseState.skills.sort((left, right) => left.id.localeCompare(right.id));
@@ -746,6 +731,249 @@ function buildRenderedRuntimeState(args: {
   baseState.mcps.sort((left, right) => left.id.localeCompare(right.id));
 
   return baseState;
+}
+
+function populateRenderedRuntimeStateFromBindings(
+  baseState: RenderedRuntimeState,
+  runtime: RuntimeRecord,
+  lock: ResolutionLock,
+  vars: Record<string, string>
+) {
+  const enabledCapabilities = new Set(runtime.enabledCapabilities);
+
+  for (const capability of lock.capabilities) {
+    if (!enabledCapabilities.has(capability.id)) {
+      continue;
+    }
+    if (!runtime.supportedAssetKinds.includes(capability.assetKind)) {
+      continue;
+    }
+
+    const selectedBinding = resolveBindingForRuntime(runtime, capability);
+    if (!selectedBinding) {
+      continue;
+    }
+
+    if (selectedBinding.binding.skill) {
+      baseState.skills.push({
+        id: capability.id,
+        bindingId: selectedBinding.bindingId,
+        artifactName: capability.install.artifactName,
+        cacheRelativePath: path.join("skills", capability.install.artifactName),
+        syncMode: selectedBinding.binding.skill.syncMode,
+      });
+      continue;
+    }
+
+    if (selectedBinding.binding.mcp) {
+      baseState.mcps.push({
+        id: capability.id,
+        bindingId: selectedBinding.bindingId,
+        serverName: selectedBinding.binding.mcp.serverName,
+        config: resolveTemplates(
+          selectedBinding.binding.mcp.config,
+          vars,
+          {},
+          false
+        ) as Record<string, unknown>,
+      });
+      continue;
+    }
+
+    if (selectedBinding.binding.plugin) {
+      baseState.plugins.push({
+        id: capability.id,
+        bindingId: selectedBinding.bindingId,
+        artifactName: selectedBinding.binding.plugin.install.artifactName,
+        ...(selectedBinding.binding.plugin.install.sourcePath
+          ? {
+              cacheRelativePath: path.join(
+                "packages",
+                selectedBinding.binding.plugin.install.artifactName
+              ),
+            }
+          : {}),
+        nativeRegistration: resolveTemplates(
+          selectedBinding.binding.plugin.nativeRegistration,
+          vars,
+          {},
+          false
+        ) as RenderedRuntimeState["plugins"][number]["nativeRegistration"],
+      });
+    }
+  }
+}
+
+function populateRenderedRuntimeStateFromLegacy(
+  baseState: RenderedRuntimeState,
+  runtimeId: string,
+  lock: LegacyResolutionLock,
+  vars: Record<string, string>
+) {
+  for (const capability of lock.capabilities) {
+    if (!capability.runtimeTargets.includes(runtimeId)) {
+      continue;
+    }
+    const binding = capability.runtimeBindings[runtimeId];
+    if (!binding) {
+      continue;
+    }
+
+    if (binding.skill) {
+      baseState.skills.push({
+        id: capability.id,
+        bindingId: binding.skill.syncMode === "user-skill-dir" ? "user-dir" : "cache",
+        artifactName: capability.install.artifactName,
+        cacheRelativePath: path.join("skills", capability.install.artifactName),
+        syncMode: binding.skill.syncMode,
+      });
+    }
+
+    if (binding.mcp) {
+      baseState.mcps.push({
+        id: capability.id,
+        bindingId: binding.mcp.config.url ? "remote-http" : "stdio-command",
+        serverName: binding.mcp.serverName,
+        config: resolveTemplates(binding.mcp.config, vars, {}, false) as Record<string, unknown>,
+      });
+    }
+  }
+
+  for (const distribution of lock.distributions) {
+    if (distribution.runtimeId !== runtimeId) {
+      continue;
+    }
+
+    baseState.plugins.push({
+      id: distribution.pluginId,
+      bindingId: "legacy-runtime-distribution",
+      artifactName: distribution.install.artifactName,
+      ...(distribution.install.sourcePath
+        ? { cacheRelativePath: path.join("packages", distribution.install.artifactName) }
+        : {}),
+      nativeRegistration: resolveTemplates(
+        distribution.nativeRegistration,
+        vars,
+        {},
+        false
+      ) as RenderedRuntimeState["plugins"][number]["nativeRegistration"],
+    });
+  }
+}
+
+function collectSharedCachePackages(
+  lock: AnyResolutionLock,
+  repo: RepoState,
+  machine: MachineRecord
+) {
+  if (isLegacyResolutionLock(lock)) {
+    return lock.distributions
+      .filter((distribution) => Boolean(distribution.install.sourcePath))
+      .map((distribution) => ({
+        id: distribution.pluginId,
+        runtimeId: distribution.runtimeId,
+        bindingId: "legacy-runtime-distribution",
+        artifactName: distribution.install.artifactName,
+        sourcePath: distribution.install.sourcePath!,
+      }));
+  }
+
+  const packages: Array<{
+    id: string;
+    runtimeId: string;
+    bindingId: string;
+    artifactName: string;
+    sourcePath: string;
+  }> = [];
+
+  for (const runtimeId of machine.enabledRuntimes) {
+    const runtime = repo.runtimes.get(runtimeId);
+    if (!runtime) {
+      continue;
+    }
+
+    const enabledCapabilities = new Set(runtime.enabledCapabilities);
+    for (const capability of lock.capabilities) {
+      if (capability.assetKind !== "plugin") {
+        continue;
+      }
+      if (!enabledCapabilities.has(capability.id)) {
+        continue;
+      }
+
+      const selectedBinding = resolveBindingForRuntime(runtime, capability);
+      const install = selectedBinding?.binding.plugin?.install;
+      if (!selectedBinding || !install?.sourcePath) {
+        continue;
+      }
+
+      packages.push({
+        id: capability.id,
+        runtimeId,
+        bindingId: selectedBinding.bindingId,
+        artifactName: install.artifactName,
+        sourcePath: install.sourcePath,
+      });
+    }
+  }
+
+  return packages;
+}
+
+function resolveBindingForRuntime(runtime: RuntimeRecord, capability: ResolutionLock["capabilities"][number]) {
+  const policyKey = bindingPolicyKeyForAssetKind(capability.assetKind);
+  if (!policyKey) {
+    return null;
+  }
+
+  const override = runtime.bindingPolicy.overrides[capability.id];
+  if (override === "disabled") {
+    return null;
+  }
+
+  const candidateBindingIds = override
+    ? [override]
+    : runtime.bindingPolicy.defaults[policyKey];
+
+  for (const bindingId of candidateBindingIds) {
+    const binding = capability.bindings[bindingId];
+    if (binding && capabilityBindingMatchesAssetKind(capability.assetKind, binding)) {
+      return { bindingId, binding };
+    }
+  }
+
+  return null;
+}
+
+function bindingPolicyKeyForAssetKind(assetKind: CapabilityRecord["assetKind"]) {
+  switch (assetKind) {
+    case "skill":
+    case "mcp":
+    case "plugin":
+      return assetKind;
+    default:
+      return null;
+  }
+}
+
+function capabilityBindingMatchesAssetKind(
+  assetKind: CapabilityRecord["assetKind"],
+  binding: ResolutionLock["capabilities"][number]["bindings"][string]
+) {
+  switch (assetKind) {
+    case "skill":
+      return Boolean(binding.skill) && !binding.plugin && !binding.mcp;
+    case "mcp":
+      return Boolean(binding.mcp) && !binding.plugin && !binding.skill;
+    case "plugin":
+      return Boolean(binding.plugin) && !binding.mcp && !binding.skill;
+    default:
+      return false;
+  }
+}
+
+function isLegacyResolutionLock(lock: AnyResolutionLock): lock is LegacyResolutionLock {
+  return lock.version === 2;
 }
 
 function buildPathVars(bootstrap: BootstrapRecord, machine: MachineRecord) {
@@ -877,29 +1105,32 @@ function validateCapabilityForPublish(repo: RepoState, capability: CapabilityRec
   return errors;
 }
 
-async function validateCopyInstallAsset(root: string, capability: CapabilityRecord) {
-  if (capability.install.strategy !== "copy") {
+async function validateCopyInstallAsset(
+  root: string,
+  record: Pick<CapabilityRecord, "id" | "assetKind" | "install">
+) {
+  if (record.install.strategy !== "copy") {
     return [];
   }
 
   const errors: string[] = [];
-  if (!capability.install.sourcePath) {
-    errors.push(`${capability.id}: copy strategy requires install.sourcePath.`);
+  if (!record.install.sourcePath) {
+    errors.push(`${record.id}: copy strategy requires install.sourcePath.`);
     return errors;
   }
 
-  const assetPath = resolveAssetPath(root, capability.install.sourcePath);
+  const assetPath = resolveAssetPath(root, record.install.sourcePath);
   if (!(await pathExists(assetPath))) {
-    errors.push(`${capability.id}: install.sourcePath does not exist at ${assetPath}.`);
+    errors.push(`${record.id}: install.sourcePath does not exist at ${assetPath}.`);
     return errors;
   }
 
-  if (capability.assetKind === "skill") {
+  if ("assetKind" in record && record.assetKind === "skill") {
     const skillEntryPath = path.join(assetPath, "SKILL.md");
     if (!(await pathExists(skillEntryPath))) {
       errors.push(
-        `${capability.id}: skill assets must include SKILL.md at ${normalizePosix(
-          path.join(capability.install.sourcePath, "SKILL.md")
+        `${record.id}: skill assets must include SKILL.md at ${normalizePosix(
+          path.join(record.install.sourcePath, "SKILL.md")
         )}.`
       );
     }
@@ -909,8 +1140,8 @@ async function validateCopyInstallAsset(root: string, capability: CapabilityReco
   for (const symlinkPath of absoluteSymlinks) {
     const relativePath = normalizePosix(path.relative(assetPath, symlinkPath));
     errors.push(
-      `${capability.id}: copy asset contains absolute symlink ${normalizePosix(
-        path.join(capability.install.sourcePath, relativePath)
+      `${record.id}: copy asset contains absolute symlink ${normalizePosix(
+        path.join(record.install.sourcePath, relativePath)
       )}.`
     );
   }
@@ -940,30 +1171,125 @@ function validateCapabilityBase(repo: RepoState, capability: CapabilityRecord) {
     }
   }
 
-  for (const runtimeId of capability.runtimeTargets) {
-    if (!repo.runtimes.has(runtimeId)) {
-      errors.push(`${capability.id}: unknown runtime target ${runtimeId}.`);
-    }
-    if (!capability.runtimeBindings[runtimeId]) {
-      errors.push(`${capability.id}: runtimeBindings must define ${runtimeId}.`);
-    }
-  }
-
-  for (const runtimeId of Object.keys(capability.runtimeBindings)) {
-    if (!repo.runtimes.has(runtimeId)) {
-      errors.push(`${capability.id}: runtimeBindings references unknown runtime ${runtimeId}.`);
-    }
-  }
-
   if (capability.assetKind !== capability.id.split(".")[0]) {
     errors.push(`${capability.id}: id prefix must match assetKind.`);
+  }
+
+  errors.push(...validateCapabilityBindings(capability));
+
+  if (capability.assetKind === "plugin") {
+    const supportedKinds = new Set(["skill", "mcp", "command", "agent"]);
+    for (const includedId of capability.includes) {
+      const included = repo.capabilities.find((item) => item.id === includedId);
+      if (!included) {
+        errors.push(`${capability.id}: includes references unknown capability ${includedId}.`);
+        continue;
+      }
+      if (!supportedKinds.has(included.assetKind)) {
+        errors.push(`${capability.id}: includes cannot reference ${included.assetKind} capability ${includedId}.`);
+      }
+    }
+
+    for (const commandId of capability.entrypoints?.commands ?? []) {
+      const command = repo.capabilities.find((item) => item.id === commandId);
+      if (!command) {
+        errors.push(`${capability.id}: entrypoints.commands references unknown capability ${commandId}.`);
+      } else if (command.assetKind !== "command") {
+        errors.push(`${capability.id}: entrypoints.commands must reference command capabilities (${commandId}).`);
+      }
+    }
+
+    for (const agentId of capability.entrypoints?.agents ?? []) {
+      const agent = repo.capabilities.find((item) => item.id === agentId);
+      if (!agent) {
+        errors.push(`${capability.id}: entrypoints.agents references unknown capability ${agentId}.`);
+      } else if (agent.assetKind !== "agent") {
+        errors.push(`${capability.id}: entrypoints.agents must reference agent capabilities (${agentId}).`);
+      }
+    }
+  }
+
+  return errors;
+}
+
+function validateCapabilityBindings(capability: CapabilityRecord) {
+  const errors: string[] = [];
+  const allowedBindingIds = new Set<string>(
+    capability.assetKind === "skill"
+      ? ["cache", "user-dir"]
+      : capability.assetKind === "mcp"
+        ? ["remote-http", "stdio-command"]
+        : capability.assetKind === "plugin"
+          ? ["package", "marketplace", "external"]
+          : []
+  );
+
+  for (const [bindingId, binding] of Object.entries(capability.bindings)) {
+    if (!allowedBindingIds.has(bindingId)) {
+      errors.push(`${capability.id}: binding ${bindingId} is not allowed for ${capability.assetKind}.`);
+    }
+
+    const activeFieldCount = Number(Boolean(binding.skill)) + Number(Boolean(binding.mcp)) + Number(Boolean(binding.plugin));
+    if (activeFieldCount !== 1) {
+      errors.push(`${capability.id}: binding ${bindingId} must define exactly one binding payload.`);
+      continue;
+    }
+
+    if (!capabilityBindingMatchesAssetKind(capability.assetKind, binding)) {
+      errors.push(`${capability.id}: binding ${bindingId} must match assetKind ${capability.assetKind}.`);
+    }
+  }
+
+  if ((capability.assetKind === "command" || capability.assetKind === "agent") && Object.keys(capability.bindings).length > 0) {
+    errors.push(`${capability.id}: ${capability.assetKind} capabilities cannot define bindings.`);
+  }
+
+  return errors;
+}
+
+function validateRuntimeConfig(repo: RepoState, runtime: RuntimeRecord) {
+  const errors: string[] = [];
+
+  for (const capabilityId of runtime.enabledCapabilities) {
+    const capability = repo.capabilities.find((item) => item.id === capabilityId);
+    if (!capability) {
+      errors.push(`${runtime.runtimeId}: enabledCapabilities references unknown capability ${capabilityId}.`);
+      continue;
+    }
+    if (!runtime.supportedAssetKinds.includes(capability.assetKind)) {
+      errors.push(
+        `${runtime.runtimeId}: enabled capability ${capabilityId} has unsupported assetKind ${capability.assetKind}.`
+      );
+    }
+  }
+
+  for (const [capabilityId, bindingId] of Object.entries(runtime.bindingPolicy.overrides)) {
+    if (bindingId === "disabled") {
+      continue;
+    }
+
+    const capability = repo.capabilities.find((item) => item.id === capabilityId);
+    if (!capability) {
+      errors.push(`${runtime.runtimeId}: binding override references unknown capability ${capabilityId}.`);
+      continue;
+    }
+    if (!capability.bindings[bindingId]) {
+      errors.push(
+        `${runtime.runtimeId}: binding override ${capabilityId} -> ${bindingId} references a missing binding.`
+      );
+    }
   }
 
   return errors;
 }
 
 async function readResolutionLock(lockPath: string) {
-  return resolutionLockSchema.parse(await readJsonFile<ResolutionLock>(lockPath));
+  const raw = await readJsonFile<unknown>(lockPath);
+  const version = raw && typeof raw === "object" ? (raw as { version?: unknown }).version : undefined;
+  if (version === 2) {
+    return legacyResolutionLockSchema.parse(raw);
+  }
+  return resolutionLockSchema.parse(raw);
 }
 
 async function loadCapabilityById(root: string, id: string) {
@@ -978,6 +1304,15 @@ async function loadCapabilityById(root: string, id: string) {
 
 function resolveAssetPath(root: string, sourcePath: string) {
   return path.isAbsolute(sourcePath) ? sourcePath : path.join(root, sourcePath);
+}
+
+function registryPathSegmentsFromId(id: string) {
+  const segments = id.split(".");
+  const [kind, ...rest] = segments;
+  if (!kind || rest.length === 0) {
+    throw new Error(`Invalid capability id ${id}.`);
+  }
+  return [kind, ...rest.slice(0, -1), `${rest.at(-1)}.yaml`];
 }
 
 function inferPermissions(riskTier: CapabilityRecord["riskTier"]): CapabilityRecord["permissions"] {
@@ -998,9 +1333,44 @@ function inferPermissions(riskTier: CapabilityRecord["riskTier"]): CapabilityRec
   }
 }
 
-function deriveDeterministicTimestamp(capabilities: CapabilityRecord[]) {
+function defaultBindingsForAssetKind(assetKind: CapabilityRecord["assetKind"]) {
+  switch (assetKind) {
+    case "skill":
+      return {
+        cache: {
+          skill: {
+            syncMode: "cache-only" as const,
+          },
+        },
+        "user-dir": {
+          skill: {
+            syncMode: "user-skill-dir" as const,
+          },
+        },
+      };
+    default:
+      return {};
+  }
+}
+
+async function enableCapabilityForRuntimes(root: string, capabilityId: string, runtimeIds: string[]) {
+  for (const runtimeId of [...new Set(runtimeIds)].sort()) {
+    const runtimePath = path.join(root, "runtimes", `${runtimeId}.yaml`);
+    if (!(await pathExists(runtimePath))) {
+      throw new Error(`Unknown runtime ${runtimeId}.`);
+    }
+
+    const runtime = runtimeSchema.parse(await readYamlFile(runtimePath));
+    if (!runtime.enabledCapabilities.includes(capabilityId)) {
+      runtime.enabledCapabilities = [...runtime.enabledCapabilities, capabilityId].sort();
+      await writeYamlFile(runtimePath, runtime);
+    }
+  }
+}
+
+function deriveDeterministicTimestamp(capabilities: Array<Pick<CapabilityRecord, "review">>) {
   const values = capabilities
-    .map((capability) => capability.review.reviewedAt)
+    .map((record) => record.review.reviewedAt)
     .filter((value): value is string => Boolean(value))
     .map((value) => new Date(value))
     .filter((date) => Number.isFinite(date.getTime()))

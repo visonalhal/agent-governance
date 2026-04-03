@@ -1,0 +1,57 @@
+id: skill.writing-plans
+name: writing-plans
+assetKind: skill
+discoverySources: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/writing-plans
+install:
+  strategy: copy
+  artifactName: writing-plans
+  sourcePath: assets/skills/writing-plans
+  manifest:
+    seededFrom: shared-skill-cache
+    source: obra/superpowers
+    sourceType: github
+    sourceUrl: https://github.com/obra/superpowers.git
+    skillPath: skills/writing-plans/SKILL.md
+    skillFolderHash: cf6f5c8813cf0445276129a5f2b443927b50f645
+    installedAt: 2026-03-06T06:55:18.973Z
+    updatedAt: 2026-03-06T06:55:18.973Z
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-04-02T09:15:33.096Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Seeded from the local shared skill cache.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 8c536ae03ef3ab1fa974c0e50a65d803acddf5d4ee7cac68ab25a39b9e338611
+tags:
+  - bootstrap-seeded
+  - shared-skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
