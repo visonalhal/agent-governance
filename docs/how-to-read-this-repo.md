@@ -70,6 +70,8 @@ Read often:
 - `runtimes/`
 - `machines/`
 - `tests/`
+- `docs/skills-capability-map.md`
+  Read this when you need to understand skill boundaries, overlap, and selection rules without digging through every `SKILL.md`.
 
 Read sometimes:
 
