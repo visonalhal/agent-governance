@@ -1,0 +1,52 @@
+id: skill.impeccable.extract
+name: extract
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/pbakaus/impeccable
+  ref: main
+  refType: branch
+  path: .codex/skills/extract
+  resolvedRevision: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+install:
+  strategy: copy
+  artifactName: extract
+  sourcePath: assets/skills/impeccable/extract
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-05T00:00:00.000Z
+  license: Apache-2.0
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from pbakaus/impeccable .codex/skills/extract
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 20eb845c377887407dd3b83004679de58f8e879334e3362f9d358427e52011e8
+tags:
+  - impeccable
+  - design
+  - external

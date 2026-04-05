@@ -1,0 +1,52 @@
+id: skill.impeccable.quieter
+name: quieter
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/pbakaus/impeccable
+  ref: main
+  refType: branch
+  path: .codex/skills/quieter
+  resolvedRevision: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+install:
+  strategy: copy
+  artifactName: quieter
+  sourcePath: assets/skills/impeccable/quieter
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-05T00:00:00.000Z
+  license: Apache-2.0
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from pbakaus/impeccable .codex/skills/quieter
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 00f562d114232354c057e208b8c312178275944fa2bee38f99498c3905b24c99
+tags:
+  - impeccable
+  - design
+  - external

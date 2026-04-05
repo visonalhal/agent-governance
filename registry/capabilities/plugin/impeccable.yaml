@@ -1,0 +1,76 @@
+id: plugin.impeccable
+name: impeccable
+assetKind: plugin
+bindings:
+  marketplace:
+    plugin:
+      install:
+        strategy: copy
+        artifactName: claude-impeccable
+        sourcePath: assets/plugins/impeccable/targets/claude
+        manifest:
+          seededFrom: claude-plugin-marketplace
+          pluginId: impeccable@impeccable
+      nativeRegistration:
+        pluginId: impeccable@impeccable
+        enabled: true
+        knownMarketplace:
+          marketplaceId: impeccable
+          installLocation: ${CACHE_ROOT}/packages/claude-impeccable
+          lastUpdated: 2026-04-05T00:00:00.000Z
+          sha: 3a4fc70
+          source:
+            repo: pbakaus/impeccable
+            source: github
+        installedRecords:
+          - gitCommitSha: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+            installedAt: 2026-04-05T00:00:00.000Z
+            installPath: ${CACHE_ROOT}/packages/claude-impeccable
+            lastUpdated: 2026-04-05T00:00:00.000Z
+            scope: user
+            version: 1.6.0
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/pbakaus/impeccable
+  ref: main
+  refType: branch
+  path: .claude-plugin
+  resolvedRevision: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+install:
+  strategy: copy
+  artifactName: impeccable
+  sourcePath: assets/plugins/impeccable
+  manifest:
+    packageTargets:
+      - claude
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: true
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-05T00:00:00.000Z
+  license: Apache-2.0
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: false
+  filesystemSideEffects: runtime plugin execution
+  notes:
+    - Imported from pbakaus/impeccable .claude-plugin and .claude/skills
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 50cee4a8c0bcafd464ee775aaf67dbe7e36fe10c7102b5a4d2547817d3e6afe6
+tags:
+  - impeccable
+  - design
+  - external

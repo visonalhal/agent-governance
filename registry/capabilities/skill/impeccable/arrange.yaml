@@ -1,0 +1,52 @@
+id: skill.impeccable.arrange
+name: arrange
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/pbakaus/impeccable
+  ref: main
+  refType: branch
+  path: .codex/skills/arrange
+  resolvedRevision: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+install:
+  strategy: copy
+  artifactName: arrange
+  sourcePath: assets/skills/impeccable/arrange
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-05T00:00:00.000Z
+  license: Apache-2.0
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from pbakaus/impeccable .codex/skills/arrange
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: b8b4e08d93d7235fa091b0ff5f998ad457831310557be97fb627d9ea6e506e87
+tags:
+  - impeccable
+  - design
+  - external

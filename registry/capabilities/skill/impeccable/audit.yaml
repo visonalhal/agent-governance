@@ -1,0 +1,52 @@
+id: skill.impeccable.audit
+name: audit
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/pbakaus/impeccable
+  ref: main
+  refType: branch
+  path: .codex/skills/audit
+  resolvedRevision: 3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd
+install:
+  strategy: copy
+  artifactName: audit
+  sourcePath: assets/skills/impeccable/audit
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-05T00:00:00.000Z
+  license: Apache-2.0
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Imported from pbakaus/impeccable .codex/skills/audit
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 8e5ee1116804bcebfac21353f557814dd2cc457ad636162ae0bff7e80a388df5
+tags:
+  - impeccable
+  - design
+  - external

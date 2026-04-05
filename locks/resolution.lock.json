@@ -503,74 +503,72 @@
         "marketplace": {
           "plugin": {
             "install": {
-              "artifactName": "claude-ui-ux-pro-max",
+              "artifactName": "claude-impeccable",
               "manifest": {
-                "localPath": "/Users/halvinshen/.claude/plugins/marketplaces/ui-ux-pro-max-skill",
-                "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill",
+                "pluginId": "impeccable@impeccable",
                 "seededFrom": "claude-plugin-marketplace"
               },
-              "sourcePath": "assets/plugins/ui-ux-pro-max/targets/claude",
+              "sourcePath": "assets/plugins/impeccable/targets/claude",
               "strategy": "copy"
             },
             "nativeRegistration": {
               "enabled": true,
               "installedRecords": [
                 {
-                  "gitCommitSha": "07f4ef3",
-                  "installedAt": "2026-03-13T02:38:03.782Z",
-                  "installPath": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
-                  "lastUpdated": "2026-03-13T02:38:03.782Z",
+                  "gitCommitSha": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+                  "installedAt": "2026-04-05T00:00:00.000Z",
+                  "installPath": "${CACHE_ROOT}/packages/claude-impeccable",
+                  "lastUpdated": "2026-04-05T00:00:00.000Z",
                   "scope": "user",
-                  "version": "07f4ef3"
+                  "version": "1.6.0"
                 }
               ],
               "knownMarketplace": {
-                "installLocation": "${CACHE_ROOT}/packages/claude-ui-ux-pro-max",
-                "lastUpdated": "2026-03-13T02:38:00.342Z",
-                "marketplaceId": "ui-ux-pro-max-skill",
-                "sha": "07f4ef3",
+                "installLocation": "${CACHE_ROOT}/packages/claude-impeccable",
+                "lastUpdated": "2026-04-05T00:00:00.000Z",
+                "marketplaceId": "impeccable",
+                "sha": "3a4fc70",
                 "source": {
-                  "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+                  "repo": "pbakaus/impeccable",
                   "source": "github"
                 }
               },
-              "pluginId": "ui-ux-pro-max@ui-ux-pro-max-skill"
+              "pluginId": "impeccable@impeccable"
             }
           }
         }
       },
       "canonicalSource": {
-        "path": "assets/plugins/ui-ux-pro-max",
+        "path": ".claude-plugin",
         "ref": "main",
         "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
       },
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "d8128fcdae42320e5164eef2b97f11116109b6dba3974bbb448b036dcdc0d05d"
+        "digest": "50cee4a8c0bcafd464ee775aaf67dbe7e36fe10c7102b5a4d2547817d3e6afe6"
       },
-      "id": "plugin.ui-ux-pro-max",
-      "includes": [
-        "skill.ui-ux-pro-max"
-      ],
+      "id": "plugin.impeccable",
+      "includes": [],
       "install": {
-        "artifactName": "ui-ux-pro-max",
+        "artifactName": "impeccable",
         "manifest": {
           "packageTargets": [
             "claude"
           ]
         },
-        "sourcePath": "assets/plugins/ui-ux-pro-max",
+        "sourcePath": "assets/plugins/impeccable",
         "strategy": "copy"
       },
-      "name": "ui-ux-pro-max",
+      "name": "impeccable",
       "riskTier": "T2",
       "tags": [
-        "bootstrap-seeded",
-        "canonical-plugin",
-        "ui-ux"
+        "design",
+        "external",
+        "impeccable"
       ]
     },
     {
@@ -895,6 +893,888 @@
       "tags": [
         "canonical-skill",
         "figma"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/adapt",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "28abf73f65ca228b7d3450843d5a8e684c3dc14d4f3274b35c0707e2812c70a9"
+      },
+      "id": "skill.impeccable.adapt",
+      "includes": [],
+      "install": {
+        "artifactName": "adapt",
+        "sourcePath": "assets/skills/impeccable/adapt",
+        "strategy": "copy"
+      },
+      "name": "adapt",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/animate",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "4eb406cc2c36ab4ca8b55ed583d51d6eaaa627cd883ea9ff2135ad7b163b9f68"
+      },
+      "id": "skill.impeccable.animate",
+      "includes": [],
+      "install": {
+        "artifactName": "animate",
+        "sourcePath": "assets/skills/impeccable/animate",
+        "strategy": "copy"
+      },
+      "name": "animate",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/arrange",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "b8b4e08d93d7235fa091b0ff5f998ad457831310557be97fb627d9ea6e506e87"
+      },
+      "id": "skill.impeccable.arrange",
+      "includes": [],
+      "install": {
+        "artifactName": "arrange",
+        "sourcePath": "assets/skills/impeccable/arrange",
+        "strategy": "copy"
+      },
+      "name": "arrange",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/audit",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "8e5ee1116804bcebfac21353f557814dd2cc457ad636162ae0bff7e80a388df5"
+      },
+      "id": "skill.impeccable.audit",
+      "includes": [],
+      "install": {
+        "artifactName": "audit",
+        "sourcePath": "assets/skills/impeccable/audit",
+        "strategy": "copy"
+      },
+      "name": "audit",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/bolder",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "9aaa0aa193f1b2ed180fb16f7593e224ed55ce4dca336585fe413dd2e8979396"
+      },
+      "id": "skill.impeccable.bolder",
+      "includes": [],
+      "install": {
+        "artifactName": "bolder",
+        "sourcePath": "assets/skills/impeccable/bolder",
+        "strategy": "copy"
+      },
+      "name": "bolder",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/clarify",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "c7aac0803b72ceaf118a5628bebe2b9395c3c4815d17b9c92a926d1283147bf6"
+      },
+      "id": "skill.impeccable.clarify",
+      "includes": [],
+      "install": {
+        "artifactName": "clarify",
+        "sourcePath": "assets/skills/impeccable/clarify",
+        "strategy": "copy"
+      },
+      "name": "clarify",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/colorize",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "e62ab7076871593424b261b5ee39256ccf65af9273f8ce3d3171e9380e570351"
+      },
+      "id": "skill.impeccable.colorize",
+      "includes": [],
+      "install": {
+        "artifactName": "colorize",
+        "sourcePath": "assets/skills/impeccable/colorize",
+        "strategy": "copy"
+      },
+      "name": "colorize",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/critique",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "ac74fc9c7af9c63bd783549c4fc78ca514557fce2bd8e07caa5b003908df125d"
+      },
+      "id": "skill.impeccable.critique",
+      "includes": [],
+      "install": {
+        "artifactName": "critique",
+        "sourcePath": "assets/skills/impeccable/critique",
+        "strategy": "copy"
+      },
+      "name": "critique",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/delight",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "524000f7450d83ad02aa815a00174eac250571fbc894f2aad048019645a6a6b1"
+      },
+      "id": "skill.impeccable.delight",
+      "includes": [],
+      "install": {
+        "artifactName": "delight",
+        "sourcePath": "assets/skills/impeccable/delight",
+        "strategy": "copy"
+      },
+      "name": "delight",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/distill",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "8a5719658e9e0fd6064e10a45860556896b86c843c4ecda161c9718d2207aab3"
+      },
+      "id": "skill.impeccable.distill",
+      "includes": [],
+      "install": {
+        "artifactName": "distill",
+        "sourcePath": "assets/skills/impeccable/distill",
+        "strategy": "copy"
+      },
+      "name": "distill",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/extract",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "20eb845c377887407dd3b83004679de58f8e879334e3362f9d358427e52011e8"
+      },
+      "id": "skill.impeccable.extract",
+      "includes": [],
+      "install": {
+        "artifactName": "extract",
+        "sourcePath": "assets/skills/impeccable/extract",
+        "strategy": "copy"
+      },
+      "name": "extract",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/frontend-design",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "2033b5eeb8116907290fbee1f0eaaf597d610d964b557067d5924bdf11944e85"
+      },
+      "id": "skill.impeccable.frontend-design",
+      "includes": [],
+      "install": {
+        "artifactName": "frontend-design",
+        "sourcePath": "assets/skills/impeccable/frontend-design",
+        "strategy": "copy"
+      },
+      "name": "frontend-design",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/harden",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1edc45d776520648a108bf696e8bc2cb28f994f28f5d23a8bb80d64c1e8175d7"
+      },
+      "id": "skill.impeccable.harden",
+      "includes": [],
+      "install": {
+        "artifactName": "harden",
+        "sourcePath": "assets/skills/impeccable/harden",
+        "strategy": "copy"
+      },
+      "name": "harden",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/normalize",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "8e584d017618427320f80a224f8917c422155baabe7fb7743460b8af03425071"
+      },
+      "id": "skill.impeccable.normalize",
+      "includes": [],
+      "install": {
+        "artifactName": "normalize",
+        "sourcePath": "assets/skills/impeccable/normalize",
+        "strategy": "copy"
+      },
+      "name": "normalize",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/onboard",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "afe4b84cff92034f220fe612b3d1c93c4bd859a8a4321b04304d13995db08e7a"
+      },
+      "id": "skill.impeccable.onboard",
+      "includes": [],
+      "install": {
+        "artifactName": "onboard",
+        "sourcePath": "assets/skills/impeccable/onboard",
+        "strategy": "copy"
+      },
+      "name": "onboard",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/optimize",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "928979253adc34f4e618360fd9c414ae0dc0746da97668c2f991638ca3e8768e"
+      },
+      "id": "skill.impeccable.optimize",
+      "includes": [],
+      "install": {
+        "artifactName": "optimize",
+        "sourcePath": "assets/skills/impeccable/optimize",
+        "strategy": "copy"
+      },
+      "name": "optimize",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/overdrive",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "7f1bc35d19770f6da0bdc02d7e465b84526a978d89d4e016c2391a97daf694ea"
+      },
+      "id": "skill.impeccable.overdrive",
+      "includes": [],
+      "install": {
+        "artifactName": "overdrive",
+        "sourcePath": "assets/skills/impeccable/overdrive",
+        "strategy": "copy"
+      },
+      "name": "overdrive",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/polish",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1048db5d6caabc13abddc36a9f6617a37f189d96a4878e7d447ca523cb5bd3e8"
+      },
+      "id": "skill.impeccable.polish",
+      "includes": [],
+      "install": {
+        "artifactName": "polish",
+        "sourcePath": "assets/skills/impeccable/polish",
+        "strategy": "copy"
+      },
+      "name": "polish",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/quieter",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "00f562d114232354c057e208b8c312178275944fa2bee38f99498c3905b24c99"
+      },
+      "id": "skill.impeccable.quieter",
+      "includes": [],
+      "install": {
+        "artifactName": "quieter",
+        "sourcePath": "assets/skills/impeccable/quieter",
+        "strategy": "copy"
+      },
+      "name": "quieter",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/teach-impeccable",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "899b1c204892d314549ecea531489b3fbc73fcd4dac1e6897108ff91ad2425df"
+      },
+      "id": "skill.impeccable.teach-impeccable",
+      "includes": [],
+      "install": {
+        "artifactName": "teach-impeccable",
+        "sourcePath": "assets/skills/impeccable/teach-impeccable",
+        "strategy": "copy"
+      },
+      "name": "teach-impeccable",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": ".codex/skills/typeset",
+        "ref": "main",
+        "refType": "branch",
+        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "sourceId": "github-direct",
+        "url": "https://github.com/pbakaus/impeccable"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1e72a4cd8223e67c53b5a7d30990027371e96496e0af43d0e40831d78e5ae29f"
+      },
+      "id": "skill.impeccable.typeset",
+      "includes": [],
+      "install": {
+        "artifactName": "typeset",
+        "sourcePath": "assets/skills/impeccable/typeset",
+        "strategy": "copy"
+      },
+      "name": "typeset",
+      "riskTier": "T1",
+      "tags": [
+        "design",
+        "external",
+        "impeccable"
       ]
     },
     {
@@ -1409,50 +2289,6 @@
         }
       },
       "canonicalSource": {
-        "path": "assets/skills/ui-ux-pro-max",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "exposes": [],
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "19e405e5f71129a13b7fe755433327209ce4d42954d7e38592d542714714eb0b"
-      },
-      "id": "skill.ui-ux-pro-max",
-      "includes": [],
-      "install": {
-        "artifactName": "ui-ux-pro-max",
-        "manifest": {
-          "localPath": "/Users/halvinshen/.agents/skills/ui-ux-pro-max",
-          "seededFrom": "shared-skill-cache"
-        },
-        "sourcePath": "assets/skills/ui-ux-pro-max",
-        "strategy": "copy"
-      },
-      "name": "ui-ux-pro-max",
-      "riskTier": "T1",
-      "tags": [
-        "bootstrap-seeded",
-        "shared-skill"
-      ]
-    },
-    {
-      "assetKind": "skill",
-      "bindings": {
-        "cache": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        },
-        "user-dir": {
-          "skill": {
-            "syncMode": "user-skill-dir"
-          }
-        }
-      },
-      "canonicalSource": {
         "path": "assets/skills/web-design-guidelines",
         "ref": "main",
         "refType": "branch",
@@ -1539,6 +2375,6 @@
       ]
     }
   ],
-  "generatedAt": "2026-04-03T07:43:08.000Z",
+  "generatedAt": "2026-04-05T00:00:00.000Z",
   "version": 3
 }

@@ -6,6 +6,27 @@ supportedAssetKinds:
 enabledCapabilities:
   - mcp.figma
   - plugin.figma
+  - skill.impeccable.adapt
+  - skill.impeccable.animate
+  - skill.impeccable.arrange
+  - skill.impeccable.audit
+  - skill.impeccable.bolder
+  - skill.impeccable.clarify
+  - skill.impeccable.colorize
+  - skill.impeccable.critique
+  - skill.impeccable.delight
+  - skill.impeccable.distill
+  - skill.impeccable.extract
+  - skill.impeccable.frontend-design
+  - skill.impeccable.harden
+  - skill.impeccable.normalize
+  - skill.impeccable.onboard
+  - skill.impeccable.optimize
+  - skill.impeccable.overdrive
+  - skill.impeccable.polish
+  - skill.impeccable.quieter
+  - skill.impeccable.teach-impeccable
+  - skill.impeccable.typeset
   - skill.playwright-best-practices
   - skill.playwright-cli
   - skill.prisma-performance
@@ -16,7 +37,6 @@ enabledCapabilities:
   - skill.tailwindcss-advanced-layouts
   - skill.testing-quality
   - skill.typescript-advanced-types
-  - skill.ui-ux-pro-max
   - skill.web-design-guidelines
   - skill.writing-plans
 bindingPolicy:

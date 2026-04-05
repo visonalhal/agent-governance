@@ -1,0 +1,19 @@
+machineId: chinami-2cjaf9s
+description: Personal Windows workstation for governed Codex, Claude, and Cursor sync.
+workspaceRoot: D:\gitworkspace
+enabledRuntimes:
+  - codex
+  - claude
+  - cursor
+pathVars: {}
+runtimeTargets:
+  codex:
+    nativeFiles: {}
+    cacheBindings: {}
+  claude:
+    nativeFiles: {}
+    cacheBindings: {}
+  cursor:
+    nativeFiles: {}
+    cacheBindings: {}
+runtimeOverrides: {}

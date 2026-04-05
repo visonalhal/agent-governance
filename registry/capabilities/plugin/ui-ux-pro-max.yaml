@@ -34,7 +34,8 @@ review:
   filesystemSideEffects: runtime plugin execution
   notes:
     - Seeded from the local Claude plugin configuration.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Replaced by external Impeccable-based design workflow.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
