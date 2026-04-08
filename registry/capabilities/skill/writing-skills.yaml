@@ -1,0 +1,55 @@
+id: skill.writing-skills
+name: writing-skills
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources:
+  - awesome-skills
+  - skills-sh
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/obra/superpowers
+  ref: 917e5f53b16b115b70a3a355ed5f4993b9f8b73d
+  refType: commit
+  path: skills/writing-skills
+  resolvedRevision: 917e5f53b16b115b70a3a355ed5f4993b9f8b73d
+install:
+  strategy: copy
+  artifactName: writing-skills
+  sourcePath: assets/skills/writing-skills
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-08T06:36:08Z
+  license: MIT
+  executesScripts: true
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: local rendered diagrams and evaluation artifacts
+  notes:
+    - Imported from obra/superpowers skills/writing-skills at
+      917e5f53b16b115b70a3a355ed5f4993b9f8b73d.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: c0a92e629e39ea91b1f54da67a6aa92723008a8ef5b500c6de078f55485937c7
+tags:
+  - obra
+  - superpowers
+  - meta

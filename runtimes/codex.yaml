@@ -6,6 +6,7 @@ supportedAssetKinds:
 enabledCapabilities:
   - mcp.figma
   - plugin.figma
+  - skill.brainstorming
   - skill.impeccable.adapt
   - skill.impeccable.animate
   - skill.impeccable.arrange
@@ -34,11 +35,13 @@ enabledCapabilities:
   - skill.receiving-code-review
   - skill.requesting-code-review
   - skill.skill-creator
+  - skill.systematic-debugging
   - skill.tailwindcss-advanced-layouts
   - skill.testing-quality
   - skill.typescript-advanced-types
   - skill.web-design-guidelines
   - skill.writing-plans
+  - skill.writing-skills
 bindingPolicy:
   defaults:
     skill:

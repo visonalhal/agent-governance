@@ -1,0 +1,55 @@
+id: skill.brainstorming
+name: brainstorming
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources:
+  - awesome-skills
+  - skills-sh
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/obra/superpowers
+  ref: 917e5f53b16b115b70a3a355ed5f4993b9f8b73d
+  refType: commit
+  path: skills/brainstorming
+  resolvedRevision: 917e5f53b16b115b70a3a355ed5f4993b9f8b73d
+install:
+  strategy: copy
+  artifactName: brainstorming
+  sourcePath: assets/skills/brainstorming
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: OpenAI Codex
+  reviewedAt: 2026-04-08T06:36:08Z
+  license: MIT
+  executesScripts: true
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: local browser helper server and temporary session files
+  notes:
+    - Imported from obra/superpowers skills/brainstorming at
+      917e5f53b16b115b70a3a355ed5f4993b9f8b73d.
+lifecycleState: published
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0
+tags:
+  - obra
+  - superpowers
+  - planning

@@ -20,7 +20,38 @@
 - 看治理记录，去 `registry/capabilities`
 - 看谁在启用，去 `runtimes`
 
-## Current Design Setup
+## Coding Capabilities
+
+当前编码与交付相关能力分成七层：
+
+| 能力 | 角色 | 当前状态 |
+| --- | --- | --- |
+| `skill.brainstorming` | 需求澄清、方案分岔、spec-first 设计 | 已启用在 `codex` |
+| `skill.writing-plans` | 把确认过的设计转成可执行 implementation plan | 已启用在 `codex` |
+| `skill.systematic-debugging` | root-cause-first 调试与故障定位 | 已启用在 `codex` |
+| `skill.requesting-code-review` | 主动请求 review 的质量闸门 | 已启用在 `codex` |
+| `skill.receiving-code-review` | 消化 review、识别该改与不该盲改的地方 | 已启用在 `codex` |
+| `skill.testing-quality` | 测试补齐、验证、提交前质量收口 | 已启用在 `codex` |
+| `skill.writing-skills` | skill 的编写、评测与迭代 | 已启用在 `codex` |
+
+编码侧的主张也很明确：
+
+- `brainstorming` 负责把需求讲清楚，不直接跳实现。
+- `writing-plans` 负责把已确认方向拆成执行步骤。
+- `systematic-debugging` 负责先找根因，再动修复。
+- `requesting-code-review` 和 `receiving-code-review` 负责 review 前后闭环。
+- `testing-quality` 负责验证，不替代设计或 review。
+- `writing-skills` 只用于维护 skill 本身，不是日常 feature 开发主入口。
+
+## Coding Runtime View
+
+| Runtime | 当前编码相关启用方式 | 说明 |
+| --- | --- | --- |
+| `codex` | `brainstorming` + `writing-plans` + `systematic-debugging` + `requesting-code-review` + `receiving-code-review` + `testing-quality` + `writing-skills` | 当前主编码编排 runtime |
+| `claude` | 无受治理 coding workflow skill | 当前主要保留插件与原生配置治理 |
+| `cursor` | 无受治理 coding workflow skill | 当前主要保留 MCP 与 user skills 同步能力 |
+
+## Design Capabilities
 
 当前设计相关能力分成三层：
 
@@ -36,7 +67,7 @@
 - `web-design-guidelines` 负责审计、checklist、finding。
 - `ui-ux-pro-max` 已停用，不再作为主设计入口。
 
-## Runtime View
+## Design Runtime View
 
 | Runtime | 当前设计相关启用方式 | 说明 |
 | --- | --- | --- |
@@ -83,6 +114,71 @@
 - 代替设计方向判断
 - 代替 UX 审计
 
+## Coding Responsibilities
+
+### brainstorming
+
+适合：
+
+- 新功能、较大改动、需求还不清楚
+- 需要先明确接口、数据流、边界和 success criteria
+- 需要先出 spec，再进入实现
+
+不适合：
+
+- 已经明确根因的单点修复
+- 纯机械修改或无决策空间的小变更
+
+### systematic-debugging
+
+适合：
+
+- flaky test、CI 故障、生产 bug、构建异常
+- 已经出现回归，但根因还不清楚
+- 多组件链路里需要逐层定位断点
+
+不适合：
+
+- 凭直觉直接打补丁
+- 用 symptom fix 代替根因修复
+
+### requesting-code-review
+
+适合：
+
+- 重要任务收尾
+- 阶段性实现完成，需要质量闸门
+- 修复复杂问题后，需要再做一次独立复核
+
+不适合：
+
+- 代替测试
+- 代替需求澄清或技术设计
+
+### receiving-code-review
+
+适合：
+
+- 收到 review 后判断哪些该改、哪些要 challenge
+- 避免表面顺从、技术上却把问题越改越偏
+
+不适合：
+
+- 在没有理解反馈的情况下机械照改
+
+### writing-skills
+
+适合：
+
+- 新建 skill
+- 修改现有 skill 的触发条件、流程或 supporting files
+- 为 skill 设计压力测试和评估闭环
+
+不适合：
+
+- 普通业务开发
+- 把项目级约定误写成通用 skill
+
 ## Figma Responsibilities
 
 | Skill | 主职责 | 结果物 |
@@ -102,7 +198,36 @@
 - 要做 Figma 设计系统，用 `figma-generate-library`
 - 要把 Figma 落到代码，用 `figma-implement-design`
 
-## Recommended Flows
+## Coding Orchestration
+
+### 场景 1：新功能或需求还不清晰
+
+1. 先用 `brainstorming` 澄清目标、约束、方案分歧，并沉淀 spec。
+2. spec 确认后转 `writing-plans`，把设计拆成 implementation plan。
+3. 实施过程中到达阶段性节点，用 `requesting-code-review` 做质量闸门。
+4. 最后用 `testing-quality` 做验证收口。
+
+### 场景 2：遇到 bug、flaky test 或 CI 异常
+
+1. 先用 `systematic-debugging` 做 root cause investigation。
+2. 根因明确后再实施修复，不要倒过来。
+3. 如果改动较大或风险较高，补一次 `requesting-code-review`。
+4. 收尾走 `testing-quality`。
+
+### 场景 3：收到 review feedback
+
+1. 先用 `receiving-code-review` 判断反馈是否成立，以及应该怎么改。
+2. 实施修改。
+3. 如改动影响边界、行为或架构，再用 `requesting-code-review` 复核一次。
+4. 最后走 `testing-quality`。
+
+### 场景 4：维护 skill 本身
+
+1. 用 `writing-skills` 设计 skill 结构、pressure scenario 和验证方法。
+2. 如果 skill 是调试类或故障分析类，可结合 `systematic-debugging` 观察 baseline failure。
+3. 最终仍然回到仓库治理主链路：`review -> approve -> publish -> render -> sync`。
+
+## Design Orchestration
 
 ### 场景 1：现有 UI 不够好看
 
@@ -135,10 +260,16 @@
 
 ## Quick Memory
 
+- 做需求澄清和 spec：`brainstorming`
+- 做计划拆解：`writing-plans`
+- 做根因调试：`systematic-debugging`
+- 做 review 请求：`requesting-code-review`
+- 做 review 反馈处理：`receiving-code-review`
+- 做测试与质量收口：`testing-quality`
+- 做 skill 维护：`writing-skills`
 - 做设计打磨：`Impeccable`
 - 做规范审计：`web-design-guidelines`
 - 做 Tailwind 布局实现：`tailwindcss-advanced-layouts`
 - 做 Figma 页面：`figma-generate-design`
 - 做 Figma 设计系统：`figma-generate-library`
 - 做 Figma 到代码：`figma-implement-design`
-- 做测试与质量收口：`testing-quality`

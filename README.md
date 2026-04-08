@@ -36,7 +36,7 @@ The flow is always:
 
 See `docs/repo-structure.md` for the canonical directory guide.
 See `docs/how-to-read-this-repo.md` for the fastest reading order back into the codebase.
-See `docs/skills-capability-map.md` for the current skill responsibility map and overlap rules.
+See `docs/skills-capability-map.md` for the current skill responsibility map, orchestration flows, and overlap rules.
 
 ## Bootstrap
 
