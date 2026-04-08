@@ -71,7 +71,7 @@ Read often:
 - `machines/`
 - `tests/`
 - `docs/skills-capability-map.md`
-  Read this when you need to understand skill boundaries, overlap, and selection rules without digging through every `SKILL.md`.
+  Read this when you need to understand skill boundaries, overlap, orchestration rules, and selection guidance without digging through every `SKILL.md`.
 
 Read sometimes:
 

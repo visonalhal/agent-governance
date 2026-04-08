@@ -586,6 +586,48 @@
         }
       },
       "canonicalSource": {
+        "path": "skills/brainstorming",
+        "ref": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "refType": "commit",
+        "resolvedRevision": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "sourceId": "github-direct",
+        "url": "https://github.com/obra/superpowers"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0"
+      },
+      "id": "skill.brainstorming",
+      "includes": [],
+      "install": {
+        "artifactName": "brainstorming",
+        "sourcePath": "assets/skills/brainstorming",
+        "strategy": "copy"
+      },
+      "name": "brainstorming",
+      "riskTier": "T1",
+      "tags": [
+        "obra",
+        "planning",
+        "superpowers"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
         "path": "assets/skills/code-review",
         "ref": "main",
         "refType": "branch",
@@ -2157,6 +2199,48 @@
         }
       },
       "canonicalSource": {
+        "path": "skills/systematic-debugging",
+        "ref": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "refType": "commit",
+        "resolvedRevision": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "sourceId": "github-direct",
+        "url": "https://github.com/obra/superpowers"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "72e9ab72627e4fd8ed26a582e82309a98ecdc4f6e1c99418430ac05682c9e91d"
+      },
+      "id": "skill.systematic-debugging",
+      "includes": [],
+      "install": {
+        "artifactName": "systematic-debugging",
+        "sourcePath": "assets/skills/systematic-debugging",
+        "strategy": "copy"
+      },
+      "name": "systematic-debugging",
+      "riskTier": "T1",
+      "tags": [
+        "debugging",
+        "obra",
+        "superpowers"
+      ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
         "path": "assets/skills/tailwindcss-advanced-layouts",
         "ref": "main",
         "refType": "branch",
@@ -2373,8 +2457,50 @@
         "bootstrap-seeded",
         "shared-skill"
       ]
+    },
+    {
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "skills/writing-skills",
+        "ref": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "refType": "commit",
+        "resolvedRevision": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
+        "sourceId": "github-direct",
+        "url": "https://github.com/obra/superpowers"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "c0a92e629e39ea91b1f54da67a6aa92723008a8ef5b500c6de078f55485937c7"
+      },
+      "id": "skill.writing-skills",
+      "includes": [],
+      "install": {
+        "artifactName": "writing-skills",
+        "sourcePath": "assets/skills/writing-skills",
+        "strategy": "copy"
+      },
+      "name": "writing-skills",
+      "riskTier": "T1",
+      "tags": [
+        "meta",
+        "obra",
+        "superpowers"
+      ]
     }
   ],
-  "generatedAt": "2026-04-05T00:00:00.000Z",
+  "generatedAt": "2026-04-08T06:36:08.000Z",
   "version": 3
 }
