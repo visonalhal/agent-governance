@@ -6,7 +6,15 @@ supportedAssetKinds:
 enabledCapabilities:
   - mcp.figma
   - plugin.figma
+  - skill.code-review
   - skill.brainstorming
+  - skill.figma.code-connect-components
+  - skill.figma.create-design-system-rules
+  - skill.figma.create-new-file
+  - skill.figma.generate-design
+  - skill.figma.generate-library
+  - skill.figma.implement-design
+  - skill.figma.use
   - skill.impeccable.adapt
   - skill.impeccable.animate
   - skill.impeccable.arrange
@@ -30,6 +38,7 @@ enabledCapabilities:
   - skill.impeccable.typeset
   - skill.playwright-best-practices
   - skill.playwright-cli
+  - skill.next-best-practices
   - skill.prisma-performance
   - skill.product-manager-toolkit
   - skill.receiving-code-review
