@@ -32,7 +32,8 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Replaced by self-owned receiving-code-review-lite.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual

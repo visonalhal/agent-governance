@@ -11,6 +11,7 @@ import {
   capabilityFilePath,
   changeCapabilityLifecycle,
   ingestCapability,
+  loadRepo,
   loadBootstrap,
   publishGovernance,
   renderGovernance,
@@ -19,6 +20,8 @@ import {
   syncGovernance,
 } from "../src/governance.js";
 import { importLocalMachineState } from "../src/local-import.js";
+import { auditRuntimeTruth } from "../src/runtime-audit.js";
+import { runTriggerEvals } from "../src/trigger-eval.js";
 
 const REPO_ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const FIXED_REVIEW_DATE = "2026-04-02T00:00:00.000Z";
@@ -193,6 +196,101 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("parses existing capabilities with activation defaults", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.activation-default",
+        runtimeTargets: [],
+      });
+
+      const repo = await loadRepo(sandbox.root);
+      const capability = repo.capabilities.find((item) => item.id === "skill.vendor.activation-default");
+      expect(capability?.activation.phase).toBe("implementation");
+      expect(capability?.activation.triggerMode).toBe("explicit");
+      expect(capability?.activation.maxChainDepth).toBe(1);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("fails publish when a profile references an unknown capability", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await writeProfile(sandbox.root, {
+        profileId: "bad-profile",
+        runtimeId: "codex",
+        enabledCapabilities: ["skill.vendor.missing"],
+      });
+
+      await expect(publishGovernance(sandbox.root)).rejects.toThrow(
+        "bad-profile: enabledCapabilities references unknown capability skill.vendor.missing"
+      );
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("renders active profile capabilities and excludes blocked and reference-only capabilities", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.profile-enabled",
+        runtimeTargets: [],
+      });
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.profile-blocked",
+        runtimeTargets: [],
+      });
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.profile-reference",
+        runtimeTargets: [],
+      });
+      await writeProfile(sandbox.root, {
+        profileId: "test-profile",
+        runtimeId: "codex",
+        enabledCapabilities: ["skill.vendor.profile-enabled", "skill.vendor.profile-blocked"],
+        referenceCapabilities: ["skill.vendor.profile-reference"],
+        blockedCapabilities: ["skill.vendor.profile-blocked"],
+      });
+      await mutateMachine(sandbox.root, sandbox.machineId, (machine) => {
+        machine.activeProfiles = ["test-profile"];
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      const desired = JSON.parse(
+        await fs.readFile(
+          path.join(sandbox.root, "generated", "machines", sandbox.machineId, "codex", "desired-state.json"),
+          "utf8"
+        )
+      ) as {
+        skills: Array<{ id: string }>;
+      };
+      expect(desired.skills.map((skill) => skill.id)).toEqual(["skill.vendor.profile-enabled"]);
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-enabled", "SKILL.md"))).toBe(true);
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-reference"))).toBe(false);
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-blocked"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
   it("syncs Codex while preserving unmanaged model settings and native entries", async () => {
     const sandbox = await createSandbox();
 
@@ -259,6 +357,172 @@ describe.sequential("agent governance", () => {
       expect(config.plugins?.["sample-plugin@governed-marketplace"]?.enabled).toBe(true);
       expect(config.mcp_servers?.manual?.command).toBe("manual-server");
       expect(config.mcp_servers?.governed?.command).toBe("npx");
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "codex-skill", "SKILL.md"))).toBe(true);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("removes stale governed Codex user skills after republish", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const capabilityId = "skill.vendor.stale-codex-skill";
+      await prepareSkillCapability(sandbox.root, {
+        id: capabilityId,
+        runtimeTargets: ["codex"],
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "stale-codex-skill", "SKILL.md"))).toBe(
+        true
+      );
+
+      await changeCapabilityLifecycle(sandbox.root, capabilityId, "deprecated", "Superseded");
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "stale-codex-skill"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("fails closed on unmanaged Codex plugin collisions unless explicitly adopted for disable", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await preparePluginCapability(sandbox.root, {
+        id: "plugin.vendor.manual-plugin-collision",
+        runtimeTargets: ["codex"],
+        runtimeBindings: {
+          codex: {
+            plugin: {
+              pluginId: "manual@vendor",
+              enabled: true,
+            },
+          },
+        },
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+
+      await expect(
+        syncGovernance({
+          root: sandbox.root,
+          machineId: sandbox.machineId,
+          runtimeId: "codex",
+          bootstrap,
+        })
+      ).rejects.toThrow("Codex plugin collision");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("adopts and disables exact high-risk Codex plugin records", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await fs.writeFile(
+        path.join(sandbox.home, ".codex", "config.toml"),
+        [
+          '[plugins."build-web-apps@openai-curated"]',
+          "enabled = true",
+          "",
+          '[plugins."superpowers@openai-curated"]',
+          "enabled = true",
+          "",
+        ].join("\n"),
+        "utf8"
+      );
+      await preparePluginCapability(sandbox.root, {
+        id: "plugin.vendor.disable-build-web-apps",
+        runtimeTargets: ["codex"],
+        runtimeBindings: {
+          codex: {
+            plugin: {
+              pluginId: "build-web-apps@openai-curated",
+              enabled: false,
+              adoptExisting: true,
+            },
+          },
+        },
+      });
+      await preparePluginCapability(sandbox.root, {
+        id: "plugin.vendor.disable-superpowers",
+        runtimeTargets: ["codex"],
+        runtimeBindings: {
+          codex: {
+            plugin: {
+              pluginId: "superpowers@openai-curated",
+              enabled: false,
+              adoptExisting: true,
+            },
+          },
+        },
+      });
+      await mutateCapability(sandbox.root, "plugin.vendor.disable-build-web-apps", (capability) => {
+        capability.bindings.package.plugin.install = {
+          strategy: "external",
+          artifactName: "disable-build-web-apps",
+        };
+      });
+      await mutateCapability(sandbox.root, "plugin.vendor.disable-superpowers", (capability) => {
+        capability.bindings.package.plugin.install = {
+          strategy: "external",
+          artifactName: "disable-superpowers",
+        };
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      const config = TOML.parse(await fs.readFile(path.join(sandbox.home, ".codex", "config.toml"), "utf8")) as {
+        plugins?: Record<string, { enabled?: boolean }>;
+      };
+      expect(config.plugins?.["build-web-apps@openai-curated"]?.enabled).toBe(false);
+      expect(config.plugins?.["superpowers@openai-curated"]?.enabled).toBe(false);
     } finally {
       await sandbox.cleanup();
     }
@@ -1179,6 +1443,63 @@ describe.sequential("agent governance", () => {
       await sandbox.cleanup();
     }
   });
+
+  it("reports runtime truth drift and high-risk plugin skill roots", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await fs.writeFile(
+        path.join(sandbox.home, ".codex", "config.toml"),
+        ['[plugins."superpowers@openai-curated"]', "enabled = true", ""].join("\n"),
+        "utf8"
+      );
+      await fs.mkdir(
+        path.join(
+          sandbox.home,
+          ".codex",
+          "plugins",
+          "cache",
+          "openai-curated",
+          "superpowers",
+          "123",
+          "skills",
+          "systematic-debugging"
+        ),
+        { recursive: true }
+      );
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      const snapshot = await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+      });
+
+      expect(snapshot.findings.some((finding) => finding.includes("superpowers@openai-curated"))).toBe(true);
+      expect(
+        await exists(path.join(sandbox.root, "generated", "machines", sandbox.machineId, "codex", "runtime-audit.json"))
+      ).toBe(false);
+
+      await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+        write: true,
+      });
+      expect(
+        await exists(path.join(sandbox.root, "generated", "machines", sandbox.machineId, "codex", "runtime-audit.json"))
+      ).toBe(true);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("passes static trigger eval scenarios for debug and non-debug prompts", async () => {
+    const report = await runTriggerEvals(REPO_ROOT);
+
+    expect(report.failures).toEqual([]);
+    expect(report.passed).toBe(true);
+  });
 });
 
 async function createSandbox() {
@@ -1563,6 +1884,35 @@ async function mutateRuntime(
   const runtime = YAML.parse(await fs.readFile(filePath, "utf8")) as Record<string, any>;
   mutate(runtime);
   await fs.writeFile(filePath, YAML.stringify(runtime), "utf8");
+}
+
+async function mutateMachine(
+  root: string,
+  machineId: string,
+  mutate: (machine: Record<string, any>) => void
+) {
+  const filePath = path.join(root, "machines", `${machineId}.yaml`);
+  const machine = YAML.parse(await fs.readFile(filePath, "utf8")) as Record<string, any>;
+  mutate(machine);
+  await fs.writeFile(filePath, YAML.stringify(machine), "utf8");
+}
+
+async function writeProfile(root: string, profile: Record<string, any>) {
+  const filePath = path.join(root, "profiles", `${profile.profileId}.yaml`);
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(
+    filePath,
+    YAML.stringify({
+      runtimeId: "codex",
+      enabledCapabilities: [],
+      referenceCapabilities: [],
+      blockedCapabilities: [],
+      projectScopes: [],
+      notes: [],
+      ...profile,
+    }),
+    "utf8"
+  );
 }
 
 async function mutateCapability(

@@ -1,0 +1,33 @@
+profileId: helix-product
+runtimeId: codex
+enabledCapabilities:
+  - skill.product-manager-toolkit
+  - skill.brainstorming-lite
+  - skill.implementation-plan-lite
+  - skill.risk-based-tdd
+  - skill.unit-test-design
+  - skill.systematic-debugging-lite
+  - skill.verification-before-completion-lite
+  - skill.receiving-code-review-lite
+  - skill.code-review
+  - skill.next-best-practices
+  - skill.prisma-performance
+  - skill.typescript-advanced-types
+  - skill.playwright-best-practices
+  - skill.tailwindcss-advanced-layouts
+  - skill.web-design-guidelines
+  - skill.impeccable.frontend-design
+  - skill.impeccable.critique
+  - skill.impeccable.polish
+  - skill.impeccable.harden
+  - skill.impeccable.clarify
+  - skill.impeccable.typeset
+  - skill.impeccable.normalize
+referenceCapabilities:
+  - skill.webapp-testing
+blockedCapabilities: []
+projectScopes:
+  - /Users/halvinshen/Documents/workspace/halvin/helix
+notes:
+  - Helix uses project AGENTS.md as the highest-priority workflow constraint.
+  - Workflow skills are lite defaults and must not override project-local intent routing.

@@ -38,7 +38,8 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Replaced by self-owned implementation-plan-lite for scoped planning without Superpowers handoff requirements.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual

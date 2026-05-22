@@ -1,3 +1,8 @@
+---
+name: tailwindcss-advanced-layouts
+description: Advanced Tailwind CSS layout patterns for complex responsive grids, application shells, dashboard layouts, and production UI composition.
+---
+
 # Tailwind CSS Advanced Layout Techniques
 
 ## CSS Grid Mastery

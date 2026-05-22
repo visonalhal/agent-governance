@@ -4,58 +4,13 @@ supportedAssetKinds:
   - plugin
   - mcp
 enabledCapabilities:
-  - mcp.figma
-  - plugin.figma
-  - skill.code-review
-  - skill.brainstorming
-  - skill.figma.code-connect-components
-  - skill.figma.create-design-system-rules
-  - skill.figma.create-new-file
-  - skill.figma.generate-design
-  - skill.figma.generate-library
-  - skill.figma.implement-design
-  - skill.figma.use
-  - skill.impeccable.adapt
-  - skill.impeccable.animate
-  - skill.impeccable.arrange
-  - skill.impeccable.audit
-  - skill.impeccable.bolder
-  - skill.impeccable.clarify
-  - skill.impeccable.colorize
-  - skill.impeccable.critique
-  - skill.impeccable.delight
-  - skill.impeccable.distill
-  - skill.impeccable.extract
-  - skill.impeccable.frontend-design
-  - skill.impeccable.harden
-  - skill.impeccable.normalize
-  - skill.impeccable.onboard
-  - skill.impeccable.optimize
-  - skill.impeccable.overdrive
-  - skill.impeccable.polish
-  - skill.impeccable.quieter
-  - skill.impeccable.teach-impeccable
-  - skill.impeccable.typeset
-  - skill.playwright-best-practices
-  - skill.playwright-cli
-  - skill.next-best-practices
-  - skill.prisma-performance
-  - skill.product-manager-toolkit
-  - skill.receiving-code-review
-  - skill.requesting-code-review
-  - skill.skill-creator
-  - skill.systematic-debugging
-  - skill.tailwindcss-advanced-layouts
-  - skill.testing-quality
-  - skill.typescript-advanced-types
-  - skill.web-design-guidelines
-  - skill.writing-plans
-  - skill.writing-skills
+  - plugin.openai-curated.build-web-apps
+  - plugin.openai-curated.superpowers
 bindingPolicy:
   defaults:
     skill:
-      - cache
       - user-dir
+      - cache
     mcp:
       - remote-http
       - stdio-command
@@ -67,6 +22,8 @@ bindingPolicy:
 nativeFiles:
   - name: config
     template: ${HOME}/.codex/config.toml
+  - name: userSkillsDir
+    template: ${HOME}/.codex/skills
 cacheBindings:
   - name: skillsDir
     template: ${CACHE_ROOT}/skills
@@ -79,5 +36,6 @@ ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/codex.json
 profileMode: managed
 notes:
   - Shared skills live in the shared artifact cache at ~/.agents/skills.
-  - Only governed plugin and MCP entries are merged into ~/.codex/config.toml.
+  - Governed Codex user skills sync into ~/.codex/skills.
+  - Governed plugin and MCP entries are merged into ~/.codex/config.toml.
   - Non-governed model and reasoning settings remain untouched.

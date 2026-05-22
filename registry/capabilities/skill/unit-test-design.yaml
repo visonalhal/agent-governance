@@ -1,0 +1,67 @@
+id: skill.unit-test-design
+name: unit-test-design
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/unit-test-design
+install:
+  strategy: copy
+  artifactName: unit-test-design
+  sourcePath: assets/skills/unit-test-design
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Replaces the unit-test slice of testing-quality.
+lifecycleState: published
+activation:
+  phase: unit-testing
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith:
+    - skill.testing-quality
+  replaces:
+    - skill.testing-quality
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - add unit tests for parser
+    - review service tests
+  antiTriggers:
+    - e2e-only work
+    - pure documentation
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: b6e478ed106ad673f5880f85912cda2e3d4066721329d49e4596d67159a18b4e
+tags:
+  - governance
+  - testing
+  - workflow-lite

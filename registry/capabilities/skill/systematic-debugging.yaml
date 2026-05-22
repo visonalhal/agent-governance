@@ -42,7 +42,8 @@ review:
   notes:
     - Imported from obra/superpowers skills/systematic-debugging at
       917e5f53b16b115b70a3a355ed5f4993b9f8b73d.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Replaced by self-owned systematic-debugging-lite with narrow failure-based triggers.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual

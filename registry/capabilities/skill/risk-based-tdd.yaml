@@ -1,0 +1,67 @@
+id: skill.risk-based-tdd
+name: risk-based-tdd
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/risk-based-tdd
+install:
+  strategy: copy
+  artifactName: risk-based-tdd
+  sourcePath: assets/skills/risk-based-tdd
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Keeps TDD where risk justifies it without making it a universal gate.
+lifecycleState: published
+activation:
+  phase: tdd
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - regression bug
+    - auth behavior change
+    - database migration
+  antiTriggers:
+    - docs edit
+    - formatting
+    - mechanical rename
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 2d061ad4cc361517f83bf4be71575e7339eccc3715908a95115d7bbee66e5cd2
+tags:
+  - governance
+  - testing
+  - workflow-lite

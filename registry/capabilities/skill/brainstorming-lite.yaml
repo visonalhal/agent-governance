@@ -1,0 +1,67 @@
+id: skill.brainstorming-lite
+name: brainstorming-lite
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/brainstorming-lite
+install:
+  strategy: copy
+  artifactName: brainstorming-lite
+  sourcePath: assets/skills/brainstorming-lite
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Replaces hard-gated brainstorming with a bounded discovery loop.
+lifecycleState: published
+activation:
+  phase: product
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith:
+    - skill.brainstorming
+  replaces:
+    - skill.brainstorming
+  projectScopes: []
+  subagentRole: researcher
+  activationExamples:
+    - product requirement is unclear
+    - choose among several architecture options
+  antiTriggers:
+    - clone repository
+    - run command
+    - obvious bug fix
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 7e9b45728b7bc6e97179d43a196e2098542d45144898b1d0660bc4a9889150bc
+tags:
+  - governance
+  - workflow-lite

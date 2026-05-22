@@ -1,0 +1,63 @@
+id: skill.intent-routing
+name: intent-routing
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/intent-routing
+install:
+  strategy: copy
+  artifactName: intent-routing
+  sourcePath: assets/skills/intent-routing
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Self-owned Codex-first workflow skill.
+lifecycleState: published
+activation:
+  phase: entry
+  triggerMode: default
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - clone this repository
+    - compare plugin configuration
+    - fix this failing test
+  antiTriggers: []
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: ff0452a869c1469dc669be40b84180909ae779b84aa46484c3a2b25819ebef32
+tags:
+  - governance
+  - workflow-lite

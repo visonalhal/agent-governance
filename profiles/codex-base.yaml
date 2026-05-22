@@ -1,0 +1,24 @@
+profileId: codex-base
+runtimeId: codex
+enabledCapabilities:
+  - plugin.openai-curated.build-web-apps
+  - plugin.openai-curated.superpowers
+  - skill.intent-routing
+referenceCapabilities:
+  - skill.webapp-testing
+blockedCapabilities:
+  - skill.testing-quality
+  - skill.brainstorming
+  - skill.writing-plans
+  - skill.systematic-debugging
+  - skill.requesting-code-review
+  - skill.receiving-code-review
+  - skill.impeccable.animate
+  - skill.impeccable.bolder
+  - skill.impeccable.delight
+  - skill.impeccable.overdrive
+  - skill.impeccable.quieter
+projectScopes: []
+notes:
+  - Base Codex profile keeps tool plumbing available and disables heavy workflow plugins.
+  - Blocked capabilities must not render even if old runtime policy still references them.

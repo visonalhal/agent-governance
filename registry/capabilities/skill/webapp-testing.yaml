@@ -1,0 +1,62 @@
+id: skill.webapp-testing
+name: webapp-testing
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources:
+  - officialskills-sh
+  - awesome-skills
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/anthropics/skills
+  ref: main
+  refType: branch
+  path: skills/webapp-testing
+install:
+  strategy: external
+  artifactName: webapp-testing
+  manifest:
+    discoveryUrl: https://officialskills.sh/anthropics/skills/webapp-testing
+riskTier: T2
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: pending
+  notes:
+    - Candidate replacement for build-web-apps frontend-testing-debugging.
+    - Must review scripts, Playwright lifecycle, local-only behavior, and license before approval.
+lifecycleState: candidate
+activation:
+  phase: web-qa
+  triggerMode: reference-only
+  maxChainDepth: 1
+  conflictsWith:
+    - plugin.openai-curated.build-web-apps
+  replaces: []
+  projectScopes: []
+  subagentRole: qa-runner
+  activationExamples:
+    - local web app UI verification
+    - screenshot and console QA
+  antiTriggers:
+    - server-only bugfix
+    - no rendered web surface
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+tags:
+  - candidate
+  - web-qa
+  - playwright

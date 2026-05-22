@@ -38,7 +38,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 9a6c19b3251593eaa800c157f669d3a890132dd3f4f828f4dd41bcef0150237d
+  digest: c3505b26b1cc2fa48b1082a6666cc0807cba8932445e1a235e24f691716ee398
 tags:
   - bootstrap-seeded
   - shared-skill

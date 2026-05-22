@@ -1,0 +1,67 @@
+id: skill.receiving-code-review-lite
+name: receiving-code-review-lite
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/receiving-code-review-lite
+install:
+  strategy: copy
+  artifactName: receiving-code-review-lite
+  sourcePath: assets/skills/receiving-code-review-lite
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Replaces broad review-response workflow with bounded review triage.
+lifecycleState: published
+activation:
+  phase: review
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith:
+    - skill.receiving-code-review
+  replaces:
+    - skill.receiving-code-review
+  projectScopes: []
+  subagentRole: reviewer
+  activationExamples:
+    - address PR comments
+    - evaluate requested changes
+  antiTriggers:
+    - ordinary feature request
+    - no review feedback present
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 5b19cf73c93680dc546ea8e0f44c1dc8b92a8bb76683e8b735439b87a02652eb
+tags:
+  - governance
+  - review
+  - workflow-lite

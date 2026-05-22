@@ -11,6 +11,7 @@ import type {
   MachineRecord,
   RenderedRuntimeState,
   ResolutionLock,
+  RuntimeProfileRecord,
   RuntimeRecord,
   SharedCacheManifest,
   SourceRecord,
@@ -23,6 +24,7 @@ import {
   machineSchema,
   renderedRuntimeStateSchema,
   resolutionLockSchema,
+  runtimeProfileSchema,
   runtimeSchema,
   sharedCacheManifestSchema,
   sourcesFileSchema,
@@ -64,6 +66,7 @@ type RepoState = {
   sources: Map<string, SourceRecord>;
   capabilities: CapabilityRecord[];
   runtimes: Map<string, RuntimeRecord>;
+  profiles: Map<string, RuntimeProfileRecord>;
   machines: Map<string, MachineRecord>;
 };
 
@@ -149,6 +152,7 @@ export async function loadRepo(root: string): Promise<RepoState> {
   const parsedSources = sourcesFileSchema.parse(sourcesFile);
   const capabilityFiles = await listFiles(path.join(root, "registry", "capabilities"), ".yaml");
   const runtimeFiles = await listFiles(path.join(root, "runtimes"), ".yaml");
+  const profileFiles = await listFiles(path.join(root, "profiles"), ".yaml");
   const machineFiles = await listFiles(path.join(root, "machines"), ".yaml");
 
   const capabilities = await Promise.all(
@@ -156,6 +160,9 @@ export async function loadRepo(root: string): Promise<RepoState> {
   );
   const runtimes = await Promise.all(
     runtimeFiles.map(async (filePath) => runtimeSchema.parse(await readYamlFile(filePath)))
+  );
+  const profiles = await Promise.all(
+    profileFiles.map(async (filePath) => runtimeProfileSchema.parse(await readYamlFile(filePath)))
   );
   const machines = await Promise.all(
     machineFiles.map(async (filePath) => machineSchema.parse(await readYamlFile(filePath)))
@@ -166,6 +173,7 @@ export async function loadRepo(root: string): Promise<RepoState> {
     sources: new Map(parsedSources.sources.map((record) => [record.id, record])),
     capabilities: capabilities.sort((left, right) => left.id.localeCompare(right.id)),
     runtimes: new Map(runtimes.map((record) => [record.runtimeId, record])),
+    profiles: new Map(profiles.map((record) => [record.profileId, record])),
     machines: new Map(machines.map((record) => [record.machineId, record])),
   };
 }
@@ -328,8 +336,10 @@ export async function publishGovernance(root: string) {
   const runtimeErrors = [...repo.runtimes.values()].flatMap((runtime) =>
     validateRuntimeConfig(repo, runtime)
   );
-  if (publishErrors.length > 0 || runtimeErrors.length > 0) {
-    throw new Error([...publishErrors, ...runtimeErrors].join("\n"));
+  const profileErrors = validateProfiles(repo);
+  const machineErrors = [...repo.machines.values()].flatMap((machine) => validateMachineConfig(repo, machine));
+  if (publishErrors.length > 0 || runtimeErrors.length > 0 || profileErrors.length > 0 || machineErrors.length > 0) {
+    throw new Error([...publishErrors, ...runtimeErrors, ...profileErrors, ...machineErrors].join("\n"));
   }
 
   const assetErrors = (
@@ -399,6 +409,7 @@ export async function renderGovernance(options: {
       deepMerge(
         buildRenderedRuntimeState({
           runtime,
+          repo,
           machine,
           bootstrap: options.bootstrap,
           lock,
@@ -523,6 +534,8 @@ export async function auditGovernance(root: string, options: AuditOptions) {
   }
 
   findings.push(...[...repo.runtimes.values()].flatMap((runtime) => validateRuntimeConfig(repo, runtime)));
+  findings.push(...validateProfiles(repo));
+  findings.push(...[...repo.machines.values()].flatMap((machine) => validateMachineConfig(repo, machine)));
 
   return findings;
 }
@@ -567,6 +580,7 @@ function buildResolutionLock(publishedCapabilities: CapabilityRecord[]): Resolut
         canonicalSource: capability.canonicalSource,
         install: capability.install,
         hash: capability.hash,
+        activation: capability.activation,
         tags: [...capability.tags].sort(),
       }))
       .sort((left, right) => left.id.localeCompare(right.id)),
@@ -586,12 +600,16 @@ async function rebuildSharedCache(
   await ensureDir(path.join(sharedCacheRoot, "manifests"));
 
   const claimedPaths = new Map<string, string>();
+  const enabledCapabilityIds = getMachineEnabledCapabilityIds(repo, machine);
 
   for (const capability of lock.capabilities) {
     if (!capability.install.sourcePath) {
       continue;
     }
     if (capability.assetKind !== "skill") {
+      continue;
+    }
+    if (!enabledCapabilityIds.has(capability.id)) {
       continue;
     }
 
@@ -638,6 +656,7 @@ async function buildSharedCacheManifest(
     skills: [],
     packages: [],
   };
+  const enabledCapabilityIds = getMachineEnabledCapabilityIds(repo, machine);
 
   for (const capability of lock.capabilities) {
     if (!capability.install.sourcePath) {
@@ -645,6 +664,9 @@ async function buildSharedCacheManifest(
     }
 
     if (capability.assetKind === "skill") {
+      if (!enabledCapabilityIds.has(capability.id)) {
+        continue;
+      }
       manifest.skills.push({
         id: capability.id,
         artifactName: capability.install.artifactName,
@@ -694,6 +716,7 @@ async function pruneGeneratedRoot(root: string) {
 
 function buildRenderedRuntimeState(args: {
   runtime: RuntimeRecord;
+  repo: RepoState;
   machine: MachineRecord;
   bootstrap: BootstrapRecord;
   lock: AnyResolutionLock;
@@ -729,7 +752,7 @@ function buildRenderedRuntimeState(args: {
   if (isLegacyResolutionLock(args.lock)) {
     populateRenderedRuntimeStateFromLegacy(baseState, args.runtime.runtimeId, args.lock, args.vars);
   } else {
-    populateRenderedRuntimeStateFromBindings(baseState, args.runtime, args.lock, args.vars);
+    populateRenderedRuntimeStateFromBindings(baseState, args.repo, args.machine, args.runtime, args.lock, args.vars);
   }
 
   baseState.skills.sort((left, right) => left.id.localeCompare(right.id));
@@ -741,11 +764,13 @@ function buildRenderedRuntimeState(args: {
 
 function populateRenderedRuntimeStateFromBindings(
   baseState: RenderedRuntimeState,
+  repo: RepoState,
+  machine: MachineRecord,
   runtime: RuntimeRecord,
   lock: ResolutionLock,
   vars: Record<string, string>
 ) {
-  const enabledCapabilities = new Set(runtime.enabledCapabilities);
+  const enabledCapabilities = getEffectiveEnabledCapabilityIds(repo, runtime, machine);
 
   for (const capability of lock.capabilities) {
     if (!enabledCapabilities.has(capability.id)) {
@@ -898,7 +923,7 @@ function collectSharedCachePackages(
       continue;
     }
 
-    const enabledCapabilities = new Set(runtime.enabledCapabilities);
+    const enabledCapabilities = getEffectiveEnabledCapabilityIds(repo, runtime, machine);
     for (const capability of lock.capabilities) {
       if (capability.assetKind !== "plugin") {
         continue;
@@ -924,6 +949,48 @@ function collectSharedCachePackages(
   }
 
   return packages;
+}
+
+function getMachineEnabledCapabilityIds(repo: RepoState, machine: MachineRecord) {
+  const enabled = new Set<string>();
+  for (const runtimeId of machine.enabledRuntimes) {
+    const runtime = repo.runtimes.get(runtimeId);
+    if (!runtime) {
+      continue;
+    }
+    for (const capabilityId of getEffectiveEnabledCapabilityIds(repo, runtime, machine)) {
+      enabled.add(capabilityId);
+    }
+  }
+  return enabled;
+}
+
+function getEffectiveEnabledCapabilityIds(
+  repo: RepoState,
+  runtime: RuntimeRecord,
+  machine: MachineRecord
+) {
+  const enabled = new Set(runtime.enabledCapabilities);
+  const blocked = new Set<string>();
+
+  for (const profileId of machine.activeProfiles) {
+    const profile = repo.profiles.get(profileId);
+    if (!profile || profile.runtimeId !== runtime.runtimeId) {
+      continue;
+    }
+    for (const capabilityId of profile.enabledCapabilities) {
+      enabled.add(capabilityId);
+    }
+    for (const capabilityId of profile.blockedCapabilities) {
+      blocked.add(capabilityId);
+    }
+  }
+
+  for (const capabilityId of blocked) {
+    enabled.delete(capabilityId);
+  }
+
+  return enabled;
 }
 
 function resolveBindingForRuntime(runtime: RuntimeRecord, capability: ResolutionLock["capabilities"][number]) {
@@ -1287,6 +1354,48 @@ function validateRuntimeConfig(repo: RepoState, runtime: RuntimeRecord) {
     }
   }
 
+  return errors;
+}
+
+function validateProfiles(repo: RepoState) {
+  const errors: string[] = [];
+
+  for (const profile of repo.profiles.values()) {
+    const runtime = repo.runtimes.get(profile.runtimeId);
+    if (!runtime) {
+      errors.push(`${profile.profileId}: references unknown runtime ${profile.runtimeId}.`);
+      continue;
+    }
+
+    const profileCapabilities = [
+      ...profile.enabledCapabilities.map((id) => ({ id, field: "enabledCapabilities" })),
+      ...profile.referenceCapabilities.map((id) => ({ id, field: "referenceCapabilities" })),
+      ...profile.blockedCapabilities.map((id) => ({ id, field: "blockedCapabilities" })),
+    ];
+    for (const { id, field } of profileCapabilities) {
+      const capability = repo.capabilities.find((item) => item.id === id);
+      if (!capability) {
+        errors.push(`${profile.profileId}: ${field} references unknown capability ${id}.`);
+        continue;
+      }
+      if (field === "enabledCapabilities" && !runtime.supportedAssetKinds.includes(capability.assetKind)) {
+        errors.push(
+          `${profile.profileId}: enabled capability ${id} has unsupported assetKind ${capability.assetKind} for ${profile.runtimeId}.`
+        );
+      }
+    }
+  }
+
+  return errors;
+}
+
+function validateMachineConfig(repo: RepoState, machine: MachineRecord) {
+  const errors: string[] = [];
+  for (const profileId of machine.activeProfiles) {
+    if (!repo.profiles.has(profileId)) {
+      errors.push(`${machine.machineId}: activeProfiles references unknown profile ${profileId}.`);
+    }
+  }
   return errors;
 }
 

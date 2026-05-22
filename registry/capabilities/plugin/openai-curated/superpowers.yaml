@@ -1,0 +1,72 @@
+id: plugin.openai-curated.superpowers
+name: superpowers
+assetKind: plugin
+bindings:
+  package:
+    plugin:
+      install:
+        strategy: external
+        artifactName: superpowers-disable-record
+        manifest:
+          pluginId: superpowers@openai-curated
+          purpose: disable-runtime-plugin
+      nativeRegistration:
+        pluginId: superpowers@openai-curated
+        enabled: false
+        adoptExisting: true
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: registry/capabilities/plugin/openai-curated/superpowers.yaml
+install:
+  strategy: external
+  artifactName: superpowers-disable-record
+  manifest:
+    pluginId: superpowers@openai-curated
+    purpose: disable-runtime-plugin
+riskTier: T1
+permissions:
+  localRead: none
+  network: false
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: N/A
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: disables Codex plugin entry
+  notes:
+    - Governance-owned disable record for hard-gated workflow skills.
+lifecycleState: published
+activation:
+  phase: governance
+  triggerMode: blocked
+  maxChainDepth: 0
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers:
+    - every conversation
+    - simple command
+    - meta question
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 54cf0ee604c3306a5bf63170bcb5d6ac07006c25813107937903f36a6b96e0f9
+tags:
+  - codex-plugin-disable
+  - openai-curated
+  - governance

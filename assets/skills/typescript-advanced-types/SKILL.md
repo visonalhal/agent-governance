@@ -1,3 +1,8 @@
+---
+name: typescript-advanced-types
+description: Advanced TypeScript type-system guidance for generics, conditional types, mapped types, inference, utility types, and strongly typed APIs.
+---
+
 # TypeScript Advanced Types
 
 Comprehensive guidance for mastering TypeScript's advanced type system including generics, conditional types, mapped types, template literal types, and utility types.

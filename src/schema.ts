@@ -19,6 +19,38 @@ export const riskTiers = ["T0", "T1", "T2", "T3"] as const;
 export const skillBindingIds = ["cache", "user-dir"] as const;
 export const mcpBindingIds = ["remote-http", "stdio-command"] as const;
 export const pluginBindingIds = ["package", "marketplace", "external"] as const;
+export const activationPhases = [
+  "entry",
+  "product",
+  "planning",
+  "design",
+  "implementation",
+  "tdd",
+  "unit-testing",
+  "web-qa",
+  "e2e",
+  "debugging",
+  "review",
+  "verification",
+  "governance",
+  "tool",
+] as const;
+export const triggerModes = [
+  "default",
+  "explicit",
+  "project-explicit",
+  "reference-only",
+  "blocked",
+] as const;
+export const subagentRoles = [
+  "none",
+  "researcher",
+  "implementer",
+  "reviewer",
+  "qa-runner",
+  "debugger",
+  "skill-auditor",
+] as const;
 
 export const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
   z.union([
@@ -99,6 +131,7 @@ export const runtimeSkillBindingSchema = z.object({
 export const runtimePluginBindingSchema = z.object({
   pluginId: z.string().min(1),
   enabled: z.boolean().default(true),
+  adoptExisting: z.boolean().default(false),
   marketplaceId: z.string().min(1).optional(),
   knownMarketplace: jsonObjectSchema.optional(),
   installedRecords: z.array(jsonObjectSchema).default([]),
@@ -131,6 +164,21 @@ export const pluginEntrypointsSchema = z.object({
   agents: z.array(z.string().min(1)).default([]),
 });
 
+export const activationSchema = z.preprocess(
+  (value) => value ?? {},
+  z.object({
+    phase: z.enum(activationPhases).default("implementation"),
+    triggerMode: z.enum(triggerModes).default("explicit"),
+    maxChainDepth: z.number().int().min(0).default(1),
+    conflictsWith: z.array(z.string().min(1)).default([]),
+    replaces: z.array(z.string().min(1)).default([]),
+    projectScopes: z.array(z.string().min(1)).default([]),
+    subagentRole: z.enum(subagentRoles).default("none"),
+    activationExamples: z.array(z.string().min(1)).default([]),
+    antiTriggers: z.array(z.string().min(1)).default([]),
+  })
+);
+
 export const capabilitySchema = z.object({
   id: z.string().regex(/^(skill|plugin|mcp|command|agent)\.[a-z0-9-]+(?:\.[a-z0-9-]+)*$/),
   name: z.string().min(1),
@@ -154,6 +202,7 @@ export const capabilitySchema = z.object({
     notes: [],
   }),
   lifecycleState: z.enum(lifecycleStates).default("candidate"),
+  activation: activationSchema,
   versionPolicy: versionPolicySchema.default({
     strategy: "pin-ref-and-hash",
     allowUpdates: "manual",
@@ -205,6 +254,16 @@ export const runtimeSchema = z.object({
   notes: z.array(z.string()).default([]),
 });
 
+export const runtimeProfileSchema = z.object({
+  profileId: z.string().min(1),
+  runtimeId: z.string().min(1),
+  enabledCapabilities: z.array(z.string().min(1)).default([]),
+  referenceCapabilities: z.array(z.string().min(1)).default([]),
+  blockedCapabilities: z.array(z.string().min(1)).default([]),
+  projectScopes: z.array(z.string().min(1)).default([]),
+  notes: z.array(z.string()).default([]),
+});
+
 export const machineRuntimeTargetSchema = z.object({
   nativeFiles: z.record(z.string(), z.string()).default({}),
   cacheBindings: z.record(z.string(), z.string()).default({}),
@@ -215,6 +274,7 @@ export const machineSchema = z.object({
   description: z.string().min(1).optional(),
   workspaceRoot: z.string().min(1),
   enabledRuntimes: z.array(z.string().min(1)).default([]),
+  activeProfiles: z.array(z.string().min(1)).default([]),
   pathVars: z.record(z.string(), z.string()).default({}),
   runtimeTargets: z.record(z.string(), machineRuntimeTargetSchema).default({}),
   runtimeOverrides: z.record(z.string(), jsonValueSchema).default({}),
@@ -244,6 +304,7 @@ export const lockCapabilitySchema = z.object({
   canonicalSource: canonicalSourceSchema,
   install: installSchema,
   hash: hashSchema,
+  activation: activationSchema,
   tags: z.array(z.string()).default([]),
 });
 
@@ -324,6 +385,33 @@ export const renderedRuntimeStateSchema = z.object({
   mcps: z.array(renderedMcpStateSchema).default([]),
 });
 
+export const runtimeAuditSnapshotSchema = z.object({
+  machineId: z.string().min(1),
+  runtimeId: z.string().min(1),
+  generatedAt: z.string().nullable(),
+  actual: z.object({
+    configPath: z.string().min(1),
+    userSkillsDir: z.string().min(1),
+    pluginCacheDir: z.string().min(1),
+    plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
+    mcpServers: z.array(z.string()).default([]),
+    userSkills: z.array(z.string()).default([]),
+    pluginSkills: z.array(
+      z.object({
+        pluginId: z.string().min(1),
+        root: z.string().min(1),
+        skills: z.array(z.string().min(1)).default([]),
+      })
+    ),
+  }),
+  desired: z.object({
+    plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
+    mcpServers: z.array(z.string()).default([]),
+    userSkills: z.array(z.string()).default([]),
+  }),
+  findings: z.array(z.string()).default([]),
+});
+
 export const sharedCacheManifestSchema = z.object({
   generatedAt: z.string().nullable(),
   skills: z.array(
@@ -349,6 +437,7 @@ export const sharedCacheManifestSchema = z.object({
 export type SourceRecord = z.infer<typeof sourceSchema>;
 export type CapabilityRecord = z.infer<typeof capabilitySchema>;
 export type RuntimeRecord = z.infer<typeof runtimeSchema>;
+export type RuntimeProfileRecord = z.infer<typeof runtimeProfileSchema>;
 export type MachineRecord = z.infer<typeof machineSchema>;
 export type BootstrapRecord = z.infer<typeof bootstrapSchema>;
 export type LocalSecretsRecord = z.infer<typeof localSecretsSchema>;
@@ -356,4 +445,5 @@ export type ResolutionLock = z.infer<typeof resolutionLockSchema>;
 export type LegacyResolutionLock = z.infer<typeof legacyResolutionLockSchema>;
 export type AnyResolutionLock = ResolutionLock | LegacyResolutionLock;
 export type RenderedRuntimeState = z.infer<typeof renderedRuntimeStateSchema>;
+export type RuntimeAuditSnapshot = z.infer<typeof runtimeAuditSnapshotSchema>;
 export type SharedCacheManifest = z.infer<typeof sharedCacheManifestSchema>;

@@ -1,10 +1,18 @@
 machineId: halvin-macbook-pro
 description: Personal macOS workstation for governed Codex, Claude, and Cursor sync.
-workspaceRoot: /Users/halvinshen/Documents/workspace/halvin-workspace
+workspaceRoot: /Users/halvinshen/Documents/workspace/halvin
 enabledRuntimes:
   - codex
   - claude
   - cursor
+activeProfiles:
+  - codex-base
+  - helix-product
+  - mercaso-web
+  - mercaso-harness
+  - agent-governance
+  - prompt-atelier
+  - nihongo-content
 pathVars: {}
 runtimeTargets:
   codex:

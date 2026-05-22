@@ -1,6 +1,17 @@
 {
   "capabilities": [
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "agent",
       "bindings": {},
       "canonicalSource": {
@@ -30,6 +41,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "agent",
       "bindings": {},
       "canonicalSource": {
@@ -59,6 +81,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "agent",
       "bindings": {},
       "canonicalSource": {
@@ -88,6 +121,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "agent",
       "bindings": {},
       "canonicalSource": {
@@ -117,6 +161,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "command",
       "bindings": {},
       "canonicalSource": {
@@ -146,6 +201,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "command",
       "bindings": {},
       "canonicalSource": {
@@ -175,6 +241,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "command",
       "bindings": {},
       "canonicalSource": {
@@ -204,6 +281,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "command",
       "bindings": {},
       "canonicalSource": {
@@ -233,6 +321,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "mcp",
       "bindings": {
         "remote-http": {
@@ -274,6 +373,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "mcp",
       "bindings": {
         "remote-http": {
@@ -317,6 +427,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "mcp",
       "bindings": {
         "remote-http": {
@@ -357,6 +478,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "mcp",
       "bindings": {
         "stdio-command": {
@@ -404,6 +536,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "plugin",
       "bindings": {
         "package": {
@@ -419,6 +562,7 @@
               "strategy": "copy"
             },
             "nativeRegistration": {
+              "adoptExisting": false,
               "enabled": true,
               "installedRecords": [],
               "pluginId": "figma@openai-curated"
@@ -498,6 +642,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "plugin",
       "bindings": {
         "marketplace": {
@@ -512,6 +667,7 @@
               "strategy": "copy"
             },
             "nativeRegistration": {
+              "adoptExisting": false,
               "enabled": true,
               "installedRecords": [
                 {
@@ -572,6 +728,162 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [
+          "routine bugfix",
+          "business page maintenance",
+          "server logic change"
+        ],
+        "conflictsWith": [],
+        "maxChainDepth": 0,
+        "phase": "tool",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "blocked"
+      },
+      "assetKind": "plugin",
+      "bindings": {
+        "package": {
+          "plugin": {
+            "install": {
+              "artifactName": "build-web-apps-disable-record",
+              "manifest": {
+                "pluginId": "build-web-apps@openai-curated",
+                "purpose": "disable-runtime-plugin"
+              },
+              "strategy": "external"
+            },
+            "nativeRegistration": {
+              "adoptExisting": true,
+              "enabled": false,
+              "installedRecords": [],
+              "pluginId": "build-web-apps@openai-curated"
+            }
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "registry/capabilities/plugin/openai-curated/build-web-apps.yaml",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1e44a90f69b1189f8d77aaef16ac296c1f2f676f18d1132bd347cb0ec7bf9d81"
+      },
+      "id": "plugin.openai-curated.build-web-apps",
+      "includes": [],
+      "install": {
+        "artifactName": "build-web-apps-disable-record",
+        "manifest": {
+          "pluginId": "build-web-apps@openai-curated",
+          "purpose": "disable-runtime-plugin"
+        },
+        "strategy": "external"
+      },
+      "name": "build-web-apps",
+      "riskTier": "T1",
+      "tags": [
+        "codex-plugin-disable",
+        "governance",
+        "openai-curated"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [
+          "every conversation",
+          "simple command",
+          "meta question"
+        ],
+        "conflictsWith": [],
+        "maxChainDepth": 0,
+        "phase": "governance",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "blocked"
+      },
+      "assetKind": "plugin",
+      "bindings": {
+        "package": {
+          "plugin": {
+            "install": {
+              "artifactName": "superpowers-disable-record",
+              "manifest": {
+                "pluginId": "superpowers@openai-curated",
+                "purpose": "disable-runtime-plugin"
+              },
+              "strategy": "external"
+            },
+            "nativeRegistration": {
+              "adoptExisting": true,
+              "enabled": false,
+              "installedRecords": [],
+              "pluginId": "superpowers@openai-curated"
+            }
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "registry/capabilities/plugin/openai-curated/superpowers.yaml",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "54cf0ee604c3306a5bf63170bcb5d6ac07006c25813107937903f36a6b96e0f9"
+      },
+      "id": "plugin.openai-curated.superpowers",
+      "includes": [],
+      "install": {
+        "artifactName": "superpowers-disable-record",
+        "manifest": {
+          "pluginId": "superpowers@openai-curated",
+          "purpose": "disable-runtime-plugin"
+        },
+        "strategy": "external"
+      },
+      "name": "superpowers",
+      "riskTier": "T1",
+      "tags": [
+        "codex-plugin-disable",
+        "governance",
+        "openai-curated"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [
+          "product requirement is unclear",
+          "choose among several architecture options"
+        ],
+        "antiTriggers": [
+          "clone repository",
+          "run command",
+          "obvious bug fix"
+        ],
+        "conflictsWith": [
+          "skill.brainstorming"
+        ],
+        "maxChainDepth": 1,
+        "phase": "product",
+        "projectScopes": [],
+        "replaces": [
+          "skill.brainstorming"
+        ],
+        "subagentRole": "researcher",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -586,34 +898,43 @@
         }
       },
       "canonicalSource": {
-        "path": "skills/brainstorming",
-        "ref": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
-        "refType": "commit",
-        "resolvedRevision": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
-        "sourceId": "github-direct",
-        "url": "https://github.com/obra/superpowers"
+        "path": "assets/skills/brainstorming-lite",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
       },
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0"
+        "digest": "7e9b45728b7bc6e97179d43a196e2098542d45144898b1d0660bc4a9889150bc"
       },
-      "id": "skill.brainstorming",
+      "id": "skill.brainstorming-lite",
       "includes": [],
       "install": {
-        "artifactName": "brainstorming",
-        "sourcePath": "assets/skills/brainstorming",
+        "artifactName": "brainstorming-lite",
+        "sourcePath": "assets/skills/brainstorming-lite",
         "strategy": "copy"
       },
-      "name": "brainstorming",
+      "name": "brainstorming-lite",
       "riskTier": "T1",
       "tags": [
-        "obra",
-        "planning",
-        "superpowers"
+        "governance",
+        "workflow-lite"
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -658,6 +979,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -698,6 +1030,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -738,6 +1081,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -778,6 +1132,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -818,6 +1183,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -858,6 +1234,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -898,6 +1285,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -938,6 +1336,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -980,6 +1389,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1022,6 +1442,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1064,6 +1495,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1106,6 +1548,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1148,6 +1601,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1190,6 +1654,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1232,6 +1707,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1274,6 +1760,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1316,6 +1813,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1358,6 +1866,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1400,6 +1919,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1442,6 +1972,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1484,6 +2025,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1526,6 +2078,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1568,6 +2131,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1610,6 +2184,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1652,6 +2237,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1694,6 +2290,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1736,6 +2343,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1778,6 +2396,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1820,6 +2449,134 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "multi-step migration",
+          "cross-module architecture change"
+        ],
+        "antiTriggers": [
+          "one-line edit",
+          "simple command",
+          "obvious local fix"
+        ],
+        "conflictsWith": [
+          "skill.writing-plans"
+        ],
+        "maxChainDepth": 1,
+        "phase": "planning",
+        "projectScopes": [],
+        "replaces": [
+          "skill.writing-plans"
+        ],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/implementation-plan-lite",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "9318db67b18743ef6298503656d9f8dbf6d564cc3908bc9f4fd272c0650acf34"
+      },
+      "id": "skill.implementation-plan-lite",
+      "includes": [],
+      "install": {
+        "artifactName": "implementation-plan-lite",
+        "sourcePath": "assets/skills/implementation-plan-lite",
+        "strategy": "copy"
+      },
+      "name": "implementation-plan-lite",
+      "riskTier": "T1",
+      "tags": [
+        "governance",
+        "workflow-lite"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [
+          "clone this repository",
+          "compare plugin configuration",
+          "fix this failing test"
+        ],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "entry",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "default"
+      },
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/intent-routing",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "ff0452a869c1469dc669be40b84180909ae779b84aa46484c3a2b25819ebef32"
+      },
+      "id": "skill.intent-routing",
+      "includes": [],
+      "install": {
+        "artifactName": "intent-routing",
+        "sourcePath": "assets/skills/intent-routing",
+        "strategy": "copy"
+      },
+      "name": "intent-routing",
+      "riskTier": "T1",
+      "tags": [
+        "governance",
+        "workflow-lite"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1864,6 +2621,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1914,6 +2682,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -1958,6 +2737,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2002,6 +2792,17 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2046,6 +2847,27 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "address PR comments",
+          "evaluate requested changes"
+        ],
+        "antiTriggers": [
+          "ordinary feature request",
+          "no review feedback present"
+        ],
+        "conflictsWith": [
+          "skill.receiving-code-review"
+        ],
+        "maxChainDepth": 1,
+        "phase": "review",
+        "projectScopes": [],
+        "replaces": [
+          "skill.receiving-code-review"
+        ],
+        "subagentRole": "reviewer",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2060,7 +2882,7 @@
         }
       },
       "canonicalSource": {
-        "path": "assets/skills/receiving-code-review",
+        "path": "assets/skills/receiving-code-review-lite",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
@@ -2069,27 +2891,43 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30"
+        "digest": "5b19cf73c93680dc546ea8e0f44c1dc8b92a8bb76683e8b735439b87a02652eb"
       },
-      "id": "skill.receiving-code-review",
+      "id": "skill.receiving-code-review-lite",
       "includes": [],
       "install": {
-        "artifactName": "receiving-code-review",
-        "manifest": {
-          "localPath": "/Users/halvinshen/.agents/skills/receiving-code-review",
-          "seededFrom": "shared-skill-cache"
-        },
-        "sourcePath": "assets/skills/receiving-code-review",
+        "artifactName": "receiving-code-review-lite",
+        "sourcePath": "assets/skills/receiving-code-review-lite",
         "strategy": "copy"
       },
-      "name": "receiving-code-review",
+      "name": "receiving-code-review-lite",
       "riskTier": "T1",
       "tags": [
-        "bootstrap-seeded",
-        "shared-skill"
+        "governance",
+        "review",
+        "workflow-lite"
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "regression bug",
+          "auth behavior change",
+          "database migration"
+        ],
+        "antiTriggers": [
+          "docs edit",
+          "formatting",
+          "mechanical rename"
+        ],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "tdd",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2104,7 +2942,7 @@
         }
       },
       "canonicalSource": {
-        "path": "assets/skills/requesting-code-review",
+        "path": "assets/skills/risk-based-tdd",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
@@ -2113,27 +2951,96 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "246e65cd72a7e360987d94e6c61564ce6d71c6361d1784d529d70e4cbbe8522d"
+        "digest": "2d061ad4cc361517f83bf4be71575e7339eccc3715908a95115d7bbee66e5cd2"
       },
-      "id": "skill.requesting-code-review",
+      "id": "skill.risk-based-tdd",
       "includes": [],
       "install": {
-        "artifactName": "requesting-code-review",
-        "manifest": {
-          "localPath": "/Users/halvinshen/.agents/skills/requesting-code-review",
-          "seededFrom": "shared-skill-cache"
-        },
-        "sourcePath": "assets/skills/requesting-code-review",
+        "artifactName": "risk-based-tdd",
+        "sourcePath": "assets/skills/risk-based-tdd",
         "strategy": "copy"
       },
-      "name": "requesting-code-review",
+      "name": "risk-based-tdd",
       "riskTier": "T1",
       "tags": [
-        "bootstrap-seeded",
-        "shared-skill"
+        "governance",
+        "testing",
+        "workflow-lite"
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "compare community skills",
+          "deprecate a workflow skill",
+          "audit plugin trigger rules"
+        ],
+        "antiTriggers": [
+          "ordinary app bugfix",
+          "product UI implementation"
+        ],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "governance",
+        "projectScopes": [
+          "/Users/halvinshen/Documents/workspace/halvin/agent-governance"
+        ],
+        "replaces": [],
+        "subagentRole": "skill-auditor",
+        "triggerMode": "explicit"
+      },
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/skill-audit",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "2b0d5f201e51b1534ef2ee9de8984803d373e7578130148ec332bebb1fc72efa"
+      },
+      "id": "skill.skill-audit",
+      "includes": [],
+      "install": {
+        "artifactName": "skill-audit",
+        "sourcePath": "assets/skills/skill-audit",
+        "strategy": "copy"
+      },
+      "name": "skill-audit",
+      "riskTier": "T1",
+      "tags": [
+        "governance",
+        "skills",
+        "workflow-lite"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2185,6 +3092,29 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "flaky test",
+          "CI failure",
+          "runtime exception"
+        ],
+        "antiTriggers": [
+          "clone repository",
+          "compare configs",
+          "meta question about agent behavior"
+        ],
+        "conflictsWith": [
+          "skill.systematic-debugging"
+        ],
+        "maxChainDepth": 1,
+        "phase": "debugging",
+        "projectScopes": [],
+        "replaces": [
+          "skill.systematic-debugging"
+        ],
+        "subagentRole": "debugger",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2199,34 +3129,44 @@
         }
       },
       "canonicalSource": {
-        "path": "skills/systematic-debugging",
-        "ref": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
-        "refType": "commit",
-        "resolvedRevision": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d",
-        "sourceId": "github-direct",
-        "url": "https://github.com/obra/superpowers"
+        "path": "assets/skills/systematic-debugging-lite",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
       },
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "72e9ab72627e4fd8ed26a582e82309a98ecdc4f6e1c99418430ac05682c9e91d"
+        "digest": "273e834f48e455a23bdec975ce10d7db154e223ae72d6c324b70989655426d63"
       },
-      "id": "skill.systematic-debugging",
+      "id": "skill.systematic-debugging-lite",
       "includes": [],
       "install": {
-        "artifactName": "systematic-debugging",
-        "sourcePath": "assets/skills/systematic-debugging",
+        "artifactName": "systematic-debugging-lite",
+        "sourcePath": "assets/skills/systematic-debugging-lite",
         "strategy": "copy"
       },
-      "name": "systematic-debugging",
+      "name": "systematic-debugging-lite",
       "riskTier": "T1",
       "tags": [
         "debugging",
-        "obra",
-        "superpowers"
+        "governance",
+        "workflow-lite"
       ]
     },
     {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2250,7 +3190,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "413e7d25a6f2cf49c98011df55d5be9c784330d7a00263d7ca745b28f2c096ee"
+        "digest": "130b53786a347a6e9763c678e72dc1bfbdfd456b847c2ffced64424ed2b74128"
       },
       "id": "skill.tailwindcss-advanced-layouts",
       "includes": [],
@@ -2271,50 +3211,17 @@
       ]
     },
     {
-      "assetKind": "skill",
-      "bindings": {
-        "cache": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        },
-        "user-dir": {
-          "skill": {
-            "syncMode": "user-skill-dir"
-          }
-        }
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
       },
-      "canonicalSource": {
-        "path": "assets/skills/testing-quality",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "exposes": [],
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "bad30ac7536b241723057f30bd7f6b98934b0862185b8453528d961497786358"
-      },
-      "id": "skill.testing-quality",
-      "includes": [],
-      "install": {
-        "artifactName": "testing-quality",
-        "manifest": {
-          "localPath": "/Users/halvinshen/.agents/skills/testing-quality",
-          "seededFrom": "shared-skill-cache"
-        },
-        "sourcePath": "assets/skills/testing-quality",
-        "strategy": "copy"
-      },
-      "name": "testing-quality",
-      "riskTier": "T1",
-      "tags": [
-        "bootstrap-seeded",
-        "shared-skill"
-      ]
-    },
-    {
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2338,7 +3245,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "9a6c19b3251593eaa800c157f669d3a890132dd3f4f828f4dd41bcef0150237d"
+        "digest": "c3505b26b1cc2fa48b1082a6666cc0807cba8932445e1a235e24f691716ee398"
       },
       "id": "skill.typescript-advanced-types",
       "includes": [],
@@ -2359,6 +3266,137 @@
       ]
     },
     {
+      "activation": {
+        "activationExamples": [
+          "add unit tests for parser",
+          "review service tests"
+        ],
+        "antiTriggers": [
+          "e2e-only work",
+          "pure documentation"
+        ],
+        "conflictsWith": [
+          "skill.testing-quality"
+        ],
+        "maxChainDepth": 1,
+        "phase": "unit-testing",
+        "projectScopes": [],
+        "replaces": [
+          "skill.testing-quality"
+        ],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/unit-test-design",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "b6e478ed106ad673f5880f85912cda2e3d4066721329d49e4596d67159a18b4e"
+      },
+      "id": "skill.unit-test-design",
+      "includes": [],
+      "install": {
+        "artifactName": "unit-test-design",
+        "sourcePath": "assets/skills/unit-test-design",
+        "strategy": "copy"
+      },
+      "name": "unit-test-design",
+      "riskTier": "T1",
+      "tags": [
+        "governance",
+        "testing",
+        "workflow-lite"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [
+          "claim fix is complete",
+          "report verification result"
+        ],
+        "antiTriggers": [
+          "pure discussion",
+          "plan-only response"
+        ],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "verification",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "qa-runner",
+        "triggerMode": "explicit"
+      },
+      "assetKind": "skill",
+      "bindings": {
+        "cache": {
+          "skill": {
+            "syncMode": "cache-only"
+          }
+        },
+        "user-dir": {
+          "skill": {
+            "syncMode": "user-skill-dir"
+          }
+        }
+      },
+      "canonicalSource": {
+        "path": "assets/skills/verification-before-completion-lite",
+        "ref": "main",
+        "refType": "branch",
+        "sourceId": "governance-repo",
+        "url": "https://github.com/visonalhal/agent-governance"
+      },
+      "exposes": [],
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "da81b63b297b005ee2caf77436ec0e131d88c917bf18230b8af95ec01db8e332"
+      },
+      "id": "skill.verification-before-completion-lite",
+      "includes": [],
+      "install": {
+        "artifactName": "verification-before-completion-lite",
+        "sourcePath": "assets/skills/verification-before-completion-lite",
+        "strategy": "copy"
+      },
+      "name": "verification-before-completion-lite",
+      "riskTier": "T1",
+      "tags": [
+        "governance",
+        "verification",
+        "workflow-lite"
+      ]
+    },
+    {
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
+      },
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2409,56 +3447,17 @@
       ]
     },
     {
-      "assetKind": "skill",
-      "bindings": {
-        "cache": {
-          "skill": {
-            "syncMode": "cache-only"
-          }
-        },
-        "user-dir": {
-          "skill": {
-            "syncMode": "user-skill-dir"
-          }
-        }
+      "activation": {
+        "activationExamples": [],
+        "antiTriggers": [],
+        "conflictsWith": [],
+        "maxChainDepth": 1,
+        "phase": "implementation",
+        "projectScopes": [],
+        "replaces": [],
+        "subagentRole": "none",
+        "triggerMode": "explicit"
       },
-      "canonicalSource": {
-        "path": "assets/skills/writing-plans",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "exposes": [],
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "8c536ae03ef3ab1fa974c0e50a65d803acddf5d4ee7cac68ab25a39b9e338611"
-      },
-      "id": "skill.writing-plans",
-      "includes": [],
-      "install": {
-        "artifactName": "writing-plans",
-        "manifest": {
-          "installedAt": "2026-03-06T06:55:18.973Z",
-          "seededFrom": "shared-skill-cache",
-          "skillFolderHash": "cf6f5c8813cf0445276129a5f2b443927b50f645",
-          "skillPath": "skills/writing-plans/SKILL.md",
-          "source": "obra/superpowers",
-          "sourceType": "github",
-          "sourceUrl": "https://github.com/obra/superpowers.git",
-          "updatedAt": "2026-03-06T06:55:18.973Z"
-        },
-        "sourcePath": "assets/skills/writing-plans",
-        "strategy": "copy"
-      },
-      "name": "writing-plans",
-      "riskTier": "T1",
-      "tags": [
-        "bootstrap-seeded",
-        "shared-skill"
-      ]
-    },
-    {
       "assetKind": "skill",
       "bindings": {
         "cache": {
@@ -2501,6 +3500,6 @@
       ]
     }
   ],
-  "generatedAt": "2026-04-08T06:36:08.000Z",
+  "generatedAt": "2026-05-22T00:00:00.000Z",
   "version": 3
 }

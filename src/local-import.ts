@@ -436,6 +436,7 @@ async function importCodexRuntimeState(args: {
               nativeRegistration: {
                 pluginId,
                 enabled: config.enabled !== false,
+                adoptExisting: false,
                 installedRecords: [],
               },
             },
@@ -657,6 +658,7 @@ async function importClaudeRuntimeState(args: {
               nativeRegistration: {
                 pluginId,
                 enabled: enabledPlugins[pluginId] === true,
+                adoptExisting: false,
                 ...(parsedPluginId.marketplaceId && Object.keys(knownMarketplace).length > 0
                   ? {
                       knownMarketplace: {

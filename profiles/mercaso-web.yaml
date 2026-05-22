@@ -1,0 +1,22 @@
+profileId: mercaso-web
+runtimeId: codex
+enabledCapabilities:
+  - skill.risk-based-tdd
+  - skill.unit-test-design
+  - skill.systematic-debugging-lite
+  - skill.verification-before-completion-lite
+  - skill.receiving-code-review-lite
+  - skill.code-review
+  - skill.next-best-practices
+  - skill.typescript-advanced-types
+  - skill.playwright-best-practices
+  - skill.tailwindcss-advanced-layouts
+  - skill.web-design-guidelines
+referenceCapabilities:
+  - skill.webapp-testing
+blockedCapabilities: []
+projectScopes:
+  - /Users/halvinshen/Documents/workspace/mercaso/mercaso-admin-web
+  - /Users/halvinshen/Documents/workspace/mercaso/mercaso-commerce-client-web
+notes:
+  - Mercaso web projects prefer project-local rules and review gates over generic coding workflows.

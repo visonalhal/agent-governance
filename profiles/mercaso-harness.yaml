@@ -1,0 +1,19 @@
+profileId: mercaso-harness
+runtimeId: codex
+enabledCapabilities:
+  - skill.systematic-debugging-lite
+  - skill.verification-before-completion-lite
+  - skill.receiving-code-review-lite
+  - skill.code-review
+  - skill.playwright-best-practices
+  - skill.typescript-advanced-types
+referenceCapabilities:
+  - skill.webapp-testing
+blockedCapabilities:
+  - skill.testing-quality
+projectScopes:
+  - /Users/halvinshen/Documents/workspace/mercaso/premier-store-os-ts
+  - /Users/halvinshen/Documents/workspace/mercaso/premier-store-os-ts-mercaso-testing
+  - /Users/halvinshen/Documents/workspace/mercaso/premier-store-os-ts-master-fix
+notes:
+  - Mercaso harness AGENTS.md and harness rulebook override generic Playwright guidance.

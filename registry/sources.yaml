@@ -33,3 +33,12 @@ sources:
     notes:
       - Discovery source only.
       - Resolve every approved capability back to a canonical upstream repo.
+  - id: officialskills-sh
+    kind: catalog
+    url: https://officialskills.sh/
+    discoveryOnly: true
+    trustLevel: untrusted-catalog
+    owner: external
+    notes:
+      - Discovery source only.
+      - Resolve every approved capability back to canonical upstream before approval.

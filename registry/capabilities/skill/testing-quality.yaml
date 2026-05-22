@@ -32,7 +32,8 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Replaced by risk-based-tdd, unit-test-design, systematic-debugging-lite, webapp-testing candidate, and verification-before-completion-lite.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual

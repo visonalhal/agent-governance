@@ -1,0 +1,65 @@
+id: skill.verification-before-completion-lite
+name: verification-before-completion-lite
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/verification-before-completion-lite
+install:
+  strategy: copy
+  artifactName: verification-before-completion-lite
+  sourcePath: assets/skills/verification-before-completion-lite
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Keeps completion evidence without full workflow ceremony.
+lifecycleState: published
+activation:
+  phase: verification
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: qa-runner
+  activationExamples:
+    - claim fix is complete
+    - report verification result
+  antiTriggers:
+    - pure discussion
+    - plan-only response
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: da81b63b297b005ee2caf77436ec0e131d88c917bf18230b8af95ec01db8e332
+tags:
+  - governance
+  - verification
+  - workflow-lite

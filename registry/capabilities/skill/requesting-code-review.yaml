@@ -32,7 +32,8 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
-lifecycleState: published
+lifecycleState: deprecated
+statusReason: Removed from default Codex runtime; use code-review and project-specific review gates instead.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual

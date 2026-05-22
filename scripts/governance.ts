@@ -12,6 +12,8 @@ import {
   syncGovernance,
 } from "../src/governance.js";
 import { importLocalMachineState } from "../src/local-import.js";
+import { auditRuntimeTruth, formatRuntimeAudit } from "../src/runtime-audit.js";
+import { runTriggerEvals } from "../src/trigger-eval.js";
 
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
@@ -58,6 +60,8 @@ async function main() {
       "lock-file": { type: "string" },
       "stale-days": { type: "string" },
       "check-upstream": { type: "boolean" },
+      json: { type: "boolean" },
+      write: { type: "boolean" },
     },
   });
 
@@ -193,6 +197,41 @@ async function main() {
       return;
     }
 
+    case "runtime-audit": {
+      const bootstrap = requireBootstrap(context.bootstrap, values.bootstrap);
+      const snapshot = await auditRuntimeTruth({
+        root: context.root,
+        bootstrap,
+        machineId: values.machine ?? bootstrap.machineId,
+        runtimeId: required(values.runtime, "--runtime"),
+        write: values.write ?? false,
+      });
+      if (values.json) {
+        console.log(JSON.stringify(snapshot, null, 2));
+      } else {
+        console.log(formatRuntimeAudit(snapshot));
+      }
+      if (snapshot.findings.length > 0) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
+    case "trigger-eval": {
+      const report = await runTriggerEvals(context.root);
+      if (values.json) {
+        console.log(JSON.stringify(report, null, 2));
+      } else if (report.passed) {
+        console.log(`Trigger eval passed with ${report.scenarios.length} scenario(s).`);
+      } else {
+        console.log(report.failures.map((failure) => `- ${failure}`).join("\n"));
+      }
+      if (!report.passed) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     case "import-local": {
       const bootstrap = requireBootstrap(context.bootstrap, values.bootstrap);
       const machineId = values.machine ?? bootstrap.machineId;
@@ -268,6 +307,8 @@ Commands:
   render      Render shared cache and machine/runtime desired state
   sync        Sync a managed runtime from rendered desired state
   audit       Check for lock drift, stale reviews, and optional upstream drift
+  runtime-audit Compare actual runtime state to rendered desired state
+  trigger-eval Run static skill trigger scenarios
   import-local Capture current local global state into the repo and adopt it as managed
   deprecate   Mark a capability deprecated
   block       Mark a capability blocked

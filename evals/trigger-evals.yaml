@@ -1,0 +1,31 @@
+scenarios:
+  - id: clone-is-direct-command
+    prompt: Clone https://github.com/visonalhal/agent-governance and run it.
+    expectedSkills:
+      - skill.intent-routing
+    forbiddenSkills:
+      - skill.systematic-debugging-lite
+      - skill.implementation-plan-lite
+
+  - id: config-governance-is-not-debugging
+    prompt: Compare our Codex plugin config with the workspace skills registry.
+    expectedSkills:
+      - skill.intent-routing
+    forbiddenSkills:
+      - skill.systematic-debugging-lite
+
+  - id: flaky-test-needs-debugging
+    prompt: This Playwright test is flaky in CI; find the root cause.
+    expectedSkills:
+      - skill.intent-routing
+      - skill.systematic-debugging-lite
+      - skill.playwright-best-practices
+    forbiddenSkills: []
+
+  - id: regression-needs-risk-based-tdd
+    prompt: Fix this auth regression and make sure it cannot come back.
+    expectedSkills:
+      - skill.intent-routing
+      - skill.risk-based-tdd
+    forbiddenSkills:
+      - skill.brainstorming-lite

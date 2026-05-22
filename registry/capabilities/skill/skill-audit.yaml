@@ -1,0 +1,67 @@
+id: skill.skill-audit
+name: skill-audit
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/skill-audit
+install:
+  strategy: copy
+  artifactName: skill-audit
+  sourcePath: assets/skills/skill-audit
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-22T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Self-owned governance skill for evaluating external and internal skills.
+lifecycleState: published
+activation:
+  phase: governance
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes:
+    - /Users/halvinshen/Documents/workspace/halvin/agent-governance
+  subagentRole: skill-auditor
+  activationExamples:
+    - compare community skills
+    - deprecate a workflow skill
+    - audit plugin trigger rules
+  antiTriggers:
+    - ordinary app bugfix
+    - product UI implementation
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 2b0d5f201e51b1534ef2ee9de8984803d373e7578130148ec332bebb1fc72efa
+tags:
+  - governance
+  - skills
+  - workflow-lite

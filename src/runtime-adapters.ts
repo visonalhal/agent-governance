@@ -23,6 +23,7 @@ type CacheState = {
 };
 
 type CodexState = {
+  managedSkillIds: string[];
   managedPluginIds: string[];
   managedMcpServerNames: string[];
 };
@@ -83,20 +84,30 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
     : {};
 
   const state = await readOptionalJson<CodexState>(statePath, {
+    managedSkillIds: [],
     managedPluginIds: [],
     managedMcpServerNames: [],
   });
+  const previousManagedSkillIds = state.managedSkillIds ?? [];
+  const userSkillsDir = runtimeState.nativeFiles.userSkillsDir;
+  if (userSkillsDir) {
+    await syncManagedSkillDirectory(
+      userSkillsDir,
+      runtimeState.cacheBindings.skillsDir,
+      runtimeState.skills.filter((skill) => skill.syncMode === "user-skill-dir"),
+      previousManagedSkillIds,
+      "Codex skill"
+    );
+  }
+
   const managedPluginIds = new Set(state.managedPluginIds);
   const managedMcpServerNames = new Set(state.managedMcpServerNames);
 
   const pluginsSection = ensureRecord(parsed, "plugins");
   for (const plugin of runtimeState.plugins) {
-    assertUnmanagedCollision(
-      pluginsSection,
-      plugin.nativeRegistration.pluginId,
-      managedPluginIds,
-      "Codex plugin"
-    );
+    assertUnmanagedCollision(pluginsSection, plugin.nativeRegistration.pluginId, managedPluginIds, "Codex plugin", {
+      allowAdopt: plugin.nativeRegistration.adoptExisting && plugin.nativeRegistration.enabled === false,
+    });
   }
   for (const pluginId of state.managedPluginIds) {
     delete pluginsSection[pluginId];
@@ -120,6 +131,11 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
 
   await writeText(configPath, TOML.stringify(parsed));
   await writeJsonFile(statePath, {
+    managedSkillIds: userSkillsDir
+      ? runtimeState.skills
+          .filter((skill) => skill.syncMode === "user-skill-dir")
+          .map((skill) => skill.artifactName)
+      : previousManagedSkillIds,
     managedPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
     managedMcpServerNames: runtimeState.mcps.map((mcp) => mcp.serverName),
   });
@@ -144,7 +160,8 @@ export async function syncCursorRuntime(runtimeState: RenderedRuntimeState) {
     userSkillsDir,
     runtimeState.cacheBindings.skillsDir,
     runtimeState.skills.filter((skill) => skill.syncMode === "user-skill-dir"),
-    state.managedSkillIds
+    state.managedSkillIds,
+    "Cursor skill"
   );
 
   await writeJsonFile(userSkillsManifest, {
@@ -280,7 +297,8 @@ async function syncManagedSkillDirectory(
   targetRoot: string,
   cacheSkillsDir: string | undefined,
   desiredSkills: RenderedRuntimeState["skills"],
-  previousManagedSkillIds: string[]
+  previousManagedSkillIds: string[],
+  label: string
 ) {
   if (!cacheSkillsDir) {
     throw new Error("Cursor runtime is missing cacheBindings.skillsDir.");
@@ -297,8 +315,12 @@ async function syncManagedSkillDirectory(
     if (!(await pathExists(sourcePath))) {
       throw new Error(`Shared cache skill missing at ${sourcePath}.`);
     }
-    if ((await pathExists(targetPath)) && !previousSet.has(skill.artifactName)) {
-      throw new Error(`Cursor skill collision at ${targetPath}.`);
+    if (
+      (await pathExists(targetPath)) &&
+      !previousSet.has(skill.artifactName) &&
+      !(await canAdoptUnmanagedCacheEntry(sourcePath, targetPath))
+    ) {
+      throw new Error(`${label} collision at ${targetPath}.`);
     }
 
     await removePath(targetPath);
@@ -402,9 +424,10 @@ function assertUnmanagedCollision(
   record: Record<string, unknown>,
   key: string,
   managedKeys: Set<string>,
-  label: string
+  label: string,
+  options: { allowAdopt?: boolean } = {}
 ) {
-  if (key in record && !managedKeys.has(key)) {
+  if (key in record && !managedKeys.has(key) && !options.allowAdopt) {
     throw new Error(`${label} collision at ${key}. Existing entry is not governed by agent-governance.`);
   }
 }
