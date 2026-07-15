@@ -30,6 +30,15 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: review
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  subagentRole: reviewer
+  activationExamples:
+    - User explicitly requests Figma design parity review.
+  antiTriggers:
+    - Do not expose as a default Figma plugin agent.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +48,5 @@ hash:
 tags:
   - canonical-agent
   - figma
+  - on-demand
 bindings: {}

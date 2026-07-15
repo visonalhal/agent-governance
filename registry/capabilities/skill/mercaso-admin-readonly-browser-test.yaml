@@ -1,0 +1,71 @@
+id: skill.mercaso-admin-readonly-browser-test
+name: mercaso-admin-readonly-browser-test
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/mercaso-admin-readonly-browser-test
+install:
+  strategy: copy
+  artifactName: mercaso-admin-readonly-browser-test
+  sourcePath: assets/skills/mercaso-admin-readonly-browser-test
+  manifest:
+    seededFrom: /Users/halvinshen/.codex/skills/mercaso-admin-readonly-browser-test
+riskTier: T3
+permissions:
+  localRead: full
+  network: true
+  credentials: true
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-30T00:00:00.000Z
+  license: UNKNOWN
+  executesScripts: false
+  networkAccess: true
+  touchesCredentials: true
+  filesystemSideEffects: appends readonly test run logs in Mercaso Admin Web project
+  notes:
+    - Adopted from existing Codex user skill.
+    - Project-specific readonly browser workflow; enable only through Mercaso profile.
+lifecycleState: published
+activation:
+  phase: web-qa
+  triggerMode: project-explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes:
+    - /Users/halvinshen/Documents/workspace/mercaso/mercaso-admin-web
+  subagentRole: qa-runner
+  activationExamples:
+    - Admin Web readonly smoke
+    - SAT 验证 checklist
+    - PROD readonly smoke
+  antiTriggers:
+    - mutating Mercaso Admin data
+    - writing Playwright tests
+    - browser automation unrelated to Mercaso Admin Web
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: f427bd110c2a5833579c7d117c79566acd4957cddfb6819290d33434ec69e37b
+tags:
+  - mercaso
+  - readonly-browser-test
+  - project-specific

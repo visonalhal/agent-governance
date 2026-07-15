@@ -3,7 +3,7 @@
 ## Problem
 
 `agent-governance` previously tracked capabilities, but Codex runtime reality still came from
-`~/.codex/config.toml`, `~/.codex/skills`, and plugin cache state. That made the registry look
+`~/.codex/config.toml`, the shared `~/.agents/skills` user-skill directory, and plugin cache state. That made the registry look
 narrow while the actual session could still load heavy process plugins such as Superpowers and
 Build Web Apps.
 
@@ -12,7 +12,7 @@ The real failure mode was not "too many skills"; it was missing activation gover
 - no runtime truth audit
 - no profile layer for project-specific activation
 - no distinction between enabled, reference-only, and blocked capabilities
-- no Codex user-skill sync into `~/.codex/skills`
+- duplicate Codex user-skill mirrors instead of one global source
 - no trigger evals for over-eager workflow skills
 
 ## Target Architecture
@@ -28,7 +28,7 @@ runtime adapter and minimal base capabilities.
 
 1. Add activation metadata to capabilities.
 2. Add runtime profiles and machine `activeProfiles`.
-3. Sync governed Codex user skills into `~/.codex/skills`.
+3. Publish governed Codex user skills once into `~/.agents/skills`.
 4. Add runtime truth audit for Codex.
 5. Add trigger eval scenarios for debug vs non-debug prompts.
 6. Deprecate heavyweight workflow skills and introduce self-owned lite skills.
@@ -58,6 +58,7 @@ runtime adapter and minimal base capabilities.
 
 - Rendered Codex desired state disables Build Web Apps and Superpowers.
 - `testing-quality` does not appear in active Codex profile output.
-- Governed Codex skills render as user-dir skills and sync into `~/.codex/skills`.
+- Governed Codex skills render as cache-only skills and publish into `~/.agents/skills`.
+- `~/.codex/skills` contains no governed user-skill mirror.
 - Runtime audit reports drift between actual Codex state and rendered desired state.
 - Trigger evals reject debugging on clone/config/meta prompts and require debugging on flaky/failure prompts.

@@ -16,18 +16,20 @@ const ALLOWED_UNMANAGED_PLUGIN_IDS = new Set([
   "chrome@openai-bundled",
   "computer-use@openai-bundled",
   "documents@openai-primary-runtime",
-  "figma@openai-curated",
   "github@openai-curated",
   "google-drive@openai-curated",
+  "pdf@openai-primary-runtime",
   "presentations@openai-primary-runtime",
+  "sites@openai-bundled",
   "slack@openai-curated",
   "spreadsheets@openai-primary-runtime",
+  "template-creator@openai-primary-runtime",
+  "visualize@openai-bundled",
 ]);
-const ALLOWED_UNMANAGED_MCP_SERVER_NAMES = new Set(["node_repl"]);
+const ALLOWED_UNMANAGED_MCP_SERVER_NAMES = new Set(["computer-use", "node_repl"]);
 const ALLOWED_UNMANAGED_USER_SKILLS = new Set([
-  "figma-create-design-system-rules",
-  "figma-implement-design",
   "hatch-pet",
+  "sample-watermark",
 ]);
 
 export async function auditRuntimeTruth(options: {
@@ -53,11 +55,11 @@ export async function auditRuntimeTruth(options: {
 
   const vars = buildPathVars(options.bootstrap, machine);
   const configPath = runtimeNativePath(runtime, machine, vars, "config")!;
-  const userSkillsDir: string =
-    runtimeNativePath(runtime, machine, vars, "userSkillsDir", false) ??
-    path.join(vars.HOME, ".codex", "skills");
-  const pluginCacheDir = path.join(vars.HOME, ".codex", "plugins", "cache");
   const desired = await readDesiredState(options.root, machine.machineId, runtime.runtimeId);
+  const nativeUserSkillsDir = runtimeNativePath(runtime, machine, vars, "userSkillsDir", false);
+  const userSkillsDir: string =
+    nativeUserSkillsDir ?? desired.cacheBindings.skillsDir ?? path.join(vars.HOME, ".agents", "skills");
+  const pluginCacheDir = path.join(vars.HOME, ".codex", "plugins", "cache");
 
   const actualPlugins = await readCodexPlugins(configPath);
   const snapshot = runtimeAuditSnapshotSchema.parse({
@@ -82,7 +84,7 @@ export async function auditRuntimeTruth(options: {
       ),
       mcpServers: desired.mcps.map((mcp) => mcp.serverName).sort(),
       userSkills: desired.skills
-        .filter((skill) => skill.syncMode === "user-skill-dir")
+        .filter((skill) => skill.syncMode === (nativeUserSkillsDir ? "user-skill-dir" : "cache-only"))
         .map((skill) => skill.artifactName)
         .sort(),
     },

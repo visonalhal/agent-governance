@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mercaso Admin Readonly Test"
+  short_description: "Run Mercaso Admin SAT/PROD readonly browser smoke tests"
+  default_prompt: "Use $mercaso-admin-readonly-browser-test to run a readonly Mercaso Admin Web smoke test from the repo checklist and append results to the run log."

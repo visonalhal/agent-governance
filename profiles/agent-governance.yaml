@@ -1,14 +1,8 @@
 profileId: agent-governance
 runtimeId: codex
 enabledCapabilities:
-  - skill.skill-creator
+  - skill.agent-governance
   - skill.skill-audit
-  - skill.implementation-plan-lite
-  - skill.risk-based-tdd
-  - skill.unit-test-design
-  - skill.verification-before-completion-lite
-  - skill.code-review
-  - skill.typescript-advanced-types
 referenceCapabilities:
   - skill.writing-skills
 blockedCapabilities:

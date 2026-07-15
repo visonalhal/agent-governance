@@ -1,0 +1,70 @@
+id: skill.long-task-planning
+name: long-task-planning
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/long-task-planning
+install:
+  strategy: copy
+  artifactName: long-task-planning
+  sourcePath: assets/skills/long-task-planning
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-28T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Self-owned prompt-only workflow skill extracted from Helix long-task planning rules.
+    - Hydrate digest after extracting global long-task planning skill.
+lifecycleState: deprecated
+activation:
+  phase: planning
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith:
+    - skill.writing-plans
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - multi-milestone rollout plan
+    - saved plan docs with evidence
+    - cross-module migration with rollout gate
+  antiTriggers:
+    - simple command
+    - one-file obvious edit
+    - configuration question that only needs an answer
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: b2862f5da0faf79c6b40ea16a557ce348e2544474b19bcbf65a85877dd72b744
+tags:
+  - governance
+  - planning
+  - workflow-lite
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

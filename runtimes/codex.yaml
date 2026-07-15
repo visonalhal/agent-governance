@@ -9,7 +9,6 @@ enabledCapabilities:
 bindingPolicy:
   defaults:
     skill:
-      - user-dir
       - cache
     mcp:
       - remote-http
@@ -22,8 +21,6 @@ bindingPolicy:
 nativeFiles:
   - name: config
     template: ${HOME}/.codex/config.toml
-  - name: userSkillsDir
-    template: ${HOME}/.codex/skills
 cacheBindings:
   - name: skillsDir
     template: ${CACHE_ROOT}/skills
@@ -35,7 +32,7 @@ mergeStrategy: codex-toml
 ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/codex.json
 profileMode: managed
 notes:
-  - Shared skills live in the shared artifact cache at ~/.agents/skills.
-  - Governed Codex user skills sync into ~/.codex/skills.
+  - Codex discovers governed and personal user skills directly from ~/.agents/skills.
+  - ~/.codex/skills is reserved for Codex-managed system skills; no user-skill mirror is generated there.
   - Governed plugin and MCP entries are merged into ~/.codex/config.toml.
   - Non-governed model and reasoning settings remain untouched.

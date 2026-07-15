@@ -140,6 +140,7 @@ export const runtimePluginBindingSchema = z.object({
 export const runtimeMcpBindingSchema = z.object({
   serverName: z.string().min(1),
   config: jsonObjectSchema,
+  adoptExisting: z.boolean().default(false),
 });
 
 export const legacyRuntimeBindingSchema = z.object({
@@ -370,6 +371,7 @@ export const renderedMcpStateSchema = z.object({
   bindingId: z.string().min(1),
   serverName: z.string().min(1),
   config: jsonObjectSchema,
+  adoptExisting: z.boolean().default(false),
 });
 
 export const renderedRuntimeStateSchema = z.object({

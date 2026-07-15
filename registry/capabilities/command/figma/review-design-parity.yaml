@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: review
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  activationExamples:
+    - User explicitly asks to review implementation parity against a Figma design.
+  antiTriggers:
+    - Do not expose as a default Figma plugin command.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +47,5 @@ hash:
 tags:
   - canonical-command
   - figma
+  - on-demand
 bindings: {}

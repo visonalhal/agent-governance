@@ -1,13 +1,10 @@
 profileId: nihongo-content
 runtimeId: codex
-enabledCapabilities:
-  - skill.intent-routing
-  - skill.brainstorming-lite
-  - skill.verification-before-completion-lite
+enabledCapabilities: []
 referenceCapabilities: []
 blockedCapabilities:
   - skill.testing-quality
 projectScopes:
   - /Users/halvinshen/Documents/workspace/halvin/nihongo-n3-compass
 notes:
-  - Lightweight content/document work should not activate heavy coding workflows.
+  - Content work relies on Codex native task handling and project-local instructions.

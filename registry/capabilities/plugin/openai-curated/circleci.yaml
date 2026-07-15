@@ -1,0 +1,77 @@
+id: plugin.openai-curated.circleci
+name: circleci
+assetKind: plugin
+bindings:
+  package:
+    plugin:
+      install:
+        strategy: external
+        artifactName: circleci-plugin-record
+        manifest:
+          pluginId: circleci@openai-curated
+          installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf
+      nativeRegistration:
+        pluginId: circleci@openai-curated
+        enabled: true
+        adoptExisting: true
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: github-direct
+  url: https://github.com/circleci-public/skills
+  ref: fef63ecf
+  refType: commit
+  path: .
+install:
+  strategy: external
+  artifactName: circleci-plugin-record
+  manifest:
+    pluginId: circleci@openai-curated
+    marketplace: openai-curated
+    installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf
+riskTier: T3
+permissions:
+  localRead: scoped
+  network: true
+  credentials: true
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-30T00:00:00.000Z
+  license: MIT
+  executesScripts: true
+  networkAccess: true
+  touchesCredentials: true
+  filesystemSideEffects: Codex plugin registration and CircleCI workflow actions
+  notes:
+    - Adopted from existing Codex plugin circleci@openai-curated.
+    - Plugin manifest advertises interactive and write capabilities; keep managed instead of allowed-unmanaged.
+lifecycleState: published
+activation:
+  phase: tool
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - diagnose CircleCI build failure
+    - review CircleCI configuration
+    - set up CircleCI Chunk CLI
+  antiTriggers:
+    - GitHub Actions failure
+    - local unit test failure without CircleCI
+    - generic CI question with no CircleCI context
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: fe63e330ef28c6bbb62772eaf3209c2574d059acc0f42d88ac8d312d30cac938
+tags:
+  - openai-curated
+  - circleci
+  - managed-runtime-plugin

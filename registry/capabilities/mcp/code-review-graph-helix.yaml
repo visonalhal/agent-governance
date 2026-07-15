@@ -1,0 +1,77 @@
+id: mcp.code-review-graph-helix
+name: code-review-graph-helix
+assetKind: mcp
+bindings:
+  stdio-command:
+    mcp:
+      serverName: code_review_graph_helix
+      adoptExisting: true
+      config:
+        command: /Users/halvinshen/.local/bin/code-review-graph
+        args:
+          - serve
+          - --tools
+          - build_or_update_graph_tool,get_minimal_context_tool,detect_changes_tool,get_review_context_tool,query_graph_tool,get_impact_radius_tool,get_affected_flows_tool,get_architecture_overview_tool
+        cwd: /Users/halvinshen/Documents/workspace/halvin/helix
+        type: stdio
+        tools:
+          get_minimal_context_tool:
+            approval_mode: approve
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: registry/capabilities/mcp/code-review-graph-helix.yaml
+install:
+  strategy: manifest
+  artifactName: code-review-graph-helix
+  manifest:
+    seededFrom: /Users/halvinshen/.codex/config.toml
+riskTier: T2
+permissions:
+  localRead: full
+  network: false
+  credentials: false
+  filesystemWrite: runtime-only
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-30T00:00:00.000Z
+  license: CONFIG_ONLY
+  executesScripts: true
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: starts local code-review-graph MCP server and maintains graph state for Helix
+  notes:
+    - Adopted from existing Codex MCP server code_review_graph_helix.
+    - Project-specific Helix graph server; enable through helix-product profile, not codex-base.
+lifecycleState: published
+activation:
+  phase: review
+  triggerMode: project-explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes:
+    - /Users/halvinshen/Documents/workspace/halvin/helix
+  subagentRole: reviewer
+  activationExamples:
+    - review Helix changes with code review graph
+    - inspect Helix impact radius
+  antiTriggers:
+    - non-Helix repository
+    - simple file edit with no graph context needed
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: config-only-code-review-graph-helix-2026-05-30
+tags:
+  - codex-mcp
+  - helix
+  - code-review-graph

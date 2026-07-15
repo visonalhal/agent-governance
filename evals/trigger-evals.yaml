@@ -1,31 +1,69 @@
 scenarios:
   - id: clone-is-direct-command
     prompt: Clone https://github.com/visonalhal/agent-governance and run it.
-    expectedSkills:
-      - skill.intent-routing
+    expectedSkills: []
     forbiddenSkills:
+      - skill.intent-routing
       - skill.systematic-debugging-lite
       - skill.implementation-plan-lite
 
-  - id: config-governance-is-not-debugging
+  - id: config-governance-uses-only-governance-skill
     prompt: Compare our Codex plugin config with the workspace skills registry.
     expectedSkills:
-      - skill.intent-routing
+      - skill.agent-governance
     forbiddenSkills:
+      - skill.intent-routing
       - skill.systematic-debugging-lite
 
-  - id: flaky-test-needs-debugging
+  - id: flaky-test-uses-domain-skill-only
     prompt: This Playwright test is flaky in CI; find the root cause.
     expectedSkills:
+      - skill.playwright-best-practices
+    forbiddenSkills:
       - skill.intent-routing
       - skill.systematic-debugging-lite
-      - skill.playwright-best-practices
-    forbiddenSkills: []
+      - skill.risk-based-tdd
 
-  - id: regression-needs-risk-based-tdd
+  - id: regression-uses-native-codex-workflow
     prompt: Fix this auth regression and make sure it cannot come back.
-    expectedSkills:
+    expectedSkills: []
+    forbiddenSkills:
       - skill.intent-routing
       - skill.risk-based-tdd
-    forbiddenSkills:
+      - skill.unit-test-design
+      - skill.verification-before-completion-lite
       - skill.brainstorming-lite
+
+  - id: migration-uses-native-plan-and-goal
+    prompt: This migration touches three services and needs milestones, evidence, rollout, and rollback gates.
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.intent-routing
+      - skill.implementation-plan-lite
+      - skill.long-task-planning
+      - skill.systematic-debugging-lite
+
+  - id: global-skill-governance-needs-agent-governance
+    prompt: Globalize this workflow as a skill, define project opt-in rules, and prevent trigger drift.
+    expectedSkills:
+      - skill.agent-governance
+    forbiddenSkills:
+      - skill.intent-routing
+      - skill.systematic-debugging-lite
+
+  - id: prompt-template-design-needs-prompt-master
+    prompt: Help me design a reusable prompt template for travel planning and include trigger and anti-trigger examples.
+    expectedSkills:
+      - skill.prompt-master
+    forbiddenSkills:
+      - skill.intent-routing
+      - skill.agent-governance
+      - skill.systematic-debugging-lite
+
+  - id: domain-task-is-not-prompt-master
+    prompt: Help me plan a 7 day Tokyo family trip with a 20000 RMB budget.
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.intent-routing
+      - skill.prompt-master
+      - skill.agent-governance

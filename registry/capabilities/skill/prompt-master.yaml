@@ -1,0 +1,70 @@
+id: skill.prompt-master
+name: prompt-master
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/prompt-master
+install:
+  strategy: copy
+  artifactName: prompt-master
+  sourcePath: assets/skills/prompt-master
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-30T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Self-owned prompt-only skill for designing, auditing, compressing, and testing prompts.
+    - Approved for global Codex install with narrow trigger and anti-trigger rules.
+lifecycleState: published
+activation:
+  phase: tool
+  triggerMode: default
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - design a prompt template
+    - audit this skill prompt
+    - create trigger and anti-trigger examples
+    - compress this system prompt without changing behavior
+  antiTriggers:
+    - execute the underlying domain task
+    - ordinary copyediting
+    - simple factual lookup
+    - project governance adoption decision
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: b27f1ebb6abf426ffb3b17be3d0aebbb7b426e0447831dc24228b70238ab5e0b
+tags:
+  - prompt
+  - meta
+  - global

@@ -1,0 +1,70 @@
+id: skill.karpathy-guidelines
+name: karpathy-guidelines
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/karpathy-guidelines
+install:
+  strategy: copy
+  artifactName: karpathy-guidelines
+  sourcePath: assets/skills/karpathy-guidelines
+  manifest:
+    seededFrom: /Users/halvinshen/.codex/skills/karpathy-guidelines
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-30T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Adopted from existing Codex user skill.
+    - Generic prompt-only coding behavior guardrail; safe for global Codex install.
+lifecycleState: deprecated
+activation:
+  phase: implementation
+  triggerMode: default
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples:
+    - write code surgically
+    - review code for overcomplication
+    - refactor without scope creep
+  antiTriggers:
+    - no code writing or review involved
+    - pure document editing
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 41e8ca055bbde13d240776a14a076a59614057200340c243130a76ba4e64cac8
+tags:
+  - coding-guidelines
+  - global
+  - prompt-only
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

@@ -1,0 +1,70 @@
+id: skill.agent-governance
+name: agent-governance
+assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
+discoverySources: []
+includes: []
+exposes: []
+canonicalSource:
+  sourceId: governance-repo
+  url: https://github.com/visonalhal/agent-governance
+  ref: main
+  refType: branch
+  path: assets/skills/agent-governance
+install:
+  strategy: copy
+  artifactName: agent-governance
+  sourcePath: assets/skills/agent-governance
+riskTier: T1
+permissions:
+  localRead: scoped
+  network: false
+  credentials: false
+  filesystemWrite: none
+review:
+  status: approved
+  reviewer: Halvin Shen
+  reviewedAt: 2026-05-28T00:00:00.000Z
+  license: MIT
+  executesScripts: false
+  networkAccess: false
+  touchesCredentials: false
+  filesystemSideEffects: none
+  notes:
+    - Self-owned prompt-only meta-governance skill for skill lifecycle and project override
+      boundaries.
+    - Hydrate digest after adding agent governance skill.
+lifecycleState: published
+activation:
+  phase: governance
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes:
+    - /Users/halvinshen/Documents/workspace/halvin/agent-governance
+  subagentRole: skill-auditor
+  activationExamples:
+    - globalize a workflow skill
+    - define project opt-in rules
+    - prevent skill trigger drift
+  antiTriggers:
+    - ordinary app bugfix
+    - product UI implementation
+    - simple command
+versionPolicy:
+  strategy: pin-ref-and-hash
+  allowUpdates: manual
+hash:
+  algorithm: sha256
+  digest: 4c38ae6846ee6ee44e597b8a3ab51f93814ca75a49cc46dbc1a1f201b7c0053d
+tags:
+  - governance
+  - skills
+  - workflow-lite

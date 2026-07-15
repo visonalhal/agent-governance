@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: design
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  activationExamples:
+    - User explicitly asks to build or reconcile a Figma design-system library.
+  antiTriggers:
+    - Do not activate for routine Figma implementation or one-off screen edits.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,6 +47,8 @@ hash:
 tags:
   - canonical-skill
   - figma
+  - low-frequency
+  - on-demand
 bindings:
   cache:
     skill:

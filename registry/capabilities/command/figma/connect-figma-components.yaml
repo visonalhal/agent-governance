@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: design
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  activationExamples:
+    - User explicitly invokes the Code Connect component mapping workflow.
+  antiTriggers:
+    - Do not expose as a default Figma plugin command.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +47,6 @@ hash:
 tags:
   - canonical-command
   - figma
+  - low-frequency
+  - on-demand
 bindings: {}

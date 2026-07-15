@@ -98,6 +98,15 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
       previousManagedSkillIds,
       "Codex skill"
     );
+  } else if (previousManagedSkillIds.length > 0) {
+    const legacyUserSkillsDir = path.join(path.dirname(configPath), "skills");
+    await syncManagedSkillDirectory(
+      legacyUserSkillsDir,
+      runtimeState.cacheBindings.skillsDir,
+      [],
+      previousManagedSkillIds,
+      "Codex legacy skill"
+    );
   }
 
   const managedPluginIds = new Set(state.managedPluginIds);
@@ -106,7 +115,7 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
   const pluginsSection = ensureRecord(parsed, "plugins");
   for (const plugin of runtimeState.plugins) {
     assertUnmanagedCollision(pluginsSection, plugin.nativeRegistration.pluginId, managedPluginIds, "Codex plugin", {
-      allowAdopt: plugin.nativeRegistration.adoptExisting && plugin.nativeRegistration.enabled === false,
+      allowAdopt: plugin.nativeRegistration.adoptExisting,
     });
   }
   for (const pluginId of state.managedPluginIds) {
@@ -120,7 +129,9 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
 
   const mcpSection = ensureRecord(parsed, "mcp_servers");
   for (const mcp of runtimeState.mcps) {
-    assertUnmanagedCollision(mcpSection, mcp.serverName, managedMcpServerNames, "Codex MCP server");
+    assertUnmanagedCollision(mcpSection, mcp.serverName, managedMcpServerNames, "Codex MCP server", {
+      allowAdopt: mcp.adoptExisting,
+    });
   }
   for (const serverName of state.managedMcpServerNames) {
     delete mcpSection[serverName];
@@ -135,7 +146,7 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
       ? runtimeState.skills
           .filter((skill) => skill.syncMode === "user-skill-dir")
           .map((skill) => skill.artifactName)
-      : previousManagedSkillIds,
+      : [],
     managedPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
     managedMcpServerNames: runtimeState.mcps.map((mcp) => mcp.serverName),
   });

@@ -30,6 +30,15 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: design
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  subagentRole: researcher
+  activationExamples:
+    - User explicitly requests Code Connect mapping research.
+  antiTriggers:
+    - Do not expose as a default Figma plugin agent.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +48,6 @@ hash:
 tags:
   - canonical-agent
   - figma
+  - low-frequency
+  - on-demand
 bindings: {}

@@ -41,7 +41,17 @@ review:
   filesystemSideEffects: none
   notes:
     - Recovered from the local shared skill cache and normalized into governance-managed assets.
-lifecycleState: published
+lifecycleState: deprecated
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -51,3 +61,4 @@ hash:
 tags:
   - bootstrap-seeded
   - shared-skill
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

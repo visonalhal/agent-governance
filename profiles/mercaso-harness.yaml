@@ -1,12 +1,7 @@
 profileId: mercaso-harness
 runtimeId: codex
 enabledCapabilities:
-  - skill.systematic-debugging-lite
-  - skill.verification-before-completion-lite
-  - skill.receiving-code-review-lite
-  - skill.code-review
   - skill.playwright-best-practices
-  - skill.typescript-advanced-types
 referenceCapabilities:
   - skill.webapp-testing
 blockedCapabilities:

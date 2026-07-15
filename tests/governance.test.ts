@@ -25,8 +25,58 @@ import { runTriggerEvals } from "../src/trigger-eval.js";
 
 const REPO_ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const FIXED_REVIEW_DATE = "2026-04-02T00:00:00.000Z";
+const RETIRED_USER_SKILL_IDS = [
+  "skill.intent-routing",
+  "skill.brainstorming-lite",
+  "skill.implementation-plan-lite",
+  "skill.long-task-planning",
+  "skill.systematic-debugging-lite",
+  "skill.verification-before-completion-lite",
+  "skill.receiving-code-review-lite",
+  "skill.unit-test-design",
+  "skill.risk-based-tdd",
+  "skill.karpathy-guidelines",
+  "skill.code-review",
+  "skill.skill-creator",
+  "skill.product-manager-toolkit",
+  "skill.typescript-advanced-types",
+  "skill.tailwindcss-advanced-layouts",
+  "skill.prisma-performance",
+  "skill.web-design-guidelines",
+  "skill.impeccable.critique",
+  "skill.impeccable.harden",
+  "skill.impeccable.normalize",
+  "skill.impeccable.polish",
+  "skill.impeccable.typeset",
+] as const;
 
 describe.sequential("agent governance", () => {
+  it("retires redundant user skills without removing the consolidated frontend workflow", async () => {
+    const repo = await loadRepo(REPO_ROOT);
+
+    for (const skillId of RETIRED_USER_SKILL_IDS) {
+      const capability = repo.capabilities.find((item) => item.id === skillId);
+      expect(capability?.lifecycleState, skillId).toBe("deprecated");
+
+      for (const profile of repo.profiles.values()) {
+        expect(profile.enabledCapabilities, `${profile.profileId} enables ${skillId}`).not.toContain(skillId);
+        expect(profile.referenceCapabilities, `${profile.profileId} references ${skillId}`).not.toContain(skillId);
+      }
+    }
+
+    const frontendDesign = repo.capabilities.find(
+      (item) => item.id === "skill.impeccable.frontend-design"
+    );
+    expect(frontendDesign?.lifecycleState).toBe("published");
+
+    const frontendSkill = await fs.readFile(
+      path.join(REPO_ROOT, "assets/skills/impeccable/frontend-design/SKILL.md"),
+      "utf8"
+    );
+    expect(frontendSkill).toContain("reference/production-qa.md");
+    expect(frontendSkill).not.toContain("$teach-impeccable");
+  });
+
   it("resolves the repo and machine from the default bootstrap path", async () => {
     const sandbox = await createSandbox();
 
@@ -215,6 +265,60 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("keeps Figma as a source plugin with only common on-demand references", async () => {
+    const repo = await loadRepo(REPO_ROOT);
+    const codexBase = repo.profiles.get("codex-base");
+    expect(codexBase?.enabledCapabilities).toContain("plugin.openai-curated.figma");
+    expect(codexBase?.enabledCapabilities).not.toContain("plugin.figma");
+    expect(codexBase?.enabledCapabilities).not.toContain("skill.figma.code-connect-components");
+    expect(codexBase?.enabledCapabilities).not.toContain("skill.figma.generate-library");
+    expect(codexBase?.enabledCapabilities).not.toContain("skill.figma.create-design-system-rules");
+    expect(codexBase?.referenceCapabilities).toEqual(
+      expect.arrayContaining(["skill.figma.implement-design", "skill.figma.use", "mcp.figma"])
+    );
+
+    const disableRecord = repo.capabilities.find(
+      (capability) => capability.id === "plugin.openai-curated.figma"
+    );
+    expect(disableRecord?.activation.triggerMode).toBe("blocked");
+    expect(disableRecord?.bindings.package?.plugin?.nativeRegistration.enabled).toBe(false);
+    expect(disableRecord?.bindings.package?.plugin?.nativeRegistration.pluginId).toBe(
+      "figma@openai-curated"
+    );
+
+    const plugin = repo.capabilities.find((capability) => capability.id === "plugin.figma");
+    expect(plugin?.lifecycleState).toBe("published");
+    expect(plugin?.activation.triggerMode).toBe("reference-only");
+    expect(plugin?.includes).toEqual(
+      expect.arrayContaining([
+        "skill.figma.code-connect-components",
+        "skill.figma.create-design-system-rules",
+        "skill.figma.generate-library",
+      ])
+    );
+    expect(plugin?.exposes).toEqual(
+      expect.arrayContaining([
+        "agent.figma.implementation",
+        "command.figma.implement-from-figma",
+        "skill.figma.implement-design",
+        "skill.figma.use",
+        "mcp.figma",
+      ])
+    );
+    expect(plugin?.exposes).not.toContain("command.figma.connect-figma-components");
+    expect(plugin?.exposes).not.toContain("command.figma.create-design-system-rules");
+
+    for (const lowFrequencyId of [
+      "skill.figma.code-connect-components",
+      "skill.figma.create-design-system-rules",
+      "skill.figma.generate-library",
+    ]) {
+      const capability = repo.capabilities.find((item) => item.id === lowFrequencyId);
+      expect(["project-explicit", "reference-only"]).toContain(capability?.activation.triggerMode);
+      expect(capability?.tags.some((tag) => tag === "on-demand" || tag === "source-only")).toBe(true);
+    }
+  });
+
   it("fails publish when a profile references an unknown capability", async () => {
     const sandbox = await createSandbox();
 
@@ -280,10 +384,14 @@ describe.sequential("agent governance", () => {
           "utf8"
         )
       ) as {
-        skills: Array<{ id: string }>;
+        nativeFiles: Record<string, string>;
+        skills: Array<{ id: string; syncMode: string }>;
       };
       expect(desired.skills.map((skill) => skill.id)).toEqual(["skill.vendor.profile-enabled"]);
-      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-enabled", "SKILL.md"))).toBe(true);
+      expect(desired.skills.map((skill) => skill.syncMode)).toEqual(["cache-only"]);
+      expect(desired.nativeFiles.userSkillsDir).toBeUndefined();
+      expect(await exists(path.join(sandbox.cacheRoot, "skills", "profile-enabled", "SKILL.md"))).toBe(true);
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-enabled"))).toBe(false);
       expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-reference"))).toBe(false);
       expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-blocked"))).toBe(false);
     } finally {
@@ -357,17 +465,17 @@ describe.sequential("agent governance", () => {
       expect(config.plugins?.["sample-plugin@governed-marketplace"]?.enabled).toBe(true);
       expect(config.mcp_servers?.manual?.command).toBe("manual-server");
       expect(config.mcp_servers?.governed?.command).toBe("npx");
-      expect(await exists(path.join(sandbox.home, ".codex", "skills", "codex-skill", "SKILL.md"))).toBe(true);
+      expect(await exists(path.join(sandbox.home, ".codex", "skills", "codex-skill"))).toBe(false);
     } finally {
       await sandbox.cleanup();
     }
   });
 
-  it("removes stale governed Codex user skills after republish", async () => {
+  it("removes legacy governed Codex skill mirrors while preserving system and unmanaged entries", async () => {
     const sandbox = await createSandbox();
 
     try {
-      const capabilityId = "skill.vendor.stale-codex-skill";
+      const capabilityId = "skill.vendor.legacy-codex-skill";
       await prepareSkillCapability(sandbox.root, {
         id: capabilityId,
         runtimeTargets: ["codex"],
@@ -380,24 +488,31 @@ describe.sequential("agent governance", () => {
         machineId: sandbox.machineId,
         bootstrap,
       });
-      await syncGovernance({
-        root: sandbox.root,
-        machineId: sandbox.machineId,
-        runtimeId: "codex",
-        bootstrap,
-      });
-
-      expect(await exists(path.join(sandbox.home, ".codex", "skills", "stale-codex-skill", "SKILL.md"))).toBe(
-        true
+      const legacySkillsDir = path.join(sandbox.home, ".codex", "skills");
+      await fs.mkdir(path.join(legacySkillsDir, "legacy-codex-skill"), { recursive: true });
+      await fs.mkdir(path.join(legacySkillsDir, ".system"), { recursive: true });
+      await fs.mkdir(path.join(legacySkillsDir, "manual-skill"), { recursive: true });
+      await fs.writeFile(path.join(legacySkillsDir, "legacy-codex-skill", "SKILL.md"), "legacy", "utf8");
+      await fs.writeFile(path.join(legacySkillsDir, ".system", "keep"), "system", "utf8");
+      await fs.writeFile(path.join(legacySkillsDir, "manual-skill", "keep"), "manual", "utf8");
+      const statePath = path.join(
+        sandbox.home,
+        ".config",
+        "agent-governance",
+        "state",
+        sandbox.machineId,
+        "codex.json"
+      );
+      await fs.writeFile(
+        statePath,
+        JSON.stringify({
+          managedSkillIds: ["legacy-codex-skill"],
+          managedPluginIds: [],
+          managedMcpServerNames: [],
+        }),
+        "utf8"
       );
 
-      await changeCapabilityLifecycle(sandbox.root, capabilityId, "deprecated", "Superseded");
-      await publishGovernance(sandbox.root);
-      await renderGovernance({
-        root: sandbox.root,
-        machineId: sandbox.machineId,
-        bootstrap,
-      });
       await syncGovernance({
         root: sandbox.root,
         machineId: sandbox.machineId,
@@ -405,7 +520,13 @@ describe.sequential("agent governance", () => {
         bootstrap,
       });
 
-      expect(await exists(path.join(sandbox.home, ".codex", "skills", "stale-codex-skill"))).toBe(false);
+      expect(await exists(path.join(sandbox.cacheRoot, "skills", "legacy-codex-skill", "SKILL.md"))).toBe(true);
+      expect(await exists(path.join(legacySkillsDir, "legacy-codex-skill"))).toBe(false);
+      expect(await exists(path.join(legacySkillsDir, ".system", "keep"))).toBe(true);
+      expect(await exists(path.join(legacySkillsDir, "manual-skill", "keep"))).toBe(true);
+
+      const state = JSON.parse(await fs.readFile(statePath, "utf8")) as { managedSkillIds: string[] };
+      expect(state.managedSkillIds).toEqual([]);
     } finally {
       await sandbox.cleanup();
     }
@@ -444,6 +565,79 @@ describe.sequential("agent governance", () => {
           bootstrap,
         })
       ).rejects.toThrow("Codex plugin collision");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("adopts exact existing Codex plugin and MCP records when explicitly allowed", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await fs.writeFile(
+        path.join(sandbox.home, ".codex", "config.toml"),
+        [
+          '[plugins."existing@vendor"]',
+          "enabled = true",
+          "",
+          "[mcp_servers.existing_mcp]",
+          'command = "existing-server"',
+          'args = ["serve"]',
+          "",
+        ].join("\n"),
+        "utf8"
+      );
+      await preparePluginCapability(sandbox.root, {
+        id: "plugin.vendor.adopt-existing-enabled",
+        runtimeTargets: ["codex"],
+        runtimeBindings: {
+          codex: {
+            plugin: {
+              pluginId: "existing@vendor",
+              enabled: true,
+              adoptExisting: true,
+            },
+          },
+        },
+      });
+      await prepareMcpCapability(sandbox.root, {
+        id: "mcp.vendor.adopt-existing-mcp",
+        runtimeTargets: ["codex"],
+        runtimeBindings: {
+          codex: {
+            mcp: {
+              serverName: "existing_mcp",
+              adoptExisting: true,
+              config: {
+                command: "existing-server",
+                args: ["serve"],
+              },
+            },
+          },
+        },
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      const config = TOML.parse(await fs.readFile(path.join(sandbox.home, ".codex", "config.toml"), "utf8")) as {
+        plugins?: Record<string, { enabled?: boolean }>;
+        mcp_servers?: Record<string, { command?: string; args?: string[] }>;
+      };
+      expect(config.plugins?.["existing@vendor"]?.enabled).toBe(true);
+      expect(config.mcp_servers?.existing_mcp?.command).toBe("existing-server");
+      expect(config.mcp_servers?.existing_mcp?.args).toEqual(["serve"]);
     } finally {
       await sandbox.cleanup();
     }

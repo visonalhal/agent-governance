@@ -1,13 +1,10 @@
 profileId: prompt-atelier
 runtimeId: codex
-enabledCapabilities:
-  - skill.intent-routing
-  - skill.unit-test-design
-  - skill.verification-before-completion-lite
+enabledCapabilities: []
 referenceCapabilities: []
 blockedCapabilities:
   - skill.testing-quality
 projectScopes:
   - /Users/halvinshen/Documents/workspace/halvin/prompt-atelier
 notes:
-  - Prompt Atelier's image production loop stays project-local; governance only adds light testing and verification skills.
+  - Prompt Atelier's image production loop stays project-local.

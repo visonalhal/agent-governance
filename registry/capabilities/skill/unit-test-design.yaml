@@ -38,7 +38,7 @@ review:
   filesystemSideEffects: none
   notes:
     - Replaces the unit-test slice of testing-quality.
-lifecycleState: published
+lifecycleState: deprecated
 activation:
   phase: unit-testing
   triggerMode: explicit
@@ -65,3 +65,4 @@ tags:
   - governance
   - testing
   - workflow-lite
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

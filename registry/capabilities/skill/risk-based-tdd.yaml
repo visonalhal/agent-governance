@@ -38,7 +38,7 @@ review:
   filesystemSideEffects: none
   notes:
     - Keeps TDD where risk justifies it without making it a universal gate.
-lifecycleState: published
+lifecycleState: deprecated
 activation:
   phase: tdd
   triggerMode: explicit
@@ -65,3 +65,4 @@ tags:
   - governance
   - testing
   - workflow-lite
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

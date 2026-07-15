@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: design
+  triggerMode: explicit
+  maxChainDepth: 1
+  activationExamples:
+    - User asks to create, edit, or inspect Figma nodes through use_figma.
+  antiTriggers:
+    - Do not use for generating app code from Figma; use skill.figma.implement-design instead.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,6 +47,8 @@ hash:
 tags:
   - canonical-skill
   - figma
+  - common-figma
+  - on-demand
 bindings:
   cache:
     skill:

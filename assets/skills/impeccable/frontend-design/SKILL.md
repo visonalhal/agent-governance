@@ -8,21 +8,20 @@ This skill guides creation of distinctive, production-grade frontend interfaces 
 
 ## Context Gathering Protocol
 
-Design skills produce generic output without project context. You MUST have confirmed design context before doing any design work.
+Design skills produce generic output without project context. Confirm enough context to make the requested design decision before implementation.
 
 **Required context** — every design skill needs at minimum:
 - **Target audience**: Who uses this product and in what context?
 - **Use cases**: What jobs are they trying to get done?
 - **Brand personality/tone**: How should the interface feel?
 
-Individual skills may require additional context — check the skill's preparation section for specifics.
-
-**CRITICAL**: You cannot infer this context by reading the codebase. Code tells you what was built, not who it's for or what it should feel like. Only the creator can provide this context.
-
 **Gathering order:**
-1. **Check current instructions (instant)**: If your loaded instructions already contain a **Design Context** section, proceed immediately.
-2. **Check .impeccable.md (fast)**: If not in instructions, read `.impeccable.md` from the project root. If it exists and contains the required context, proceed.
-3. **Run teach-impeccable (REQUIRED)**: If neither source has context, you MUST run $teach-impeccable NOW before doing anything else. Do NOT skip this step. Do NOT attempt to infer context from the codebase instead.
+1. Check current instructions for a **Design Context** section.
+2. Check `.impeccable.md` in the project root.
+3. Read the existing interface and design-system primitives for constraints and established patterns.
+4. Ask only the questions whose answers would materially change the result. For a narrow refinement, use the existing interface and the user's request instead of blocking on a full brand brief.
+
+Do not invent audience or brand facts that the available context does not support. State material assumptions when proceeding without a complete brief.
 
 ---
 
@@ -125,6 +124,14 @@ Make interactions feel fast. Use optimistic UI—update immediately, sync later.
 
 **DO**: Make every word earn its place
 **DON'T**: Repeat information users can already see
+
+---
+
+## Production QA
+
+→ *Consult [production QA reference](reference/production-qa.md) before calling an interface production-ready or polished.*
+
+Use the checklist to cover design-system alignment, resilient states, typography, responsive behavior, accessibility, and final visual consistency. Keep pure design critique separate: use a dedicated product-design audit workflow when one is available.
 
 ---
 

@@ -21,10 +21,9 @@ Governance profile: `agent-governance`. This repository is the source of truth f
 ## Skill Use
 
 - Use `skill-audit` for skill, profile, plugin, and trigger-rule review.
-- Use `implementation-plan-lite` for multi-file governance changes. Do not write a long plan for a simple doc or one-line config fix.
-- Use `risk-based-tdd` for high-risk runtime sync, schema, plugin-disable, lock, or render behavior changes.
-- Use `unit-test-design` for focused unit tests.
-- Use `verification-before-completion-lite` before claiming a governance sync or implementation is complete.
+- Use Codex's native plan and goal mechanisms for multi-file or multi-session governance changes.
+- Add focused regression tests for high-risk runtime sync, schema, plugin-disable, lock, or render behavior changes.
+- Run the narrowest relevant verification before claiming a governance sync or implementation is complete.
 - Do not use `testing-quality` or original Superpowers workflow skills as the default workflow.
 
 ## Verification

@@ -73,22 +73,39 @@ export async function runTriggerEvals(root: string): Promise<TriggerEvalReport> 
 
 function predictSkills(prompt: string) {
   const lower = prompt.toLowerCase();
-  const selected = new Set<string>(["skill.intent-routing"]);
+  const selected = new Set<string>();
 
-  if (matches(lower, ["flaky", "fails", "failure", "stack trace", "runtime error", "ci", "reproduce", "reproducible", "test failed"])) {
-    selected.add("skill.systematic-debugging-lite");
+  if (
+    matches(lower, [
+      "agent governance",
+      "agent-governance",
+      "agent-governnance",
+      "skill governance",
+      "skills registry",
+      "globalize",
+      "global skill",
+      "project opt-in",
+      "trigger drift",
+    ])
+  ) {
+    selected.add("skill.agent-governance");
   }
 
-  if (matches(lower, ["tdd", "regression", "auth", "database migration", "public api", "data transform", "high risk"])) {
-    selected.add("skill.risk-based-tdd");
-  }
-
-  if (matches(lower, ["brainstorm", "product", "prd", "requirements", "roadmap", "discovery"])) {
-    selected.add("skill.brainstorming-lite");
-  }
-
-  if (matches(lower, ["implementation plan", "architecture plan", "multi-step", "migration plan"])) {
-    selected.add("skill.implementation-plan-lite");
+  if (
+    matches(lower, [
+      "prompt template",
+      "system prompt",
+      "skill prompt",
+      "prompt pack",
+      "trigger and anti-trigger",
+      "anti-trigger examples",
+      "compress this prompt",
+      "audit this prompt",
+      "rewrite this prompt",
+      "design a prompt",
+    ])
+  ) {
+    selected.add("skill.prompt-master");
   }
 
   if (matches(lower, ["playwright", "e2e", "browser test"])) {

@@ -1,7 +1,16 @@
 id: skill.tailwindcss-advanced-layouts
 name: tailwindcss-advanced-layouts
 assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
 discoverySources: []
+includes: []
+exposes: []
 canonicalSource:
   sourceId: governance-repo
   url: https://github.com/visonalhal/agent-governance
@@ -32,7 +41,17 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
-lifecycleState: published
+lifecycleState: deprecated
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -42,10 +61,4 @@ hash:
 tags:
   - bootstrap-seeded
   - shared-skill
-bindings:
-  cache:
-    skill:
-      syncMode: cache-only
-  user-dir:
-    skill:
-      syncMode: user-skill-dir
+statusReason: Retired pending evidence for a narrower, current, and reviewed replacement.

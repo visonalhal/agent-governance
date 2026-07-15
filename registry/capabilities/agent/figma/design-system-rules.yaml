@@ -30,6 +30,15 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: governance
+  triggerMode: reference-only
+  maxChainDepth: 0
+  subagentRole: skill-auditor
+  activationExamples:
+    - Use as source material for project-specific Figma rule generation.
+  antiTriggers:
+    - Do not expose as a default Figma plugin agent.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +48,6 @@ hash:
 tags:
   - canonical-agent
   - figma
+  - low-frequency
+  - source-only
 bindings: {}

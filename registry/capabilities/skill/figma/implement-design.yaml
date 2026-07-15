@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  activationExamples:
+    - User provides a Figma URL or selected node and asks to implement it in code.
+  antiTriggers:
+    - Do not use for writing to the Figma canvas; use skill.figma.use with mcp.figma instead.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,6 +47,8 @@ hash:
 tags:
   - canonical-skill
   - figma
+  - common-figma
+  - on-demand
 bindings:
   cache:
     skill:

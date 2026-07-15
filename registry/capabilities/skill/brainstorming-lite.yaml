@@ -38,7 +38,7 @@ review:
   filesystemSideEffects: none
   notes:
     - Replaces hard-gated brainstorming with a bounded discovery loop.
-lifecycleState: published
+lifecycleState: deprecated
 activation:
   phase: product
   triggerMode: explicit
@@ -65,3 +65,4 @@ hash:
 tags:
   - governance
   - workflow-lite
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

@@ -783,6 +783,7 @@ function buildMcpCapability(args: {
         mcp: {
           serverName: args.serverName,
           config: asRecord(args.sanitizedConfig),
+          adoptExisting: true,
         },
       },
     },

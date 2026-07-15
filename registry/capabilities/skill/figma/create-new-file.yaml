@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: tool
+  triggerMode: project-explicit
+  maxChainDepth: 0
+  activationExamples:
+    - User explicitly asks to create a new Figma design or FigJam file.
+  antiTriggers:
+    - Do not activate just because a task mentions Figma; use only when a new file is required.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,6 +47,7 @@ hash:
 tags:
   - canonical-skill
   - figma
+  - on-demand
 bindings:
   cache:
     skill:

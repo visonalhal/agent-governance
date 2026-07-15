@@ -21,24 +21,15 @@ includes:
   - skill.figma.use
 entrypoints:
   commands:
-    - command.figma.connect-figma-components
-    - command.figma.create-design-system-rules
     - command.figma.implement-from-figma
-    - command.figma.review-design-parity
   agents:
-    - agent.figma.code-connect
-    - agent.figma.design-parity-review
-    - agent.figma.design-system-rules
     - agent.figma.implementation
 exposes:
-  - agent.figma.code-connect
-  - agent.figma.design-parity-review
-  - agent.figma.design-system-rules
   - agent.figma.implementation
-  - command.figma.connect-figma-components
-  - command.figma.create-design-system-rules
   - command.figma.implement-from-figma
-  - command.figma.review-design-parity
+  - mcp.figma
+  - skill.figma.implement-design
+  - skill.figma.use
 canonicalSource:
   sourceId: governance-repo
   url: https://github.com/visonalhal/agent-governance
@@ -70,6 +61,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: tool
+  triggerMode: reference-only
+  maxChainDepth: 0
+  activationExamples:
+    - Use this as the canonical source package for Figma assets, not as the daily Codex activation surface.
+  antiTriggers:
+    - Do not enable plugin.figma in a default profile; enable only the specific Figma capability needed for a project.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -79,6 +78,7 @@ hash:
 tags:
   - canonical-plugin
   - figma
+  - source-plugin
 bindings:
   package:
     plugin:

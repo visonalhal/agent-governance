@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  activationExamples:
+    - User explicitly asks to implement code from a Figma frame or component.
+  antiTriggers:
+    - Do not activate for Figma canvas write operations.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +47,6 @@ hash:
 tags:
   - canonical-command
   - figma
+  - common-figma
+  - on-demand
 bindings: {}

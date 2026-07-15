@@ -31,6 +31,14 @@ review:
   notes:
     - Seeded from codex runtime MCP configuration.
 lifecycleState: published
+activation:
+  phase: tool
+  triggerMode: explicit
+  maxChainDepth: 0
+  activationExamples:
+    - User explicitly needs Figma MCP tools for reading or writing a Figma file.
+  antiTriggers:
+    - Do not enable as part of the default Codex profile without a Figma task.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -40,6 +48,8 @@ hash:
 tags:
   - bootstrap-seeded
   - codex-mcp
+  - figma
+  - on-demand
 bindings:
   remote-http:
     mcp:

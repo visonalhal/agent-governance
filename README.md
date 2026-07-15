@@ -75,7 +75,7 @@ Use `--bootstrap` to point at a non-default bootstrap file, and `--machine` to r
 ## Managed Runtimes
 
 - `codex`: managed
-  Codex keeps governed plugins and MCP servers in `~/.codex/config.toml`, while shared skills remain in `~/.agents/skills`.
+  Codex keeps governed plugins and MCP servers in `~/.codex/config.toml` and discovers all user skills directly from `~/.agents/skills`. `~/.codex/skills` is reserved for Codex-managed system skills.
 - `cursor`: managed
   Cursor gets governed MCP servers in `~/.cursor/mcp.json` and governed custom skills in `~/.cursor/skills`.
 - `claude`: managed

@@ -30,6 +30,15 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  subagentRole: implementer
+  activationExamples:
+    - User explicitly asks for implementation work from a Figma design.
+  antiTriggers:
+    - Do not use for Figma canvas write operations.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +48,6 @@ hash:
 tags:
   - canonical-agent
   - figma
+  - common-figma
+  - on-demand
 bindings: {}

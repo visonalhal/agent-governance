@@ -39,7 +39,17 @@ review:
   filesystemSideEffects: none
   notes:
     - Imported from pbakaus/impeccable .codex/skills/critique
-lifecycleState: published
+lifecycleState: deprecated
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -50,3 +60,4 @@ tags:
   - impeccable
   - design
   - external
+statusReason: Retired after consolidating the useful production QA guidance into frontend-design.

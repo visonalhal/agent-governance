@@ -15,19 +15,12 @@
 
 | Phase | Skill | Trigger |
 | --- | --- | --- |
-| Entry | `skill.intent-routing` | 任何治理项目任务先分类，不直接进 debugging 或计划 |
-| Product | `skill.product-manager-toolkit`, `skill.brainstorming-lite` | 需求、用户价值、范围或取舍不清楚 |
-| Planning | `skill.implementation-plan-lite` | 跨模块、迁移、runtime、共享契约改动 |
-| Design | selected `skill.impeccable.*`, `skill.web-design-guidelines` | 明确 UI/设计审计或视觉 polish |
-| Implementation | `skill.next-best-practices`, `skill.typescript-advanced-types`, `skill.prisma-performance` | 对应领域代码修改 |
-| TDD | `skill.risk-based-tdd` | 高风险行为、回归、DB/auth/API/data transform |
-| Unit Testing | `skill.unit-test-design` | 业务逻辑、parser、service、validator、generator 单测 |
-| Web QA | `skill.webapp-testing` | 候选/reference-only；本地 Web UI QA，批准前不默认启用 |
+| Design | `skill.impeccable.frontend-design`, `skill.impeccable.clarify` | 前端界面创建或 UX 文案改进 |
+| Implementation | `skill.next-best-practices` | Next.js 项目专用实现或审查 |
 | E2E | `skill.playwright-best-practices` | Playwright 测试设计、flaky、auth、fixture、POM |
-| Debugging | `skill.systematic-debugging-lite` | 真实 bug、失败测试、CI、runtime exception、flaky |
-| Review | `skill.code-review`, `skill.receiving-code-review-lite` | review findings 或 requested changes |
-| Verification | `skill.verification-before-completion-lite` | 声称完成前报告实际验证 |
-| Governance | `skill.skill-creator`, `skill.skill-audit` | 创建、评估、废弃、比较 skills/plugins/profiles |
+| Governance | `skill.agent-governance`, `skill.skill-audit` | 全局能力采用、覆盖、触发治理和废弃审计 |
+| Tool | `skill.prompt-master` | prompt、prompt template、system instruction、skill prompt、trigger/anti-trigger 设计或审查 |
+| Web QA | `skill.mercaso-admin-readonly-browser-test` | Mercaso Admin Web SAT/PROD 只读浏览器 smoke test |
 
 ## Active Profiles
 
@@ -38,12 +31,12 @@
 | `mercaso-web` | Mercaso Web 维护与 review |
 | `mercaso-harness` | Mercaso Playwright harness，项目 rulebook 优先 |
 | `agent-governance` | 本仓库 schema、profile、sync、audit、eval 治理 |
-| `prompt-atelier` | 图像 prompt 生产 loop 的轻量测试/验证 |
-| `nihongo-content` | 内容项目的轻量产品/验证流程 |
+| `prompt-atelier` | 图像 prompt 生产 loop，依赖项目本地规则 |
+| `nihongo-content` | 内容项目，依赖 Codex 原生任务处理与项目规则 |
 
 ## Explicit Deprecations
 
-这些能力保留历史记录，但不再进入 active Codex profile 输出：
+这些能力保留 registry 和资产历史，但不再进入 active Codex profile 或运行时输出：
 
 - `skill.testing-quality`
 - `skill.brainstorming`
@@ -51,14 +44,40 @@
 - `skill.systematic-debugging`
 - `skill.requesting-code-review`
 - `skill.receiving-code-review`
+- `skill.intent-routing`
+- `skill.brainstorming-lite`
+- `skill.implementation-plan-lite`
+- `skill.long-task-planning`
+- `skill.systematic-debugging-lite`
+- `skill.verification-before-completion-lite`
+- `skill.receiving-code-review-lite`
+- `skill.unit-test-design`
+- `skill.risk-based-tdd`
+- `skill.karpathy-guidelines`
+- `skill.code-review`
+- `skill.skill-creator`
+- `skill.product-manager-toolkit`
+- `skill.typescript-advanced-types`
+- `skill.tailwindcss-advanced-layouts`
+- `skill.prisma-performance`
+- `skill.web-design-guidelines`
+- `skill.impeccable.critique`
+- `skill.impeccable.harden`
+- `skill.impeccable.normalize`
+- `skill.impeccable.polish`
+- `skill.impeccable.typeset`
 
-原因很简单：它们的触发范围太宽，容易把简单任务升级成流程任务。
+通用规划、调试、review、测试和验证依赖 Codex 原生行为；静态或低质量知识 skill 等待更窄、更及时、经验证的替代；UI resilience、design-system、typography 和 polish 检查已合并进 `frontend-design` 的 `production-qa.md`。
 
 ## Plugin Policy
 
 - `plugin.openai-curated.build-web-apps` 是 disable record，目标是让 Codex 配置显式 `enabled = false`。
+- `plugin.openai-curated.figma` 是 disable record，目标是让 Codex 配置显式 `enabled = false`；需要 Figma 时按任务启用具体能力。
 - `plugin.openai-curated.superpowers` 是 disable record，目标是让 Codex 配置显式 `enabled = false`。
-- Impeccable 只默认使用精选 skill：`frontend-design`、`critique`、`polish`、`harden`、`clarify`、`typeset`、`normalize`。
+- `plugin.openai-curated.circleci` 是 enabled external plugin，由治理接管现有 `circleci@openai-curated` runtime 配置。
+- `plugin.figma` 保留为 canonical/source plugin，不进入默认 Codex profile。日常只把 `skill.figma.implement-design`、`skill.figma.use` 和 `mcp.figma` 作为 on-demand reference；`Code Connect`、`generate-library`、`create-design-system-rules` 这类低频 Figma workflow 只能 project-explicit 或 reference-only。
+- `skill.prompt-master` 全局安装，但只处理 prompt 设计、审查、压缩和触发测试；不能接管普通领域任务或治理采纳决策。
+- Impeccable 只保留 `frontend-design` 和 `clarify`。生产 QA 检查集中在 `frontend-design/reference/production-qa.md`。
 - `webapp-testing` 当前是 candidate/reference-only，批准前不能全局同步。
 
 ## Runtime Checks
@@ -70,10 +89,7 @@ pnpm governance runtime-audit --runtime codex
 pnpm governance trigger-eval
 ```
 
-`runtime-audit` 对比 Codex 实际插件、MCP、user skills、plugin skill roots 和 rendered desired state。
-少量工具型 unmanaged capability 被显式允许，例如 Browser/Chrome/GitHub/Drive/Figma 插件、`node_repl`、Figma 本地辅助 skills 和 `hatch-pet`。
+`runtime-audit` 对比 Codex 实际插件、MCP、`~/.agents/skills` 中的 user skills、plugin skill roots 和 rendered desired state。Codex 不再向 `~/.codex/skills` 生成用户 skill 镜像；该目录只保留 Codex 管理的 `.system`。
+少量工具型 unmanaged capability 被显式允许，例如 OpenAI bundled/primary runtime 插件、`node_repl`、`computer-use`、`hatch-pet` 和 `sample-watermark`。CircleCI、Helix code-review graph 和 Mercaso readonly browser test 必须作为 governed capabilities 出现在 desired state。
 
-`trigger-eval` 固定检查两类关键错误：
-
-- clone/config/meta 问题不能触发 debugging。
-- flaky/failure 问题必须触发 debugging。
+`trigger-eval` 固定检查：通用任务不再激活已废弃的 workflow skills；只有 governance、prompt 和 Playwright 等窄领域请求才选择对应能力。

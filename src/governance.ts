@@ -801,6 +801,7 @@ function populateRenderedRuntimeStateFromBindings(
         id: capability.id,
         bindingId: selectedBinding.bindingId,
         serverName: selectedBinding.binding.mcp.serverName,
+        adoptExisting: selectedBinding.binding.mcp.adoptExisting,
         config: resolveTemplates(
           selectedBinding.binding.mcp.config,
           vars,
@@ -865,6 +866,7 @@ function populateRenderedRuntimeStateFromLegacy(
         id: capability.id,
         bindingId: binding.mcp.config.url ? "remote-http" : "stdio-command",
         serverName: binding.mcp.serverName,
+        adoptExisting: binding.mcp.adoptExisting,
         config: resolveTemplates(binding.mcp.config, vars, {}, false) as Record<string, unknown>,
       });
     }

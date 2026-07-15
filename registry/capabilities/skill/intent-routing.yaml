@@ -38,7 +38,7 @@ review:
   filesystemSideEffects: none
   notes:
     - Self-owned Codex-first workflow skill.
-lifecycleState: published
+lifecycleState: deprecated
 activation:
   phase: entry
   triggerMode: default
@@ -61,3 +61,4 @@ hash:
 tags:
   - governance
   - workflow-lite
+statusReason: Retired as redundant with Codex native behavior or a maintained system capability.

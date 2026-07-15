@@ -30,6 +30,14 @@ review:
   notes:
     - Canonicalized from the OpenAI-curated Figma plugin package.
 lifecycleState: published
+activation:
+  phase: governance
+  triggerMode: reference-only
+  maxChainDepth: 0
+  activationExamples:
+    - Use as source material for intentionally creating project Figma design-system rules.
+  antiTriggers:
+    - Do not expose as a default Figma plugin command.
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -39,4 +47,6 @@ hash:
 tags:
   - canonical-command
   - figma
+  - low-frequency
+  - source-only
 bindings: {}
