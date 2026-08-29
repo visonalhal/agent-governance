@@ -1,0 +1,10 @@
+profileId: mercaso-admin-readonly
+runtimeId: codex
+enabledCapabilities:
+  - skill.mercaso-admin-readonly-browser-test
+referenceCapabilities: []
+blockedCapabilities: []
+projectScopes:
+  - /Users/halvinshen/Documents/workspace/mercaso/mercaso-admin-web
+notes:
+  - The credentialed readonly browser workflow is available only in Mercaso Admin Web.

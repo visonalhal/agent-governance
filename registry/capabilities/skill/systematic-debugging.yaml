@@ -23,7 +23,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: systematic-debugging
-  sourcePath: assets/skills/systematic-debugging
+  sourcePath: archive/deprecated-capabilities/skills/systematic-debugging
 riskTier: T1
 permissions:
   localRead: scoped

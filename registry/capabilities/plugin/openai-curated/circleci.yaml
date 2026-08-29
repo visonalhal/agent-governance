@@ -9,7 +9,7 @@ bindings:
         artifactName: circleci-plugin-record
         manifest:
           pluginId: circleci@openai-curated
-          installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf
+          installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/11c74d6b
       nativeRegistration:
         pluginId: circleci@openai-curated
         enabled: true
@@ -19,17 +19,17 @@ includes: []
 exposes: []
 canonicalSource:
   sourceId: github-direct
-  url: https://github.com/circleci-public/skills
-  ref: fef63ecf
+  url: https://github.com/openai/plugins
+  ref: 1e285826e604f66f7208f7ac4dba0fe8341d1f57
   refType: commit
-  path: .
+  path: plugins/circleci
 install:
   strategy: external
   artifactName: circleci-plugin-record
   manifest:
     pluginId: circleci@openai-curated
     marketplace: openai-curated
-    installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf
+    installedPath: /Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/11c74d6b
 riskTier: T3
 permissions:
   localRead: scoped
@@ -39,7 +39,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-30T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: MIT
   executesScripts: true
   networkAccess: true
@@ -48,6 +48,7 @@ review:
   notes:
     - Adopted from existing Codex plugin circleci@openai-curated.
     - Plugin manifest advertises interactive and write capabilities; keep managed instead of allowed-unmanaged.
+    - Verified installed 1.0.4 bundle byte-for-byte against openai/plugins at the pinned commit; enabled only in Mercaso web and harness project scopes.
 lifecycleState: published
 activation:
   phase: tool
@@ -70,7 +71,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: fe63e330ef28c6bbb62772eaf3209c2574d059acc0f42d88ac8d312d30cac938
+  digest: 1f461668ae08db88826745ba8d8033086ba8d83f1bf1806820051419dce97685
 tags:
   - openai-curated
   - circleci

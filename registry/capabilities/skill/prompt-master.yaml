@@ -30,7 +30,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-30T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: MIT
   executesScripts: false
   networkAccess: false
@@ -39,6 +39,8 @@ review:
   notes:
     - Self-owned prompt-only skill for designing, auditing, compressing, and testing prompts.
     - Approved for global Codex install with narrow trigger and anti-trigger rules.
+    - Rewritten to remove the fixed report template, narrow anti-triggers, and keep small prompt
+      edits lightweight; structure-validated and Plugin Eval checked.
 lifecycleState: published
 activation:
   phase: tool
@@ -63,7 +65,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: b27f1ebb6abf426ffb3b17be3d0aebbb7b426e0447831dc24228b70238ab5e0b
+  digest: a7620cf02c311ba549e9ce456264f5c416081616ead39a4911ffb78765369ab7
 tags:
   - prompt
   - meta

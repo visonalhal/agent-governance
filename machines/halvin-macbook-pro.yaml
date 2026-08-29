@@ -1,27 +1,53 @@
 machineId: halvin-macbook-pro
-description: Personal macOS workstation for governed Codex, Claude, and Cursor sync.
+description: Personal macOS workstation for governed Codex sync.
 workspaceRoot: /Users/halvinshen/Documents/workspace/halvin
 enabledRuntimes:
   - codex
-  - claude
-  - cursor
 activeProfiles:
   - codex-base
   - helix-product
   - mercaso-web
   - mercaso-harness
+  - mercaso-admin-readonly
   - agent-governance
-  - prompt-atelier
-  - nihongo-content
 pathVars: {}
 runtimeTargets:
   codex:
     nativeFiles: {}
     cacheBindings: {}
-  claude:
-    nativeFiles: {}
-    cacheBindings: {}
-  cursor:
-    nativeFiles: {}
-    cacheBindings: {}
 runtimeOverrides: {}
+runtimeAuditAllowlist:
+  codex:
+    plugins:
+      - codex-app-tools@openai-bundled
+      - demo-studio@personal
+    mcpServers:
+      - cua_repl
+    userSkills:
+      - hatch-pet
+      - hyperframes
+      - hyperframes-animation
+      - hyperframes-cli
+      - hyperframes-core
+      - hyperframes-creative
+      - hyperframes-keyframes
+      - hyperframes-registry
+      - media-use
+      - sample-watermark
+    auditRemotePlugins: true
+    remotePlugins:
+      - app-694546cd042881919bb746a8dc300f38@openai-curated-remote
+      - app-69c4d4163c8c819183a9bdcf6d2ac262@openai-curated-remote
+      - atlassian-rovo@openai-curated-remote
+      - data-analytics@openai-curated-remote
+      - gmail@openai-curated-remote
+      - google-calendar@openai-curated-remote
+      - google-drive@openai-curated-remote
+      - hyperframes@openai-curated-remote
+      - open-design@openai-curated-remote
+      - openai-developers@openai-curated-remote
+      - openai-templates@openai-curated-remote
+      - plugin-management@openai-curated-remote
+      - product-design@openai-curated-remote
+      - remotion@openai-curated-remote
+      - slack@openai-curated-remote

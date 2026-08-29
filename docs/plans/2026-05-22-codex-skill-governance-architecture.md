@@ -1,5 +1,7 @@
 # Codex Skill Governance Architecture Plan
 
+> Superseded on 2026-08-29. The current architecture separates the artifact cache from `~/.agents/skills` and renders scoped capabilities through project `.codex/config.toml`; see `README.md` and `docs/skills-capability-map.md`.
+
 ## Problem
 
 `agent-governance` previously tracked capabilities, but Codex runtime reality still came from

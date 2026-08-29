@@ -24,8 +24,18 @@ type CacheState = {
 
 type CodexState = {
   managedSkillIds: string[];
+  managedSkillPaths: string[];
   managedPluginIds: string[];
   managedMcpServerNames: string[];
+};
+
+type ManagedFileState = {
+  managed: boolean;
+  sourceDigest?: string;
+};
+
+type CodexProjectTrustState = {
+  managedProjectScopes: string[];
 };
 
 type CursorState = {
@@ -85,10 +95,12 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
 
   const state = await readOptionalJson<CodexState>(statePath, {
     managedSkillIds: [],
+    managedSkillPaths: [],
     managedPluginIds: [],
     managedMcpServerNames: [],
   });
   const previousManagedSkillIds = state.managedSkillIds ?? [];
+  const previousManagedSkillPaths = state.managedSkillPaths ?? [];
   const userSkillsDir = runtimeState.nativeFiles.userSkillsDir;
   if (userSkillsDir) {
     await syncManagedSkillDirectory(
@@ -98,6 +110,12 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
       previousManagedSkillIds,
       "Codex skill"
     );
+    const legacyUserSkillsDir = path.join(path.dirname(configPath), "skills");
+    if (path.resolve(legacyUserSkillsDir) !== path.resolve(userSkillsDir)) {
+      for (const previousSkillId of previousManagedSkillIds) {
+        await removePath(path.join(legacyUserSkillsDir, previousSkillId));
+      }
+    }
   } else if (previousManagedSkillIds.length > 0) {
     const legacyUserSkillsDir = path.join(path.dirname(configPath), "skills");
     await syncManagedSkillDirectory(
@@ -107,6 +125,38 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
       previousManagedSkillIds,
       "Codex legacy skill"
     );
+  }
+
+  const desiredSkillPaths = runtimeState.skills
+    .filter((skill) => skill.syncMode === "config-path")
+    .map((skill) => path.join(requiredPath(runtimeState.cacheBindings.skillsDir, "Codex skill cache"), skill.artifactName));
+  const skillsSection = ensureRecord(parsed, "skills");
+  const existingSkillConfig = Array.isArray(skillsSection.config)
+    ? skillsSection.config.filter((entry): entry is TOML.JsonMap => Boolean(entry) && typeof entry === "object")
+    : [];
+  const previousPathSet = new Set(previousManagedSkillPaths);
+  const unmanagedSkillConfig = existingSkillConfig.filter((entry) => {
+    const configuredPath = typeof entry.path === "string" ? entry.path : null;
+    return !configuredPath || !previousPathSet.has(configuredPath);
+  });
+  const unmanagedPathSet = new Set(
+    unmanagedSkillConfig
+      .map((entry) => (typeof entry.path === "string" ? entry.path : null))
+      .filter((value): value is string => Boolean(value))
+  );
+  for (const skillPath of desiredSkillPaths) {
+    if (!(await pathExists(skillPath))) {
+      throw new Error(`Configured Codex skill is missing at ${skillPath}.`);
+    }
+    if (unmanagedPathSet.has(skillPath)) {
+      continue;
+    }
+    unmanagedSkillConfig.push({ path: skillPath, enabled: true });
+  }
+  if (unmanagedSkillConfig.length > 0) {
+    skillsSection.config = unmanagedSkillConfig;
+  } else {
+    delete skillsSection.config;
   }
 
   const managedPluginIds = new Set(state.managedPluginIds);
@@ -140,6 +190,10 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
     mcpSection[mcp.serverName] = mcp.config as unknown as TOML.AnyJson;
   }
 
+  removeEmptyRecord(parsed, "skills");
+  removeEmptyRecord(parsed, "plugins");
+  removeEmptyRecord(parsed, "mcp_servers");
+
   await writeText(configPath, TOML.stringify(parsed));
   await writeJsonFile(statePath, {
     managedSkillIds: userSkillsDir
@@ -147,9 +201,89 @@ export async function syncCodexRuntime(runtimeState: RenderedRuntimeState) {
           .filter((skill) => skill.syncMode === "user-skill-dir")
           .map((skill) => skill.artifactName)
       : [],
+    managedSkillPaths: desiredSkillPaths,
     managedPluginIds: runtimeState.plugins.map((plugin) => plugin.nativeRegistration.pluginId),
     managedMcpServerNames: runtimeState.mcps.map((mcp) => mcp.serverName),
   });
+}
+
+export async function syncCodexGlobalAgents(
+  sourcePath: string,
+  targetPath: string,
+  statePath: string
+) {
+  if (!(await pathExists(sourcePath))) {
+    throw new Error(`Missing versioned Codex global AGENTS source at ${sourcePath}.`);
+  }
+
+  const sourceDigest = await computeDirectoryDigest(sourcePath);
+  const previous = await readOptionalJson<ManagedFileState>(statePath, { managed: false });
+
+  if (
+    (await pathExists(targetPath)) &&
+    !previous.managed &&
+    (await computeDirectoryDigest(targetPath)) !== sourceDigest
+  ) {
+    throw new Error(`Codex global AGENTS collision at ${targetPath}.`);
+  }
+
+  await copyFile(sourcePath, targetPath);
+  await writeJsonFile(statePath, {
+    managed: true,
+    sourceDigest,
+  });
+}
+
+export async function syncCodexProjectTrust(
+  configPath: string,
+  statePath: string,
+  desiredProjectScopes: string[]
+) {
+  const existingText = (await pathExists(configPath)) ? await readText(configPath) : "";
+  const parsed: TOML.JsonMap = existingText.trim()
+    ? (TOML.parse(existingText) as TOML.JsonMap)
+    : {};
+  const previous = await readOptionalJson<CodexProjectTrustState>(statePath, {
+    managedProjectScopes: [],
+  });
+  const previouslyManaged = new Set(previous.managedProjectScopes);
+  const desired = [...new Set(desiredProjectScopes)].sort();
+  const desiredSet = new Set(desired);
+  const projects = ensureRecord(parsed, "projects");
+  const managedProjectScopes: string[] = [];
+
+  for (const projectScope of desired) {
+    const existing = projects[projectScope];
+    const project = existing && typeof existing === "object" && !Array.isArray(existing)
+      ? (existing as Record<string, unknown>)
+      : {};
+    const isAlreadyTrusted = project.trust_level === "trusted";
+    if (!isAlreadyTrusted || previouslyManaged.has(projectScope)) {
+      project.trust_level = "trusted";
+      managedProjectScopes.push(projectScope);
+    }
+    projects[projectScope] = project as TOML.AnyJson;
+  }
+
+  for (const projectScope of previous.managedProjectScopes) {
+    if (desiredSet.has(projectScope)) {
+      continue;
+    }
+    const project = projects[projectScope];
+    if (!project || typeof project !== "object" || Array.isArray(project)) {
+      continue;
+    }
+    if ((project as Record<string, unknown>).trust_level === "trusted") {
+      delete (project as Record<string, unknown>).trust_level;
+    }
+    if (Object.keys(project).length === 0) {
+      delete projects[projectScope];
+    }
+  }
+
+  removeEmptyRecord(parsed, "projects");
+  await writeText(configPath, TOML.stringify(parsed));
+  await writeJsonFile(statePath, { managedProjectScopes });
 }
 
 export async function syncCursorRuntime(runtimeState: RenderedRuntimeState) {
@@ -422,6 +556,13 @@ function ensureRecord(container: Record<string, unknown>, key: string) {
   const record: Record<string, unknown> = {};
   container[key] = record;
   return record;
+}
+
+function removeEmptyRecord(container: Record<string, unknown>, key: string) {
+  const value = container[key];
+  if (value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0) {
+    delete container[key];
+  }
 }
 
 function requiredPath(value: string | undefined, label: string) {

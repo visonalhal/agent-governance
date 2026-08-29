@@ -16,11 +16,11 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: assets/skills/karpathy-guidelines
+  path: archive/deprecated-capabilities/skills/karpathy-guidelines
 install:
   strategy: copy
   artifactName: karpathy-guidelines
-  sourcePath: assets/skills/karpathy-guidelines
+  sourcePath: archive/deprecated-capabilities/skills/karpathy-guidelines
   manifest:
     seededFrom: /Users/halvinshen/.codex/skills/karpathy-guidelines
 riskTier: T1

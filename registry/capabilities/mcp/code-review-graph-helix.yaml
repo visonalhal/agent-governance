@@ -40,7 +40,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-30T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: CONFIG_ONLY
   executesScripts: true
   networkAccess: false
@@ -49,6 +49,7 @@ review:
   notes:
     - Adopted from existing Codex MCP server code_review_graph_helix.
     - Project-specific Helix graph server; enable through helix-product profile, not codex-base.
+    - Verified local code-review-graph 2.3.3 executable, stdio serve arguments, tool allowlist, and Helix cwd.
 lifecycleState: published
 activation:
   phase: review
@@ -70,7 +71,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: config-only-code-review-graph-helix-2026-05-30
+  digest: da3b94357663ff204ce1356e0c5df73c0b0fcceb86a7ae5c189e289405e78620
 tags:
   - codex-mcp
   - helix

@@ -31,7 +31,7 @@ permissions:
 review:
   status: approved
   reviewer: OpenAI Codex
-  reviewedAt: 2026-07-15T03:15:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: Apache-2.0
   executesScripts: false
   networkAccess: false
@@ -41,6 +41,8 @@ review:
     - Imported from pbakaus/impeccable .codex/skills/frontend-design
     - Consolidated production QA guidance from retired harden, normalize, polish, and typeset
       skills; removed the unavailable teach-impeccable dependency.
+    - Rewritten to preserve established product systems during maintenance and avoid unrequested
+      visual overdesign; references remain deferred.
 lifecycleState: published
 activation:
   phase: implementation
@@ -57,7 +59,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: ac7be319054ba3945769544c53059cff0bccfe6c147ee7e382c4413dcac57970
+  digest: 643e0d32384823be7c3a2da054def4b7d261c0f19dc83e3ab661f643f8393045
 tags:
   - impeccable
   - design

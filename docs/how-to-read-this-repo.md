@@ -18,7 +18,7 @@ Think in four layers:
    `publish` turns approved capabilities into a deterministic resolution lock.
 3. `generated/`
    `render` turns the lock plus machine/runtime config into shared-cache artifacts and per-runtime desired state.
-4. local runtime config under `~/.codex`, `~/.cursor`, `~/.claude`, plus `~/.agents`
+4. local runtime config under `~/.codex`, `~/.cursor`, `~/.claude`, project `.codex` overlays, plus the independent governance cache
    `sync` merges the rendered desired state into real runtime-native config files.
 
 The shortest way to think about the whole system is:

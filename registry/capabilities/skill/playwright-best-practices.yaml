@@ -1,7 +1,16 @@
 id: skill.playwright-best-practices
 name: playwright-best-practices
 assetKind: skill
+bindings:
+  cache:
+    skill:
+      syncMode: cache-only
+  user-dir:
+    skill:
+      syncMode: user-skill-dir
 discoverySources: []
+includes: []
+exposes: []
 canonicalSource:
   sourceId: governance-repo
   url: https://github.com/visonalhal/agent-governance
@@ -30,7 +39,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-04-02T09:15:33.096Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: UNKNOWN
   executesScripts: false
   networkAccess: false
@@ -38,20 +47,25 @@ review:
   filesystemSideEffects: none
   notes:
     - Seeded from the local shared skill cache.
+    - Rewritten from a monolithic workflow into a project-first Playwright router; only
+      task-relevant references are loaded.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: f19838929d2126a896ba3626b589cd7a47c4d1c6a5527609e46f5ebf69691aa2
+  digest: ce648030805e931a3d3b25c56f9e84b4cb91d356fa1d403e8bade16b5a283680
 tags:
   - bootstrap-seeded
   - shared-skill
-bindings:
-  cache:
-    skill:
-      syncMode: cache-only
-  user-dir:
-    skill:
-      syncMode: user-skill-dir

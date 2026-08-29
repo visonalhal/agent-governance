@@ -31,7 +31,7 @@ permissions:
 review:
   status: approved
   reviewer: OpenAI Codex
-  reviewedAt: 2026-04-05T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: Apache-2.0
   executesScripts: false
   networkAccess: false
@@ -39,13 +39,25 @@ review:
   filesystemSideEffects: none
   notes:
     - Imported from pbakaus/impeccable .codex/skills/clarify
+    - Rewritten as a narrow UX-copy workflow with no forced skill chaining; structure-validated and
+      Plugin Eval checked.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: c7aac0803b72ceaf118a5628bebe2b9395c3c4815d17b9c92a926d1283147bf6
+  digest: d1c0441e6bb347b6d3be348f82e53614a72ff5c25f4fadfc4830701f465d59ee
 tags:
   - impeccable
   - design

@@ -42,6 +42,7 @@ This command:
 - rebuilds `generated/shared-cache`
 - writes `generated/shared-cache/manifests/shared-cache-manifest.json`
 - writes `generated/machines/<machineId>/<runtime>/desired-state.json`
+- writes Codex project overlays to `generated/machines/<machineId>/codex/project-scopes.json`
 
 Render is deterministic for a given lock and machine profile.
 
@@ -51,14 +52,17 @@ Render is deterministic for a given lock and machine profile.
 
 This command:
 
-- syncs the rendered shared cache into `~/.agents`
+- syncs the rendered shared cache into the bootstrap `cacheRoot`
+- syncs the versioned `policies/codex/global-AGENTS.md` contract into `~/.codex/AGENTS.md`
+- syncs global Codex skills into `~/.agents/skills` and project capabilities into project `.codex/config.toml`
+- sets exact Codex project trust for governed project overlays and removes only trust entries previously owned by governance
 - resolves `${HOME}`, `${WORKSPACE_ROOT}`, `${CACHE_ROOT}`, and `${SECRET:<key>}`
 - merges only governed keys into the runtime native config
 - refuses to overwrite unmanaged collisions
 
 Current native targets:
 
-- Codex: `~/.codex/config.toml`
+- Codex: `~/.codex/config.toml`, `~/.codex/AGENTS.md`
 - Cursor: `~/.cursor/mcp.json` and `~/.cursor/skills`
 - Claude: `~/.claude/settings.json`, `~/.claude/plugins/known_marketplaces.json`, `~/.claude/plugins/installed_plugins.json`
 
@@ -66,7 +70,7 @@ Current native targets:
 
 When something exists in more than one place, the precedence is:
 
-1. This repo under `assets/`, `registry/`, and `locks/`
+1. This repo under `assets/`, `policies/`, `registry/`, and `locks/`
 2. Rendered output under `generated/`
 3. Runtime-native config and shared cache on the local machine
 
@@ -88,7 +92,7 @@ This command:
 - syncs the seeded state back through the normal governed pipeline
 - preserves unrelated canonical assets already owned by the repo
 
-Use `import-local` to adopt existing workstation state. After adoption, edit the repo instead of editing `~/.agents` or runtime-native config files by hand.
+Use `import-local` to adopt existing workstation state. After adoption, edit the repo instead of editing governed user skills, project overlays, or runtime-native config files by hand.
 
 ## Rollback
 
@@ -110,9 +114,11 @@ This restores both runtime desired state and shared-cache references to the sele
 Audit checks for:
 
 - lock drift
-- stale reviews
+- stale reviews for capabilities active on at least one managed machine
 - missing digests
 - optional upstream ref drift
+
+`pnpm governance runtime-audit --runtime codex` additionally checks global `AGENTS.md` drift, local and remote plugin allowlists, MCP and user-skill drift, exact project trust, symmetric project overlay drift, and configured Skill path existence.
 
 ## Secrets and Local Overrides
 

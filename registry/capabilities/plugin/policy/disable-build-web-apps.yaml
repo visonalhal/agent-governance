@@ -1,19 +1,20 @@
-id: plugin.openai-curated.figma
-name: figma
+id: plugin.policy.disable-build-web-apps
+name: disable-build-web-apps
 assetKind: plugin
 bindings:
   package:
     plugin:
       install:
         strategy: external
-        artifactName: figma-disable-record
+        artifactName: build-web-apps-disable-record
         manifest:
-          pluginId: figma@openai-curated
+          pluginId: build-web-apps@openai-curated
           purpose: disable-runtime-plugin
       nativeRegistration:
-        pluginId: figma@openai-curated
+        pluginId: build-web-apps@openai-curated
         enabled: false
         adoptExisting: true
+        installedRecords: []
 discoverySources: []
 includes: []
 exposes: []
@@ -22,12 +23,12 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: registry/capabilities/plugin/openai-curated/figma.yaml
+  path: registry/capabilities/plugin/policy/disable-build-web-apps.yaml
 install:
   strategy: external
-  artifactName: figma-disable-record
+  artifactName: build-web-apps-disable-record
   manifest:
-    pluginId: figma@openai-curated
+    pluginId: build-web-apps@openai-curated
     purpose: disable-runtime-plugin
 riskTier: T1
 permissions:
@@ -38,37 +39,37 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-24T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: N/A
   executesScripts: false
   networkAccess: false
   touchesCredentials: false
   filesystemSideEffects: disables Codex plugin entry
   notes:
-    - Governance-owned disable record for the low-frequency Figma plugin.
+    - Governance policy record that explicitly disables an over-broad frontend plugin.
+    - "Reconfirmed: remains disabled because its broad frontend scope duplicates narrower project
+      skills."
 lifecycleState: published
 activation:
   phase: tool
   triggerMode: blocked
   maxChainDepth: 0
   conflictsWith: []
-  replaces:
-    - plugin.figma
+  replaces: []
   projectScopes: []
   subagentRole: none
   activationExamples: []
   antiTriggers:
-    - every conversation
-    - routine implementation without a Figma URL
-    - design-system rule generation without explicit request
+    - routine bugfix
+    - business page maintenance
+    - server logic change
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 83428013620431c09373ea837bd667b5df4a4abd68505b73a7a38df30f6f7d7d
+  digest: 1e44a90f69b1189f8d77aaef16ac296c1f2f676f18d1132bd347cb0ec7bf9d81
 tags:
   - codex-plugin-disable
   - openai-curated
-  - figma
   - governance

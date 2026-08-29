@@ -21,7 +21,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: harden
-  sourcePath: assets/skills/impeccable/harden
+  sourcePath: archive/deprecated-capabilities/skills/impeccable/harden
 riskTier: T1
 permissions:
   localRead: scoped

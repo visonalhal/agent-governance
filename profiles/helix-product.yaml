@@ -2,7 +2,6 @@ profileId: helix-product
 runtimeId: codex
 enabledCapabilities:
   - mcp.code-review-graph-helix
-  - skill.agent-governance
   - skill.next-best-practices
   - skill.playwright-best-practices
   - skill.impeccable.frontend-design

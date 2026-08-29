@@ -1,46 +1,30 @@
 ---
 name: next-best-practices
-description: Next.js best practices for file conventions, RSC boundaries, data patterns, async APIs, metadata, error handling, route handlers, image and font optimization, and bundling. Use when implementing, reviewing, or refactoring Next.js App Router code, especially when the user mentions layouts, route handlers, metadata, Suspense, scripts, runtime selection, self-hosting, or parallel routes.
+description: Use when implementing, reviewing, or debugging Next.js App Router code and framework-specific routing, rendering, metadata, runtime, or optimization behavior matters. Do not use for generic React or CSS work.
 ---
 
-# Next Best Practices
+# Next.js App Router
 
-Apply these guidelines when working in a Next.js codebase, especially with the App Router.
-
-## Core Principles
-
-- Follow the existing repo conventions before introducing new patterns
-- Prefer Server Components by default and push client boundaries to the leaves
-- Keep routing, metadata, and runtime decisions explicit
-- Use framework primitives instead of generic React or browser workarounds when Next.js already solves the problem
-
-## Review And Implementation Flow
-
-1. Confirm whether the target uses the App Router and how the repo already structures routes
-2. Check whether the change should stay server-side, move client-side, or split across boundaries
-3. Use the narrowest relevant reference file instead of loading all guidance
-4. Verify the change still matches the runtime, metadata, and routing constraints of Next.js
-
-## Reference Files
-
-- `metadata.md` for `metadata` and `generateMetadata`
-- `parallel-routes.md` for parallel and intercepting routes
-- `route-handlers.md` for `route.ts`
-- `runtime-selection.md` for Node.js vs Edge decisions
-- `scripts.md` for third-party scripts
-- `self-hosting.md` for standalone output and deployment concerns
-- `suspense-boundaries.md` for `useSearchParams` and CSR bailout issues
+Read the nearest repository instructions, Next.js config, and adjacent route before applying generic guidance. Preserve the project's architecture and version-specific conventions.
 
 ## Defaults
 
-- Default to the Node.js runtime unless the project already uses Edge or the requirement is explicit
-- Default to Server Components unless interactive client behavior is required
-- Default to `next/script`, built-in metadata APIs, and route conventions instead of custom alternatives
+- Keep code server-side unless interaction or browser APIs require a client boundary.
+- Push `"use client"` to the smallest useful leaf.
+- Prefer Next.js routing, metadata, script, image, and font primitives over custom workarounds.
+- Use Node.js runtime unless Edge is already required and its dependency constraints are satisfied.
+- Treat caching, dynamic rendering, and request APIs as explicit behavioral decisions.
 
-## What To Catch
+## Route references
 
-- Metadata added inside Client Components
-- Route handler placement mistakes
-- Missing Suspense around client hooks that force CSR bailouts
-- Edge runtime used without a real need
-- Patterns that fight App Router conventions instead of using them
+Read only what the task needs:
+
+- `metadata.md` for metadata APIs
+- `parallel-routes.md` for parallel or intercepting routes
+- `route-handlers.md` for `route.ts`
+- `runtime-selection.md` for Node.js versus Edge
+- `scripts.md` for third-party scripts
+- `self-hosting.md` for deployment output
+- `suspense-boundaries.md` for client hooks and CSR bailouts
+
+Verify with the repository's narrowest relevant command. Watch for metadata in Client Components, misplaced route handlers, missing Suspense, accidental client expansion, and runtime-incompatible dependencies.

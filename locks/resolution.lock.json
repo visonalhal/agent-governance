@@ -473,7 +473,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "config-only-code-review-graph-helix-2026-05-30"
+        "digest": "da3b94357663ff204ce1356e0c5df73c0b0fcceb86a7ae5c189e289405e78620"
       },
       "id": "mcp.code-review-graph-helix",
       "includes": [],
@@ -511,7 +511,7 @@
             "adoptExisting": false,
             "config": {
               "headers": {
-                "CONTEXT7_API_KEY": "${SECRET:SEEDED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}"
+                "Authorization": "Bearer ${SECRET:SEEDED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}"
               },
               "url": "https://mcp.context7.com/mcp"
             },
@@ -529,7 +529,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "4ed91e90373acc6a92e52f6bdffe08e100f4436de108d7908528070a567eb1a6"
+        "digest": "b818f10c511ba3ec719b5e51826ad41a4120a684384bb0e35fcd2f460a29a20d"
       },
       "id": "mcp.context7",
       "includes": [],
@@ -603,65 +603,6 @@
         "codex-mcp",
         "figma",
         "on-demand"
-      ]
-    },
-    {
-      "activation": {
-        "activationExamples": [],
-        "antiTriggers": [],
-        "conflictsWith": [],
-        "maxChainDepth": 1,
-        "phase": "implementation",
-        "projectScopes": [],
-        "replaces": [],
-        "subagentRole": "none",
-        "triggerMode": "explicit"
-      },
-      "assetKind": "mcp",
-      "bindings": {
-        "stdio-command": {
-          "mcp": {
-            "adoptExisting": false,
-            "config": {
-              "args": [
-                "-y",
-                "@modelcontextprotocol/server-github"
-              ],
-              "command": "npx",
-              "env": {
-                "GITHUB_PERSONAL_ACCESS_TOKEN": "${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}"
-              }
-            },
-            "serverName": "github"
-          }
-        }
-      },
-      "canonicalSource": {
-        "path": "registry/capabilities/mcp/github.yaml",
-        "ref": "main",
-        "refType": "branch",
-        "sourceId": "governance-repo",
-        "url": "https://github.com/visonalhal/agent-governance"
-      },
-      "exposes": [],
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "c256b32cb4154d45126422c3371b18ad48eb97214dc1b082a3e6453d8c8ea9f0"
-      },
-      "id": "mcp.github",
-      "includes": [],
-      "install": {
-        "artifactName": "github",
-        "manifest": {
-          "seededFrom": "/Users/halvinshen/.cursor/mcp.json"
-        },
-        "strategy": "manifest"
-      },
-      "name": "github",
-      "riskTier": "T3",
-      "tags": [
-        "bootstrap-seeded",
-        "cursor-mcp"
       ]
     },
     {
@@ -768,11 +709,19 @@
     },
     {
       "activation": {
-        "activationExamples": [],
-        "antiTriggers": [],
+        "activationExamples": [
+          "diagnose CircleCI build failure",
+          "review CircleCI configuration",
+          "set up CircleCI Chunk CLI"
+        ],
+        "antiTriggers": [
+          "GitHub Actions failure",
+          "local unit test failure without CircleCI",
+          "generic CI question with no CircleCI context"
+        ],
         "conflictsWith": [],
         "maxChainDepth": 1,
-        "phase": "implementation",
+        "phase": "tool",
         "projectScopes": [],
         "replaces": [],
         "subagentRole": "none",
@@ -780,76 +729,54 @@
       },
       "assetKind": "plugin",
       "bindings": {
-        "marketplace": {
+        "package": {
           "plugin": {
             "install": {
-              "artifactName": "claude-impeccable",
+              "artifactName": "circleci-plugin-record",
               "manifest": {
-                "pluginId": "impeccable@impeccable",
-                "seededFrom": "claude-plugin-marketplace"
+                "installedPath": "/Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/11c74d6b",
+                "pluginId": "circleci@openai-curated"
               },
-              "sourcePath": "assets/plugins/impeccable/targets/claude",
-              "strategy": "copy"
+              "strategy": "external"
             },
             "nativeRegistration": {
-              "adoptExisting": false,
+              "adoptExisting": true,
               "enabled": true,
-              "installedRecords": [
-                {
-                  "gitCommitSha": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
-                  "installedAt": "2026-04-05T00:00:00.000Z",
-                  "installPath": "${CACHE_ROOT}/packages/claude-impeccable",
-                  "lastUpdated": "2026-04-05T00:00:00.000Z",
-                  "scope": "user",
-                  "version": "1.6.0"
-                }
-              ],
-              "knownMarketplace": {
-                "installLocation": "${CACHE_ROOT}/packages/claude-impeccable",
-                "lastUpdated": "2026-04-05T00:00:00.000Z",
-                "marketplaceId": "impeccable",
-                "sha": "3a4fc70",
-                "source": {
-                  "repo": "pbakaus/impeccable",
-                  "source": "github"
-                }
-              },
-              "pluginId": "impeccable@impeccable"
+              "installedRecords": [],
+              "pluginId": "circleci@openai-curated"
             }
           }
         }
       },
       "canonicalSource": {
-        "path": ".claude-plugin",
-        "ref": "main",
-        "refType": "branch",
-        "resolvedRevision": "3a4fc70f0e17fccb22565d37e868f8e2f3e73bdd",
+        "path": "plugins/circleci",
+        "ref": "1e285826e604f66f7208f7ac4dba0fe8341d1f57",
+        "refType": "commit",
         "sourceId": "github-direct",
-        "url": "https://github.com/pbakaus/impeccable"
+        "url": "https://github.com/openai/plugins"
       },
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "50cee4a8c0bcafd464ee775aaf67dbe7e36fe10c7102b5a4d2547817d3e6afe6"
+        "digest": "1f461668ae08db88826745ba8d8033086ba8d83f1bf1806820051419dce97685"
       },
-      "id": "plugin.impeccable",
+      "id": "plugin.openai-curated.circleci",
       "includes": [],
       "install": {
-        "artifactName": "impeccable",
+        "artifactName": "circleci-plugin-record",
         "manifest": {
-          "packageTargets": [
-            "claude"
-          ]
+          "installedPath": "/Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/11c74d6b",
+          "marketplace": "openai-curated",
+          "pluginId": "circleci@openai-curated"
         },
-        "sourcePath": "assets/plugins/impeccable",
-        "strategy": "copy"
+        "strategy": "external"
       },
-      "name": "impeccable",
-      "riskTier": "T2",
+      "name": "circleci",
+      "riskTier": "T3",
       "tags": [
-        "design",
-        "external",
-        "impeccable"
+        "circleci",
+        "managed-runtime-plugin",
+        "openai-curated"
       ]
     },
     {
@@ -890,7 +817,7 @@
         }
       },
       "canonicalSource": {
-        "path": "registry/capabilities/plugin/openai-curated/build-web-apps.yaml",
+        "path": "registry/capabilities/plugin/policy/disable-build-web-apps.yaml",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
@@ -901,7 +828,7 @@
         "algorithm": "sha256",
         "digest": "1e44a90f69b1189f8d77aaef16ac296c1f2f676f18d1132bd347cb0ec7bf9d81"
       },
-      "id": "plugin.openai-curated.build-web-apps",
+      "id": "plugin.policy.disable-build-web-apps",
       "includes": [],
       "install": {
         "artifactName": "build-web-apps-disable-record",
@@ -911,83 +838,11 @@
         },
         "strategy": "external"
       },
-      "name": "build-web-apps",
+      "name": "disable-build-web-apps",
       "riskTier": "T1",
       "tags": [
         "codex-plugin-disable",
         "governance",
-        "openai-curated"
-      ]
-    },
-    {
-      "activation": {
-        "activationExamples": [
-          "diagnose CircleCI build failure",
-          "review CircleCI configuration",
-          "set up CircleCI Chunk CLI"
-        ],
-        "antiTriggers": [
-          "GitHub Actions failure",
-          "local unit test failure without CircleCI",
-          "generic CI question with no CircleCI context"
-        ],
-        "conflictsWith": [],
-        "maxChainDepth": 1,
-        "phase": "tool",
-        "projectScopes": [],
-        "replaces": [],
-        "subagentRole": "none",
-        "triggerMode": "explicit"
-      },
-      "assetKind": "plugin",
-      "bindings": {
-        "package": {
-          "plugin": {
-            "install": {
-              "artifactName": "circleci-plugin-record",
-              "manifest": {
-                "installedPath": "/Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf",
-                "pluginId": "circleci@openai-curated"
-              },
-              "strategy": "external"
-            },
-            "nativeRegistration": {
-              "adoptExisting": true,
-              "enabled": true,
-              "installedRecords": [],
-              "pluginId": "circleci@openai-curated"
-            }
-          }
-        }
-      },
-      "canonicalSource": {
-        "path": ".",
-        "ref": "fef63ecf",
-        "refType": "commit",
-        "sourceId": "github-direct",
-        "url": "https://github.com/circleci-public/skills"
-      },
-      "exposes": [],
-      "hash": {
-        "algorithm": "sha256",
-        "digest": "fe63e330ef28c6bbb62772eaf3209c2574d059acc0f42d88ac8d312d30cac938"
-      },
-      "id": "plugin.openai-curated.circleci",
-      "includes": [],
-      "install": {
-        "artifactName": "circleci-plugin-record",
-        "manifest": {
-          "installedPath": "/Users/halvinshen/.codex/plugins/cache/openai-curated/circleci/fef63ecf",
-          "marketplace": "openai-curated",
-          "pluginId": "circleci@openai-curated"
-        },
-        "strategy": "external"
-      },
-      "name": "circleci",
-      "riskTier": "T3",
-      "tags": [
-        "circleci",
-        "managed-runtime-plugin",
         "openai-curated"
       ]
     },
@@ -1031,7 +886,7 @@
         }
       },
       "canonicalSource": {
-        "path": "registry/capabilities/plugin/openai-curated/figma.yaml",
+        "path": "registry/capabilities/plugin/policy/disable-figma.yaml",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
@@ -1042,7 +897,7 @@
         "algorithm": "sha256",
         "digest": "83428013620431c09373ea837bd667b5df4a4abd68505b73a7a38df30f6f7d7d"
       },
-      "id": "plugin.openai-curated.figma",
+      "id": "plugin.policy.disable-figma",
       "includes": [],
       "install": {
         "artifactName": "figma-disable-record",
@@ -1052,7 +907,7 @@
         },
         "strategy": "external"
       },
-      "name": "figma",
+      "name": "disable-figma",
       "riskTier": "T1",
       "tags": [
         "codex-plugin-disable",
@@ -1099,7 +954,7 @@
         }
       },
       "canonicalSource": {
-        "path": "registry/capabilities/plugin/openai-curated/superpowers.yaml",
+        "path": "registry/capabilities/plugin/policy/disable-superpowers.yaml",
         "ref": "main",
         "refType": "branch",
         "sourceId": "governance-repo",
@@ -1110,7 +965,7 @@
         "algorithm": "sha256",
         "digest": "54cf0ee604c3306a5bf63170bcb5d6ac07006c25813107937903f36a6b96e0f9"
       },
-      "id": "plugin.openai-curated.superpowers",
+      "id": "plugin.policy.disable-superpowers",
       "includes": [],
       "install": {
         "artifactName": "superpowers-disable-record",
@@ -1120,7 +975,7 @@
         },
         "strategy": "external"
       },
-      "name": "superpowers",
+      "name": "disable-superpowers",
       "riskTier": "T1",
       "tags": [
         "codex-plugin-disable",
@@ -1173,7 +1028,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "4c38ae6846ee6ee44e597b8a3ab51f93814ca75a49cc46dbc1a1f201b7c0053d"
+        "digest": "1eb78281c37a2a8bc3a0ef06cf5353610c7a6ce189fe55c338f952f47626ac92"
       },
       "id": "skill.agent-governance",
       "includes": [],
@@ -1888,7 +1743,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "c7aac0803b72ceaf118a5628bebe2b9395c3c4815d17b9c92a926d1283147bf6"
+        "digest": "d1c0441e6bb347b6d3be348f82e53614a72ff5c25f4fadfc4830701f465d59ee"
       },
       "id": "skill.impeccable.clarify",
       "includes": [],
@@ -2153,7 +2008,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "ac7be319054ba3945769544c53059cff0bccfe6c147ee7e382c4413dcac57970"
+        "digest": "643e0d32384823be7c3a2da054def4b7d261c0f19dc83e3ab661f643f8393045"
       },
       "id": "skill.impeccable.frontend-design",
       "includes": [],
@@ -2480,7 +2335,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "f427bd110c2a5833579c7d117c79566acd4957cddfb6819290d33434ec69e37b"
+        "digest": "f0b856a03447235757e93aa8d700ff59f299ce86ec5607ffcfe96313ebd65930"
       },
       "id": "skill.mercaso-admin-readonly-browser-test",
       "includes": [],
@@ -2535,7 +2390,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "964b654986d68ad1b050b33ac40806ce6724ce42f456f3f722c0285edd9b9470"
+        "digest": "83d1dd38081338d3b8187b73c453dbd15a887587015f09dfe8acd2825fa53e8a"
       },
       "id": "skill.next-best-practices",
       "includes": [],
@@ -2590,7 +2445,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "f19838929d2126a896ba3626b589cd7a47c4d1c6a5527609e46f5ebf69691aa2"
+        "digest": "ce648030805e931a3d3b25c56f9e84b4cb91d356fa1d403e8bade16b5a283680"
       },
       "id": "skill.playwright-best-practices",
       "includes": [],
@@ -2716,7 +2571,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "b27f1ebb6abf426ffb3b17be3d0aebbb7b426e0447831dc24228b70238ab5e0b"
+        "digest": "a7620cf02c311ba549e9ce456264f5c416081616ead39a4911ffb78765369ab7"
       },
       "id": "skill.prompt-master",
       "includes": [],
@@ -2777,7 +2632,7 @@
       "exposes": [],
       "hash": {
         "algorithm": "sha256",
-        "digest": "2b0d5f201e51b1534ef2ee9de8984803d373e7578130148ec332bebb1fc72efa"
+        "digest": "5371c54a2e96a8c35cf8ed8653fea1eccefbf2e683c65da58833577d7e90ae63"
       },
       "id": "skill.skill-audit",
       "includes": [],
@@ -2848,6 +2703,6 @@
       ]
     }
   ],
-  "generatedAt": "2026-07-15T03:15:00.000Z",
+  "generatedAt": "2026-08-29T06:09:35.000Z",
   "version": 3
 }

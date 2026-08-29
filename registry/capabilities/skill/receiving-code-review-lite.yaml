@@ -16,11 +16,11 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: assets/skills/receiving-code-review-lite
+  path: archive/deprecated-capabilities/skills/receiving-code-review-lite
 install:
   strategy: copy
   artifactName: receiving-code-review-lite
-  sourcePath: assets/skills/receiving-code-review-lite
+  sourcePath: archive/deprecated-capabilities/skills/receiving-code-review-lite
 riskTier: T1
 permissions:
   localRead: scoped

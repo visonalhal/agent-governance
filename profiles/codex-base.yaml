@@ -1,10 +1,9 @@
 profileId: codex-base
 runtimeId: codex
 enabledCapabilities:
-  - plugin.openai-curated.build-web-apps
-  - plugin.openai-curated.circleci
-  - plugin.openai-curated.figma
-  - plugin.openai-curated.superpowers
+  - plugin.policy.disable-build-web-apps
+  - plugin.policy.disable-figma
+  - plugin.policy.disable-superpowers
   - skill.prompt-master
 referenceCapabilities:
   - skill.webapp-testing
@@ -29,4 +28,4 @@ notes:
   - Blocked capabilities must not render even if old runtime policy still references them.
   - "Figma stays on-demand: daily Codex does not enable plugin.figma or low-frequency Figma workflows."
   - Prompt Master is globally installed, but only for prompt, template, system instruction, and skill prompt work.
-  - CircleCI is governed as an enabled external plugin because the local runtime already uses circleci@openai-curated.
+  - Project-specific tools such as CircleCI are rendered only inside their project scopes.
