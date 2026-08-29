@@ -30,7 +30,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-28T00:00:00.000Z
+  reviewedAt: 2026-08-29T06:09:35Z
   license: MIT
   executesScripts: false
   networkAccess: false
@@ -40,6 +40,7 @@ review:
     - Self-owned prompt-only meta-governance skill for skill lifecycle and project override
       boundaries.
     - Hydrate digest after adding agent governance skill.
+    - Disable implicit invocation; governance work must be explicitly requested.
 lifecycleState: published
 activation:
   phase: governance
@@ -63,7 +64,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 4c38ae6846ee6ee44e597b8a3ab51f93814ca75a49cc46dbc1a1f201b7c0053d
+  digest: 1eb78281c37a2a8bc3a0ef06cf5353610c7a6ce189fe55c338f952f47626ac92
 tags:
   - governance
   - skills

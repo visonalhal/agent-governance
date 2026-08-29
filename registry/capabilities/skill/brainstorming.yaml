@@ -23,7 +23,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: brainstorming
-  sourcePath: assets/skills/brainstorming
+  sourcePath: archive/deprecated-capabilities/skills/brainstorming
 riskTier: T1
 permissions:
   localRead: scoped

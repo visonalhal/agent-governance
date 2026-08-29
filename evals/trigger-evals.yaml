@@ -8,7 +8,7 @@ scenarios:
       - skill.implementation-plan-lite
 
   - id: config-governance-uses-only-governance-skill
-    prompt: Compare our Codex plugin config with the workspace skills registry.
+    prompt: $agent-governance Compare our Codex plugin config with the workspace skills registry.
     expectedSkills:
       - skill.agent-governance
     forbiddenSkills:
@@ -44,7 +44,7 @@ scenarios:
       - skill.systematic-debugging-lite
 
   - id: global-skill-governance-needs-agent-governance
-    prompt: Globalize this workflow as a skill, define project opt-in rules, and prevent trigger drift.
+    prompt: $agent-governance Globalize this workflow as a skill, define project opt-in rules, and prevent trigger drift.
     expectedSkills:
       - skill.agent-governance
     forbiddenSkills:
@@ -67,3 +67,54 @@ scenarios:
       - skill.intent-routing
       - skill.prompt-master
       - skill.agent-governance
+
+  - id: zh-simple-answer-does-not-trigger-meta-workflows
+    prompt: 用三句话解释为什么索引能加快数据库查询。
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.agent-governance
+      - skill.skill-audit
+      - skill.prompt-master
+      - skill.playwright-best-practices
+
+  - id: zh-diagnosis-does-not-trigger-governance
+    prompt: 只诊断这个 Node 服务为什么启动失败，不要修改文件。
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.agent-governance
+      - skill.skill-audit
+      - skill.prompt-master
+
+  - id: zh-implementation-uses-native-workflow
+    prompt: 修复登录按钮无响应的问题，完成后运行相关测试。
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.agent-governance
+      - skill.skill-audit
+      - skill.prompt-master
+      - skill.intent-routing
+
+  - id: zh-long-migration-does-not-trigger-meta-skills
+    prompt: 这个迁移跨三个服务，需要里程碑、证据、灰度和回滚门禁。
+    expectedSkills: []
+    forbiddenSkills:
+      - skill.agent-governance
+      - skill.skill-audit
+      - skill.prompt-master
+      - skill.long-task-planning
+
+  - id: zh-explicit-governance-invocation
+    prompt: $agent-governance 审计当前全局 skills、项目 opt-in 和触发漂移。
+    expectedSkills:
+      - skill.agent-governance
+    forbiddenSkills:
+      - skill.skill-audit
+      - skill.prompt-master
+
+  - id: zh-prompt-audit-uses-prompt-master-only
+    prompt: 审计这段 system prompt，压缩重复规则并补充 trigger 和 anti-trigger 示例。
+    expectedSkills:
+      - skill.prompt-master
+    forbiddenSkills:
+      - skill.agent-governance
+      - skill.skill-audit

@@ -9,11 +9,11 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: assets/plugins/ui-ux-pro-max
+  path: archive/deprecated-capabilities/plugins/ui-ux-pro-max
 install:
   strategy: copy
   artifactName: ui-ux-pro-max
-  sourcePath: assets/plugins/ui-ux-pro-max
+  sourcePath: archive/deprecated-capabilities/plugins/ui-ux-pro-max
   manifest:
     packageTargets:
       - claude
@@ -52,7 +52,7 @@ bindings:
       install:
         strategy: copy
         artifactName: claude-ui-ux-pro-max
-        sourcePath: assets/plugins/ui-ux-pro-max/targets/claude
+        sourcePath: archive/deprecated-capabilities/plugins/ui-ux-pro-max/targets/claude
         manifest:
           seededFrom: claude-plugin-marketplace
           pluginId: ui-ux-pro-max@ui-ux-pro-max-skill

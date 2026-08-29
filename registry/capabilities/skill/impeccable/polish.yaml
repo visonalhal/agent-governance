@@ -21,7 +21,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: polish
-  sourcePath: assets/skills/impeccable/polish
+  sourcePath: archive/deprecated-capabilities/skills/impeccable/polish
 riskTier: T1
 permissions:
   localRead: scoped

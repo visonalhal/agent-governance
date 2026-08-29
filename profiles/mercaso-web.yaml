@@ -1,15 +1,16 @@
 profileId: mercaso-web
 runtimeId: codex
 enabledCapabilities:
+  - plugin.openai-curated.circleci
   - skill.next-best-practices
   - skill.playwright-best-practices
-  - skill.mercaso-admin-readonly-browser-test
 referenceCapabilities:
   - skill.webapp-testing
 blockedCapabilities: []
 projectScopes:
   - /Users/halvinshen/Documents/workspace/mercaso/mercaso-admin-web
   - /Users/halvinshen/Documents/workspace/mercaso/mercaso-commerce-client-web
+  - /Users/halvinshen/Documents/workspace/mercaso/mercaso-quality-platform
 notes:
   - Mercaso web projects prefer project-local rules and review gates over generic coding workflows.
-  - Mercaso Admin readonly browser testing is enabled only for Mercaso web project scopes.
+  - CircleCI is project-scoped because its credentials and actions are irrelevant outside Mercaso.

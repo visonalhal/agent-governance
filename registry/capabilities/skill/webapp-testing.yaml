@@ -41,7 +41,7 @@ activation:
   triggerMode: reference-only
   maxChainDepth: 1
   conflictsWith:
-    - plugin.openai-curated.build-web-apps
+    - plugin.policy.disable-build-web-apps
   replaces: []
   projectScopes: []
   subagentRole: qa-runner

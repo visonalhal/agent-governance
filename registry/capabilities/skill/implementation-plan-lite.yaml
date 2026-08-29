@@ -16,11 +16,11 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: assets/skills/implementation-plan-lite
+  path: archive/deprecated-capabilities/skills/implementation-plan-lite
 install:
   strategy: copy
   artifactName: implementation-plan-lite
-  sourcePath: assets/skills/implementation-plan-lite
+  sourcePath: archive/deprecated-capabilities/skills/implementation-plan-lite
 riskTier: T1
 permissions:
   localRead: scoped

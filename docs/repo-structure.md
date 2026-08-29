@@ -7,7 +7,7 @@ If you want the shortest "how do I read this codebase?" path, read `docs/how-to-
 ## Source of Truth
 
 - `assets/`
-  Source-controlled canonical assets that the repo owns and publishes.
+  Source-controlled active assets that the repo owns and may publish.
   Capability assets live under `assets/skills/`, `assets/commands/`, `assets/agents/`, and `assets/plugins/`.
   Runtime-specific plugin payloads stay colocated under `assets/plugins/<plugin>/targets/<runtime>/`.
 - `registry/`
@@ -15,6 +15,9 @@ If you want the shortest "how do I read this codebase?" path, read `docs/how-to-
   `registry/capabilities/` is organized by `kind[/namespace]/name.yaml`.
 - `locks/`
   Published resolution lock plus historical snapshots used for deterministic rollback.
+- `archive/deprecated-capabilities/`
+  Inactive payloads retained only for traceability. Normal repository search excludes this tree;
+  deprecated registry tombstones remain searchable under `registry/`.
 
 ## Rendered Output
 
@@ -30,7 +33,7 @@ Generated files are not hand-edited and never become source of truth.
 - `runtimes/`
   Runtime adapter definitions and merge behavior for Codex, Cursor, Claude, and review-only profiles.
 - `policies/`
-  Governance policy documents and templates.
+  Governance policy documents and runtime contracts, including the versioned Codex global `AGENTS.md` source.
 
 ## Implementation
 
@@ -47,9 +50,9 @@ Generated files are not hand-edited and never become source of truth.
 
 When the same concept appears in multiple places, the precedence is:
 
-1. This repo under `assets/`, `registry/`, and `locks/`
+1. Active source under `assets/` and `policies/`, plus metadata and published state under `registry/` and `locks/`
 2. Rendered output under `generated/`
-3. Local runtime config under `~/.codex`, `~/.cursor`, `~/.claude`, and shared cache state under `~/.agents`
+3. Local runtime config under `~/.codex`, `~/.cursor`, `~/.claude`, project `.codex` overlays, and cache state under `~/.cache/agent-governance`
 
 `import-local` is the adoption path for existing local state. It is not the long-term editing surface.
 

@@ -1,6 +1,7 @@
 profileId: mercaso-harness
 runtimeId: codex
 enabledCapabilities:
+  - plugin.openai-curated.circleci
   - skill.playwright-best-practices
 referenceCapabilities:
   - skill.webapp-testing

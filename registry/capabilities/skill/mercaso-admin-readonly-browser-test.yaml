@@ -32,7 +32,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-30T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: UNKNOWN
   executesScripts: false
   networkAccess: true
@@ -41,6 +41,8 @@ review:
   notes:
     - Adopted from existing Codex user skill.
     - Project-specific readonly browser workflow; enable only through Mercaso profile.
+    - Compressed while preserving the checklist-only readonly boundary, explicit mutation stop
+      conditions, and append-only evidence.
 lifecycleState: published
 activation:
   phase: web-qa
@@ -64,7 +66,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: f427bd110c2a5833579c7d117c79566acd4957cddfb6819290d33434ec69e37b
+  digest: f0b856a03447235757e93aa8d700ff59f299ce86ec5607ffcfe96313ebd65930
 tags:
   - mercaso
   - readonly-browser-test

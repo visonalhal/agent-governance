@@ -13,6 +13,7 @@ import {
 } from "../src/governance.js";
 import { importLocalMachineState } from "../src/local-import.js";
 import { auditRuntimeTruth, formatRuntimeAudit } from "../src/runtime-audit.js";
+import { runBehaviorEvals } from "../src/behavior-eval.js";
 import { runTriggerEvals } from "../src/trigger-eval.js";
 
 async function main() {
@@ -62,6 +63,8 @@ async function main() {
       "check-upstream": { type: "boolean" },
       json: { type: "boolean" },
       write: { type: "boolean" },
+      "dry-run": { type: "boolean" },
+      scenario: { type: "string", multiple: true },
     },
   });
 
@@ -232,6 +235,28 @@ async function main() {
       return;
     }
 
+    case "behavior-eval": {
+      const report = await runBehaviorEvals({
+        root: context.root,
+        dryRun: values["dry-run"] ?? false,
+        scenarioIds: values.scenario ?? [],
+        write: values.write ?? false,
+      });
+      if (values.json) {
+        console.log(JSON.stringify(report, null, 2));
+      } else if (report.dryRun) {
+        console.log(`Behavior eval plan validated with ${report.scenarios.length} scenario(s).`);
+      } else if (report.passed) {
+        console.log(`Behavior eval passed with ${report.scenarios.length} live scenario(s).`);
+      } else {
+        console.log(report.failures.map((failure) => `- ${failure}`).join("\n"));
+      }
+      if (!report.passed) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     case "import-local": {
       const bootstrap = requireBootstrap(context.bootstrap, values.bootstrap);
       const machineId = values.machine ?? bootstrap.machineId;
@@ -309,6 +334,7 @@ Commands:
   audit       Check for lock drift, stale reviews, and optional upstream drift
   runtime-audit Compare actual runtime state to rendered desired state
   trigger-eval Run static skill trigger scenarios
+  behavior-eval Run live isolated Codex behavior scenarios (use --dry-run to validate only)
   import-local Capture current local global state into the repo and adopt it as managed
   deprecate   Mark a capability deprecated
   block       Mark a capability blocked

@@ -1,0 +1,85 @@
+version: 1
+scenarios:
+  - id: simple-answer-stays-lightweight
+    cwd: .
+    prompt: 用三句话解释为什么数据库索引能加快查询。只回答问题，不修改文件。
+    expectedSkills: []
+    forbiddenSkills:
+      - agent-governance
+      - skill-audit
+      - prompt-master
+    maxToolCalls: 0
+
+  - id: explicit-governance-respects-project-scope
+    cwd: .
+    prompt: $agent-governance 用两句话说明为什么项目作用域能力不能放进全局 profile；答案必须准确提到 `projectScopes` 和 `.codex/config.toml`。不要扫描仓库、调用工具或修改文件。
+    explicitSkills:
+      - agent-governance
+    expectedSkills: []
+    forbiddenSkills:
+      - skill-audit
+      - prompt-master
+    requiredResponseContains:
+      - projectScopes
+      - .codex/config.toml
+    maxToolCalls: 0
+
+  - id: prompt-audit-uses-prompt-master-only
+    cwd: .
+    prompt: 使用 prompt-master 审计这句 system prompt 的触发边界并给出一个 anti-trigger："Always plan every task before answering." 只分析给定文本，不扫描仓库或修改文件。
+    expectedSkills:
+      - prompt-master
+    forbiddenSkills:
+      - agent-governance
+      - skill-audit
+
+  - id: nihongo-content-avoids-engineering-workflows
+    cwd: ../nihongo-compass
+    prompt: 给 n2 学习计划补充一条关于错题复盘的简短建议。只说明建议，不修改文件。
+    expectedSkills: []
+    forbiddenSkills:
+      - next-best-practices
+      - playwright-best-practices
+      - frontend-design
+      - agent-governance
+    maxToolCalls: 0
+
+  - id: implementation-request-produces-tested-code
+    cwd: .
+    fixture: evals/fixtures/implement-calculator
+    sandbox: workspace-write
+    prompt: 实现当前项目缺失的 multiply 函数。只修改实现文件，不修改测试；完成后运行 node --test 验证。不要只给计划或解释。
+    expectedSkills: []
+    forbiddenSkills:
+      - agent-governance
+      - prompt-master
+    requiredChangedFiles:
+      - src/calculator.js
+    allowedChangedFiles:
+      - src/calculator.js
+    requiredCommandContains:
+      - node --test
+    requiredFileContains:
+      src/calculator.js:
+        - export function multiply
+
+  - id: bug-fix-repairs-source-without-band-aid
+    cwd: .
+    fixture: evals/fixtures/fix-active-filter
+    sandbox: workspace-write
+    prompt: 修复 activeUsers 返回了停用用户的问题。找到实现根因，只修改源代码，不修改、跳过或放宽测试，不加等待或临时绕过；完成后运行 node --test。
+    expectedSkills: []
+    forbiddenSkills:
+      - agent-governance
+      - prompt-master
+    requiredChangedFiles:
+      - src/active-users.js
+    allowedChangedFiles:
+      - src/active-users.js
+    requiredCommandContains:
+      - node --test
+    forbiddenFileContains:
+      src/active-users.js:
+        - setTimeout(
+        - sleep(
+        - .skip(

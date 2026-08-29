@@ -21,7 +21,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: normalize
-  sourcePath: assets/skills/impeccable/normalize
+  sourcePath: archive/deprecated-capabilities/skills/impeccable/normalize
 riskTier: T1
 permissions:
   localRead: scoped

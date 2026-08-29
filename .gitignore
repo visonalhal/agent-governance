@@ -3,5 +3,6 @@ dist
 .DS_Store
 generated/machines
 generated/shared-cache
+generated/behavior-evals
 locks/history
 .vscode

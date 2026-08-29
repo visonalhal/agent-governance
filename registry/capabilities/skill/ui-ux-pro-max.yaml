@@ -7,11 +7,11 @@ canonicalSource:
   url: https://github.com/visonalhal/agent-governance
   ref: main
   refType: branch
-  path: assets/skills/ui-ux-pro-max
+  path: archive/deprecated-capabilities/skills/ui-ux-pro-max
 install:
   strategy: copy
   artifactName: ui-ux-pro-max
-  sourcePath: assets/skills/ui-ux-pro-max
+  sourcePath: archive/deprecated-capabilities/skills/ui-ux-pro-max
   manifest:
     seededFrom: shared-skill-cache
     localPath: /Users/halvinshen/.agents/skills/ui-ux-pro-max

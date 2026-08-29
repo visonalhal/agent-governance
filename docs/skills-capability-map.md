@@ -10,6 +10,7 @@
 - `runtimes/*.yaml`: runtime 适配和最小基础能力。
 - `machines/*.yaml`: 当前机器启用哪些 profiles。
 - `generated/machines/**/desired-state.json`: render 后的期望 runtime 状态。
+- `generated/machines/**/project-scopes.json`: 项目作用域能力及其项目本地配置目标。
 
 ## Product Development Phases
 
@@ -30,6 +31,7 @@
 | `helix-product` | Helix 产品研发，项目 `AGENTS.md` 优先 |
 | `mercaso-web` | Mercaso Web 维护与 review |
 | `mercaso-harness` | Mercaso Playwright harness，项目 rulebook 优先 |
+| `mercaso-admin-readonly` | 仅在 Mercaso Admin Web 暴露凭据型只读 smoke workflow |
 | `agent-governance` | 本仓库 schema、profile、sync、audit、eval 治理 |
 | `prompt-atelier` | 图像 prompt 生产 loop，依赖项目本地规则 |
 | `nihongo-content` | 内容项目，依赖 Codex 原生任务处理与项目规则 |
@@ -71,10 +73,10 @@
 
 ## Plugin Policy
 
-- `plugin.openai-curated.build-web-apps` 是 disable record，目标是让 Codex 配置显式 `enabled = false`。
-- `plugin.openai-curated.figma` 是 disable record，目标是让 Codex 配置显式 `enabled = false`；需要 Figma 时按任务启用具体能力。
-- `plugin.openai-curated.superpowers` 是 disable record，目标是让 Codex 配置显式 `enabled = false`。
-- `plugin.openai-curated.circleci` 是 enabled external plugin，由治理接管现有 `circleci@openai-curated` runtime 配置。
+- `plugin.policy.disable-build-web-apps` 是全局禁用策略，目标是让 Codex 配置显式 `enabled = false`。
+- `plugin.policy.disable-figma` 是默认禁用策略；需要 Figma 时按任务启用具体能力。
+- `plugin.policy.disable-superpowers` 是默认禁用策略；只有经过评测的显式严谨模式才能覆盖它。
+- `plugin.openai-curated.circleci` 只在 Mercaso profiles 中启用并写入项目 `.codex/config.toml`，不进入全局配置。
 - `plugin.figma` 保留为 canonical/source plugin，不进入默认 Codex profile。日常只把 `skill.figma.implement-design`、`skill.figma.use` 和 `mcp.figma` 作为 on-demand reference；`Code Connect`、`generate-library`、`create-design-system-rules` 这类低频 Figma workflow 只能 project-explicit 或 reference-only。
 - `skill.prompt-master` 全局安装，但只处理 prompt 设计、审查、压缩和触发测试；不能接管普通领域任务或治理采纳决策。
 - Impeccable 只保留 `frontend-design` 和 `clarify`。生产 QA 检查集中在 `frontend-design/reference/production-qa.md`。
@@ -87,9 +89,12 @@ Use:
 ```bash
 pnpm governance runtime-audit --runtime codex
 pnpm governance trigger-eval
+pnpm governance behavior-eval --dry-run
 ```
 
-`runtime-audit` 对比 Codex 实际插件、MCP、`~/.agents/skills` 中的 user skills、plugin skill roots 和 rendered desired state。Codex 不再向 `~/.codex/skills` 生成用户 skill 镜像；该目录只保留 Codex 管理的 `.system`。
-少量工具型 unmanaged capability 被显式允许，例如 OpenAI bundled/primary runtime 插件、`node_repl`、`computer-use`、`hatch-pet` 和 `sample-watermark`。CircleCI、Helix code-review graph 和 Mercaso readonly browser test 必须作为 governed capabilities 出现在 desired state。
+`runtime-audit` 对比 Codex 本地与远程插件、MCP、全局 user skills、项目精确信任、项目本地状态、plugin skill roots 和 rendered desired state。共享缓存位于 `~/.cache/agent-governance`；只有全局能力复制到 `~/.agents/skills`，项目能力通过 `.codex/config.toml` 的 `skills.config[].path` 引用缓存。`~/.codex/skills` 只保留 Codex 管理的 `.system`。
+少量工具型或个人 capability 通过内建平台清单或 machine `runtimeAuditAllowlist` 显式允许；远程插件必须出现在同一 machine allowlist。CircleCI、Helix code-review graph 和 Mercaso readonly browser test 必须作为 project-scoped governed capabilities 出现在 `project-scopes.json`，不得出现在全局 desired state。
 
-`trigger-eval` 固定检查：通用任务不再激活已废弃的 workflow skills；只有 governance、prompt 和 Playwright 等窄领域请求才选择对应能力。
+`trigger-eval` 是静态触发规则 lint：它能发现声明漂移，但不能证明真实模型行为。Skill/Plugin 采纳还必须使用代表性 live runs 或 Plugin Eval 做原生基线与候选能力对照。
+
+`behavior-eval` 通过隔离的 `codex exec` 运行代表场景并记录 Skill 读取、工具调用、命令、文件变化和最终响应。写入场景只能在复制到临时目录的 fixture 中运行，并可约束允许修改的文件、验证命令和禁止的止血内容；`--dry-run` 只校验场景。Live run 依赖有效的 Codex CLI 登录状态。

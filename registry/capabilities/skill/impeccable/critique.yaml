@@ -21,7 +21,7 @@ canonicalSource:
 install:
   strategy: copy
   artifactName: critique
-  sourcePath: assets/skills/impeccable/critique
+  sourcePath: archive/deprecated-capabilities/skills/impeccable/critique
 riskTier: T1
 permissions:
   localRead: scoped

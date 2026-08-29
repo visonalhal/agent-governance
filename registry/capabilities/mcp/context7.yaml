@@ -1,7 +1,18 @@
 id: mcp.context7
 name: context7
 assetKind: mcp
+bindings:
+  remote-http:
+    mcp:
+      serverName: context7
+      config:
+        headers:
+          Authorization: Bearer ${SECRET:SEEDED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}
+        url: https://mcp.context7.com/mcp
+      adoptExisting: false
 discoverySources: []
+includes: []
+exposes: []
 canonicalSource:
   sourceId: governance-repo
   url: https://github.com/visonalhal/agent-governance
@@ -22,7 +33,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-04-02T09:15:33.096Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: CONFIG_ONLY
   executesScripts: true
   networkAccess: true
@@ -30,21 +41,25 @@ review:
   filesystemSideEffects: runtime MCP process access
   notes:
     - Seeded from cursor runtime MCP configuration.
+    - "Verified against current Upstash Context7 client documentation; retained as the sole global
+      Cursor documentation MCP and migrated authentication to Authorization: Bearer."
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 4ed91e90373acc6a92e52f6bdffe08e100f4436de108d7908528070a567eb1a6
+  digest: b818f10c511ba3ec719b5e51826ad41a4120a684384bb0e35fcd2f460a29a20d
 tags:
   - bootstrap-seeded
   - cursor-mcp
-bindings:
-  remote-http:
-    mcp:
-      serverName: context7
-      config:
-        headers:
-          CONTEXT7_API_KEY: ${SECRET:SEEDED_CURSOR_MCP_CONTEXT7_HEADERS_CONTEXT7_API_KEY}
-        url: https://mcp.context7.com/mcp

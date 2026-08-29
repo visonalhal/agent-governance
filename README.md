@@ -1,6 +1,6 @@
 # Agent Governance
 
-`agent-governance` is the single source of truth for personal, cross-runtime governance of `skills`, `plugins`, `MCP`, `commands`, and `agents`.
+`agent-governance` is the source of truth for governed shared and project-scoped `skills`, `plugins`, `MCP`, `commands`, and `agents`. Intentional personal capabilities can remain outside it only through an explicit machine audit allowlist.
 
 The repo stores audited capability metadata, abstract capability bindings, runtime adapter profiles, machine profiles, and deterministic locks. Local runtimes keep their own native config files, but they are rendered and synced from this repo instead of being hand-maintained.
 
@@ -11,8 +11,8 @@ If you're trying to get your bearings again, start with `docs/how-to-read-this-r
 The system is split into three layers:
 
 - True source: this repo under `halvin-workspace/agent-governance`
-- Shared artifact cache: `~/.agents`, which stores shared `skills/`, runtime install `packages/`, and `manifests/`
-- Runtime native config: `~/.codex/config.toml`, `~/.cursor/mcp.json`, `~/.claude/settings.json`, and related plugin manifests
+- Independent artifact cache: `~/.cache/agent-governance`, which stores governed `skills/`, runtime install `packages/`, and `manifests/`
+- Runtime config: global native files plus project `.codex/config.toml` overlays for scoped Codex capabilities
 
 The flow is always:
 
@@ -49,7 +49,7 @@ Example:
 ```yaml
 repoPath: /Users/halvinshen/Documents/workspace/halvin-workspace/agent-governance
 machineId: halvin-macbook-pro
-cacheRoot: /Users/halvinshen/.agents
+cacheRoot: /Users/halvinshen/.cache/agent-governance
 localSecretsFile: /Users/halvinshen/.config/agent-governance/local/halvin-macbook-pro.yaml
 ```
 
@@ -67,6 +67,9 @@ Secrets and machine-local overrides stay outside Git:
 - `pnpm governance sync --runtime <runtime>`
 - `pnpm governance import-local`
 - `pnpm governance audit`
+- `pnpm governance runtime-audit --runtime codex`
+- `pnpm governance trigger-eval`
+- `pnpm governance behavior-eval --dry-run`
 - `pnpm governance deprecate`
 - `pnpm governance block`
 
@@ -75,7 +78,7 @@ Use `--bootstrap` to point at a non-default bootstrap file, and `--machine` to r
 ## Managed Runtimes
 
 - `codex`: managed
-  Codex keeps governed plugins and MCP servers in `~/.codex/config.toml` and discovers all user skills directly from `~/.agents/skills`. `~/.codex/skills` is reserved for Codex-managed system skills.
+  Global governed state is merged into `~/.codex/config.toml` and `~/.agents/skills`. Project-scoped Skill, Plugin, and MCP state is merged into the matching project `.codex/config.toml`; Skill entries point at the independent cache. `~/.codex/skills` is reserved for Codex-managed system skills.
 - `cursor`: managed
   Cursor gets governed MCP servers in `~/.cursor/mcp.json` and governed custom skills in `~/.cursor/skills`.
 - `claude`: managed

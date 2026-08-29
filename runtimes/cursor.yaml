@@ -4,9 +4,7 @@ supportedAssetKinds:
   - plugin
   - mcp
 enabledCapabilities:
-  - mcp.clerk
   - mcp.context7
-  - mcp.github
 bindingPolicy:
   defaults:
     skill:
@@ -38,3 +36,4 @@ notes:
   - Governed custom skills sync into ~/.cursor/skills.
   - The built-in ~/.cursor/skills-cursor directory remains reserved for Cursor internals.
   - Only governed MCP servers are merged into ~/.cursor/mcp.json.
+  - Project-specific MCPs are not enabled globally; Context7 is the only general documentation service.

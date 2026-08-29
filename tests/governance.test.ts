@@ -20,7 +20,12 @@ import {
   syncGovernance,
 } from "../src/governance.js";
 import { importLocalMachineState } from "../src/local-import.js";
-import { auditRuntimeTruth } from "../src/runtime-audit.js";
+import {
+  analyzeBehaviorEvalEvents,
+  runBehaviorEvals,
+  summarizeBehaviorEvalError,
+} from "../src/behavior-eval.js";
+import { auditRuntimeTruth, parseInstalledRemotePlugins } from "../src/runtime-audit.js";
 import { runTriggerEvals } from "../src/trigger-eval.js";
 
 const REPO_ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -268,7 +273,7 @@ describe.sequential("agent governance", () => {
   it("keeps Figma as a source plugin with only common on-demand references", async () => {
     const repo = await loadRepo(REPO_ROOT);
     const codexBase = repo.profiles.get("codex-base");
-    expect(codexBase?.enabledCapabilities).toContain("plugin.openai-curated.figma");
+    expect(codexBase?.enabledCapabilities).toContain("plugin.policy.disable-figma");
     expect(codexBase?.enabledCapabilities).not.toContain("plugin.figma");
     expect(codexBase?.enabledCapabilities).not.toContain("skill.figma.code-connect-components");
     expect(codexBase?.enabledCapabilities).not.toContain("skill.figma.generate-library");
@@ -278,7 +283,7 @@ describe.sequential("agent governance", () => {
     );
 
     const disableRecord = repo.capabilities.find(
-      (capability) => capability.id === "plugin.openai-curated.figma"
+      (capability) => capability.id === "plugin.policy.disable-figma"
     );
     expect(disableRecord?.activation.triggerMode).toBe("blocked");
     expect(disableRecord?.bindings.package?.plugin?.nativeRegistration.enabled).toBe(false);
@@ -388,12 +393,209 @@ describe.sequential("agent governance", () => {
         skills: Array<{ id: string; syncMode: string }>;
       };
       expect(desired.skills.map((skill) => skill.id)).toEqual(["skill.vendor.profile-enabled"]);
-      expect(desired.skills.map((skill) => skill.syncMode)).toEqual(["cache-only"]);
-      expect(desired.nativeFiles.userSkillsDir).toBeUndefined();
+      expect(desired.skills.map((skill) => skill.syncMode)).toEqual(["user-skill-dir"]);
+      expect(desired.nativeFiles.userSkillsDir).toBe(path.join(sandbox.home, ".agents", "skills"));
+      expect(desired.nativeFiles.globalAgents).toBe(path.join(sandbox.home, ".codex", "AGENTS.md"));
+      expect(
+        await fs.readFile(path.join(sandbox.home, ".codex", "AGENTS.md"), "utf8")
+      ).toBe(
+        await fs.readFile(path.join(sandbox.root, "policies", "codex", "global-AGENTS.md"), "utf8")
+      );
       expect(await exists(path.join(sandbox.cacheRoot, "skills", "profile-enabled", "SKILL.md"))).toBe(true);
-      expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-enabled"))).toBe(false);
+      expect(await exists(path.join(sandbox.home, ".agents", "skills", "profile-enabled", "SKILL.md"))).toBe(true);
       expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-reference"))).toBe(false);
       expect(await exists(path.join(sandbox.home, ".codex", "skills", "profile-blocked"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("renders scoped profile capabilities into the project without leaking them globally", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const projectRoot = path.join(sandbox.home, "workspace", "project-a");
+      await fs.mkdir(projectRoot, { recursive: true });
+
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.project-skill",
+        runtimeTargets: [],
+      });
+      await preparePluginCapability(sandbox.root, {
+        id: "plugin.vendor.project-plugin",
+        runtimeTargets: [],
+        runtimeBindings: {
+          codex: {
+            plugin: {
+              pluginId: "project-plugin@vendor",
+              enabled: true,
+              adoptExisting: true,
+            },
+          },
+        },
+      });
+      await mutateRuntime(sandbox.root, "codex", (runtime) => {
+        runtime.enabledCapabilities = [];
+      });
+      for (const capabilityId of ["skill.vendor.project-skill", "plugin.vendor.project-plugin"]) {
+        await mutateCapability(sandbox.root, capabilityId, (capability) => {
+          capability.activation = {
+            ...capability.activation,
+            projectScopes: [projectRoot],
+          };
+        });
+      }
+      await writeProfile(sandbox.root, {
+        profileId: "project-profile",
+        runtimeId: "codex",
+        enabledCapabilities: ["skill.vendor.project-skill", "plugin.vendor.project-plugin"],
+        projectScopes: [projectRoot],
+      });
+      await mutateMachine(sandbox.root, sandbox.machineId, (machine) => {
+        machine.activeProfiles = ["project-profile"];
+      });
+
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      const result = await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+
+      const globalCodex = result.renderedStates.find((state) => state.runtimeId === "codex");
+      expect(globalCodex?.skills).toEqual([]);
+      expect(globalCodex?.plugins).toEqual([]);
+
+      const projectCodex = result.projectStates.find(
+        (entry) => entry.projectScope === projectRoot && entry.state.runtimeId === "codex"
+      );
+      expect(projectCodex?.state.skills.map((skill) => skill.id)).toEqual([
+        "skill.vendor.project-skill",
+      ]);
+      expect(projectCodex?.state.skills[0]?.syncMode).toBe("config-path");
+      expect(projectCodex?.state.plugins.map((plugin) => plugin.id)).toEqual([
+        "plugin.vendor.project-plugin",
+      ]);
+      expect(projectCodex?.state.nativeFiles.config).toBe(
+        path.join(projectRoot, ".codex", "config.toml")
+      );
+      expect(projectCodex?.state.nativeFiles.globalAgents).toBeUndefined();
+      expect(projectCodex?.state.nativeFiles.userSkillsDir).toBeUndefined();
+
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      expect(await exists(path.join(projectRoot, ".agents", "skills", "project-skill"))).toBe(false);
+      const globalConfig = TOML.parse(
+        await fs.readFile(path.join(sandbox.home, ".codex", "config.toml"), "utf8")
+      ) as Record<string, any>;
+      expect(globalConfig.plugins?.["project-plugin@vendor"]).toBeUndefined();
+      expect(globalConfig.projects?.[projectRoot]?.trust_level).toBe("trusted");
+      const projectConfig = TOML.parse(
+        await fs.readFile(path.join(projectRoot, ".codex", "config.toml"), "utf8")
+      ) as Record<string, any>;
+      expect(projectConfig.plugins?.["project-plugin@vendor"]?.enabled).toBe(true);
+      expect(projectConfig.skills?.config).toEqual([
+        {
+          path: path.join(sandbox.cacheRoot, "skills", "project-skill"),
+          enabled: true,
+        },
+      ]);
+      const scopedAudit = await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+      });
+      expect(scopedAudit.projects.map((project) => project.projectScope)).toContain(projectRoot);
+      expect(
+        scopedAudit.findings.filter((finding) => finding.startsWith(`[${projectRoot}]`))
+      ).toEqual([]);
+
+      projectConfig.plugins["manual@vendor"] = { enabled: true };
+      projectConfig.mcp_servers = { manual: { command: "manual" } };
+      projectConfig.skills.config.push({ path: path.join(projectRoot, "manual-skill"), enabled: true });
+      await fs.writeFile(
+        path.join(projectRoot, ".codex", "config.toml"),
+        TOML.stringify(projectConfig),
+        "utf8"
+      );
+      const driftedAudit = await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+      });
+      const projectFindings = driftedAudit.findings.filter((finding) =>
+        finding.startsWith(`[${projectRoot}]`)
+      );
+      expect(projectFindings.some((finding) => finding.includes("manual@vendor"))).toBe(true);
+      expect(projectFindings.some((finding) => finding.includes("MCP server manual"))).toBe(true);
+      expect(projectFindings.some((finding) => finding.includes("manual-skill"))).toBe(true);
+
+      await writeProfile(sandbox.root, {
+        profileId: "project-profile",
+        runtimeId: "codex",
+        enabledCapabilities: [],
+        projectScopes: [projectRoot],
+      });
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      expect(
+        await exists(path.join(projectRoot, ".agents", "skills", "project-skill"))
+      ).toBe(false);
+      const cleanedProjectConfig = TOML.parse(
+        await fs.readFile(path.join(projectRoot, ".codex", "config.toml"), "utf8")
+      ) as Record<string, any>;
+      expect(cleanedProjectConfig.plugins?.["project-plugin@vendor"]).toBeUndefined();
+      const cleanedGlobalConfig = TOML.parse(
+        await fs.readFile(path.join(sandbox.home, ".codex", "config.toml"), "utf8")
+      ) as Record<string, any>;
+      expect(cleanedGlobalConfig.projects?.[projectRoot]).toBeUndefined();
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("rejects a global profile that enables a project-scoped capability", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const projectRoot = path.join(sandbox.home, "workspace", "project-a");
+      await prepareSkillCapability(sandbox.root, {
+        id: "skill.vendor.scoped-only",
+        runtimeTargets: [],
+      });
+      await mutateCapability(sandbox.root, "skill.vendor.scoped-only", (capability) => {
+        capability.activation = {
+          ...capability.activation,
+          projectScopes: [projectRoot],
+        };
+      });
+      await writeProfile(sandbox.root, {
+        profileId: "bad-global-profile",
+        runtimeId: "codex",
+        enabledCapabilities: ["skill.vendor.scoped-only"],
+        projectScopes: [],
+      });
+
+      await expect(publishGovernance(sandbox.root)).rejects.toThrow(
+        "bad-global-profile: global profile cannot enable project-scoped capability skill.vendor.scoped-only"
+      );
     } finally {
       await sandbox.cleanup();
     }
@@ -471,7 +673,7 @@ describe.sequential("agent governance", () => {
     }
   });
 
-  it("removes legacy governed Codex skill mirrors while preserving system and unmanaged entries", async () => {
+  it("migrates legacy governed Codex skill mirrors while preserving system and unmanaged entries", async () => {
     const sandbox = await createSandbox();
 
     try {
@@ -521,12 +723,13 @@ describe.sequential("agent governance", () => {
       });
 
       expect(await exists(path.join(sandbox.cacheRoot, "skills", "legacy-codex-skill", "SKILL.md"))).toBe(true);
+      expect(await exists(path.join(sandbox.home, ".agents", "skills", "legacy-codex-skill", "SKILL.md"))).toBe(true);
       expect(await exists(path.join(legacySkillsDir, "legacy-codex-skill"))).toBe(false);
       expect(await exists(path.join(legacySkillsDir, ".system", "keep"))).toBe(true);
       expect(await exists(path.join(legacySkillsDir, "manual-skill", "keep"))).toBe(true);
 
       const state = JSON.parse(await fs.readFile(statePath, "utf8")) as { managedSkillIds: string[] };
-      expect(state.managedSkillIds).toEqual([]);
+      expect(state.managedSkillIds).toEqual(["legacy-codex-skill"]);
     } finally {
       await sandbox.cleanup();
     }
@@ -1638,6 +1841,44 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("requires fresh reviews only for capabilities active on a managed machine", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const capabilityId = "skill.vendor.review-scope";
+      await prepareSkillCapability(sandbox.root, {
+        id: capabilityId,
+        runtimeTargets: ["codex"],
+      });
+      await mutateRuntime(sandbox.root, "codex", (runtime) => {
+        runtime.enabledCapabilities = [];
+      });
+      await publishGovernance(sandbox.root);
+
+      const dormantFindings = await auditGovernance(sandbox.root, {
+        staleDays: 1,
+        checkUpstream: false,
+      });
+      expect(dormantFindings).not.toContain(
+        `${capabilityId}: review is stale (${FIXED_REVIEW_DATE}).`
+      );
+
+      await mutateRuntime(sandbox.root, "codex", (runtime) => {
+        runtime.enabledCapabilities = [capabilityId];
+      });
+
+      const activeFindings = await auditGovernance(sandbox.root, {
+        staleDays: 1,
+        checkUpstream: false,
+      });
+      expect(activeFindings).toContain(
+        `${capabilityId}: review is stale (${FIXED_REVIEW_DATE}).`
+      );
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
   it("reports runtime truth drift and high-risk plugin skill roots", async () => {
     const sandbox = await createSandbox();
 
@@ -1688,11 +1929,200 @@ describe.sequential("agent governance", () => {
     }
   });
 
+  it("reports drift in the versioned Codex global AGENTS file", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+      await syncGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        runtimeId: "codex",
+        bootstrap,
+      });
+
+      await fs.writeFile(path.join(sandbox.home, ".codex", "AGENTS.md"), "drift\n", "utf8");
+      const snapshot = await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+      });
+
+      expect(snapshot.findings).toContain(
+        `Codex global AGENTS ${path.join(sandbox.home, ".codex", "AGENTS.md")} differs from ${path.join(sandbox.root, "policies", "codex", "global-AGENTS.md")}.`
+      );
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("refuses to overwrite an unmanaged Codex global AGENTS file", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      const targetPath = path.join(sandbox.home, ".codex", "AGENTS.md");
+      await fs.writeFile(targetPath, "unmanaged\n", "utf8");
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      await publishGovernance(sandbox.root);
+      await renderGovernance({
+        root: sandbox.root,
+        machineId: sandbox.machineId,
+        bootstrap,
+      });
+
+      await expect(
+        syncGovernance({
+          root: sandbox.root,
+          machineId: sandbox.machineId,
+          runtimeId: "codex",
+          bootstrap,
+        })
+      ).rejects.toThrow(`Codex global AGENTS collision at ${targetPath}.`);
+      expect(await fs.readFile(targetPath, "utf8")).toBe("unmanaged\n");
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("uses the machine audit allowlist for intentional personal runtime capabilities", async () => {
+    const sandbox = await createSandbox();
+
+    try {
+      await mutateMachine(sandbox.root, sandbox.machineId, (machine) => {
+        machine.runtimeAuditAllowlist = {
+          codex: {
+            plugins: ["manual@vendor"],
+            mcpServers: ["manual"],
+            userSkills: [],
+          },
+        };
+      });
+      const bootstrap = await loadBootstrapFromDefaultPath();
+      const snapshot = await auditRuntimeTruth({
+        root: sandbox.root,
+        bootstrap,
+        runtimeId: "codex",
+      });
+
+      expect(snapshot.findings.some((finding) => finding.includes("manual@vendor"))).toBe(false);
+      expect(snapshot.findings.some((finding) => finding.includes("MCP server manual"))).toBe(false);
+    } finally {
+      await sandbox.cleanup();
+    }
+  });
+
+  it("extracts only installed remote plugins from the Codex plugin inventory", () => {
+    expect(
+      parseInstalledRemotePlugins({
+        marketplaces: [
+          {
+            plugins: [
+              {
+                id: "remote@market",
+                source: { type: "remote" },
+                installed: true,
+                enabled: true,
+                version: "1.2.3",
+                interface: { displayName: "Remote" },
+              },
+              {
+                id: "not-installed@market",
+                source: { type: "remote" },
+                installed: false,
+                enabled: true,
+              },
+              {
+                id: "local@market",
+                source: { type: "local" },
+                installed: true,
+                enabled: true,
+              },
+            ],
+          },
+        ],
+      })
+    ).toEqual({
+      "remote@market": {
+        installed: true,
+        enabled: true,
+        displayName: "Remote",
+        version: "1.2.3",
+      },
+    });
+  });
+
   it("passes static trigger eval scenarios for debug and non-debug prompts", async () => {
     const report = await runTriggerEvals(REPO_ROOT);
 
     expect(report.failures).toEqual([]);
     expect(report.passed).toBe(true);
+  });
+
+  it("parses live Codex events into skill and tool evidence", () => {
+    const events = [
+      JSON.stringify({
+        type: "item.started",
+        item: {
+          type: "command_execution",
+          command: "sed -n '1,200p' /tmp/project/.agents/skills/project-skill/SKILL.md",
+        },
+      }),
+      JSON.stringify({
+        type: "item.completed",
+        item: {
+          type: "command_execution",
+          command: "rg --files -g SKILL.md",
+          aggregated_output: "/tmp/project/.agents/skills/not-read/SKILL.md\n",
+        },
+      }),
+      JSON.stringify({
+        type: "item.completed",
+        item: { type: "agent_message", text: "done" },
+      }),
+    ].join("\n");
+
+    expect(analyzeBehaviorEvalEvents(events)).toEqual({
+      skillReads: ["project-skill"],
+      toolCallCount: 1,
+      commands: [
+        "sed -n '1,200p' /tmp/project/.agents/skills/project-skill/SKILL.md",
+        "rg --files -g SKILL.md",
+      ],
+      finalResponse: "done",
+    });
+  });
+
+  it("validates the live behavior suite without starting model runs", async () => {
+    const report = await runBehaviorEvals({
+      root: REPO_ROOT,
+      dryRun: true,
+    });
+
+    expect(report.passed).toBe(true);
+    expect(report.scenarios.length).toBeGreaterThanOrEqual(4);
+    expect(report.scenarios.every((scenario) => scenario.status === "planned")).toBe(true);
+  });
+
+  it("reduces live behavior process failures to the actionable Codex error", () => {
+    const error = Object.assign(new Error("Command failed with verbose output"), {
+      stdout: [
+        JSON.stringify({ type: "thread.started", thread_id: "test" }),
+        JSON.stringify({
+          type: "turn.failed",
+          error: { message: "OAuth refresh token is invalidated; sign in again." },
+        }),
+      ].join("\n"),
+    });
+
+    expect(summarizeBehaviorEvalError(error)).toBe(
+      "OAuth refresh token is invalidated; sign in again."
+    );
   });
 });
 
@@ -1701,7 +2131,7 @@ async function createSandbox() {
   const repoRoot = path.join(root, "repo");
   const home = path.join(root, "home");
   const machineId = "test-mac";
-  const cacheRoot = path.join(home, ".agents");
+  const cacheRoot = path.join(home, ".cache", "agent-governance");
   const bootstrapPath = path.join(home, ".config", "agent-governance", "bootstrap.yaml");
   const localSecretsFile = path.join(
     home,
@@ -1734,6 +2164,7 @@ async function createSandbox() {
   await copyIntoSandbox("runtimes/cursor.yaml", repoRoot);
   await copyIntoSandbox("runtimes/claude.yaml", repoRoot);
   await copyIntoSandbox("runtimes/gemini.yaml", repoRoot);
+  await copyIntoSandbox("policies/codex/global-AGENTS.md", repoRoot);
   await resetSandboxRuntimePolicies(repoRoot);
   await copyIntoSandbox("tests/fixtures/assets/sample-skill", repoRoot);
   await copyIntoSandbox("tests/fixtures/assets/sample-plugin", repoRoot);

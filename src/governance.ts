@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -9,6 +10,7 @@ import type {
   LegacyResolutionLock,
   LocalSecretsRecord,
   MachineRecord,
+  RenderedProjectRuntimeState,
   RenderedRuntimeState,
   ResolutionLock,
   RuntimeProfileRecord,
@@ -22,6 +24,7 @@ import {
   legacyResolutionLockSchema,
   localSecretsSchema,
   machineSchema,
+  renderedProjectRuntimeStatesSchema,
   renderedRuntimeStateSchema,
   resolutionLockSchema,
   runtimeProfileSchema,
@@ -49,6 +52,8 @@ import {
 } from "./io.js";
 import {
   syncClaudeRuntime,
+  syncCodexGlobalAgents,
+  syncCodexProjectTrust,
   syncCodexRuntime,
   syncCursorRuntime,
   syncSharedArtifactCache,
@@ -56,6 +61,14 @@ import {
 
 const execFileAsync = promisify(execFile);
 const CACHE_STATE_FILE = ".agent-governance-cache-state.json";
+const CODEX_GLOBAL_AGENTS_SOURCE = path.join("policies", "codex", "global-AGENTS.md");
+
+function requiredRuntimePath(value: string | undefined, label: string) {
+  if (!value) {
+    throw new Error(`Missing required runtime path for ${label}.`);
+  }
+  return value;
+}
 
 // Main governance lifecycle orchestration lives here:
 // registry authoring -> approval/publish -> machine render -> runtime sync -> audit.
@@ -398,6 +411,7 @@ export async function renderGovernance(options: {
 
   const vars = buildPathVars(options.bootstrap, machine);
   const renderedStates: RenderedRuntimeState[] = [];
+  const projectStates: RenderedProjectRuntimeState[] = [];
 
   for (const runtimeId of machine.enabledRuntimes) {
     const runtime = repo.runtimes.get(runtimeId);
@@ -421,12 +435,36 @@ export async function renderGovernance(options: {
     const outputPath = path.join(generatedMachineRoot, runtimeId, "desired-state.json");
     await writeJsonFile(outputPath, rendered);
     renderedStates.push(rendered);
+
+    if (runtime.runtimeId === "codex") {
+      for (const projectScope of getActiveProjectScopes(repo, runtime, machine)) {
+        const projectState = renderedRuntimeStateSchema.parse(
+          buildRenderedRuntimeState({
+            runtime,
+            repo,
+            machine,
+            bootstrap: options.bootstrap,
+            lock,
+            vars,
+            projectScope,
+          })
+        );
+        projectStates.push({ projectScope, state: projectState });
+      }
+      await writeJsonFile(
+        path.join(generatedMachineRoot, runtimeId, "project-scopes.json"),
+        renderedProjectRuntimeStatesSchema.parse(
+          projectStates.filter((entry) => entry.state.runtimeId === runtimeId)
+        )
+      );
+    }
   }
 
   return {
     lock,
     sharedCacheManifest,
     renderedStates,
+    projectStates,
   };
 }
 
@@ -481,7 +519,20 @@ export async function syncGovernance(options: {
 
   switch (runtime.mergeStrategy) {
     case "codex-toml":
+      await syncCodexGlobalAgents(
+        path.join(options.root, CODEX_GLOBAL_AGENTS_SOURCE),
+        requiredRuntimePath(resolvedState.nativeFiles.globalAgents, "Codex global AGENTS"),
+        path.join(path.dirname(resolvedState.ownedStateFile), "codex-global-agents.json")
+      );
       await syncCodexRuntime(resolvedState);
+      await syncCodexProjectStates({
+        root: options.root,
+        machineId: machine.machineId,
+        runtimeId: runtime.runtimeId,
+        globalConfigPath: requiredRuntimePath(resolvedState.nativeFiles.config, "Codex config"),
+        vars,
+        localSecrets,
+      });
       return;
     case "cursor-json":
       await syncCursorRuntime(resolvedState);
@@ -494,8 +545,80 @@ export async function syncGovernance(options: {
   }
 }
 
+async function syncCodexProjectStates(args: {
+  root: string;
+  machineId: string;
+  runtimeId: string;
+  globalConfigPath: string;
+  vars: Record<string, string>;
+  localSecrets: LocalSecretsRecord;
+}) {
+  const projectStatesPath = path.join(
+    args.root,
+    "generated",
+    "machines",
+    args.machineId,
+    args.runtimeId,
+    "project-scopes.json"
+  );
+  const unresolvedProjectStates = (await pathExists(projectStatesPath))
+    ? renderedProjectRuntimeStatesSchema.parse(await readJsonFile(projectStatesPath))
+    : [];
+  const projectStates = unresolvedProjectStates.map((entry) => ({
+    projectScope: entry.projectScope,
+    state: renderedRuntimeStateSchema.parse(
+      resolveTemplates(
+        deepMerge(entry.state, asObject(args.localSecrets.runtimeLocalOverrides[args.runtimeId])),
+        args.vars,
+        args.localSecrets.secrets,
+        true
+      )
+    ),
+  }));
+
+  const indexPath = projectRuntimeIndexFile(args.runtimeId, args.vars);
+  const previousProjectStates = (await pathExists(indexPath))
+    ? renderedProjectRuntimeStatesSchema.parse(await readJsonFile(indexPath))
+    : [];
+  const activeProjectStates = projectStates.filter((entry) => hasManagedRuntimeEntries(entry.state));
+  const activeScopes = new Set(activeProjectStates.map((entry) => entry.projectScope));
+
+  for (const previous of previousProjectStates) {
+    if (activeScopes.has(previous.projectScope)) {
+      continue;
+    }
+    await syncCodexRuntime({
+      ...previous.state,
+      skills: [],
+      plugins: [],
+      mcps: [],
+    });
+    await removePath(previous.state.ownedStateFile);
+  }
+
+  for (const projectState of activeProjectStates) {
+    await syncCodexRuntime(projectState.state);
+  }
+  await syncCodexProjectTrust(
+    args.globalConfigPath,
+    path.join(
+      args.vars.HOME!,
+      ".config",
+      "agent-governance",
+      "state",
+      args.machineId,
+      "codex-project-trust.json"
+    ),
+    [...activeScopes]
+  );
+  await writeJsonFile(indexPath, renderedProjectRuntimeStatesSchema.parse(activeProjectStates));
+}
+
 export async function auditGovernance(root: string, options: AuditOptions) {
   const repo = await loadRepo(root);
+  const activeCapabilityIds = new Set(
+    [...repo.machines.values()].flatMap((machine) => [...getMachineEnabledCapabilityIds(repo, machine)])
+  );
   const publishedCapabilities = repo.capabilities.filter(
     (capability) => capability.lifecycleState === "published"
   );
@@ -515,7 +638,7 @@ export async function auditGovernance(root: string, options: AuditOptions) {
     }
 
     const reviewedAt = capability.review.reviewedAt ? new Date(capability.review.reviewedAt) : null;
-    if (reviewedAt && Number.isFinite(reviewedAt.getTime())) {
+    if (activeCapabilityIds.has(capability.id) && reviewedAt && Number.isFinite(reviewedAt.getTime())) {
       const ageMs = Date.now() - reviewedAt.getTime();
       const maxAgeMs = options.staleDays * 24 * 60 * 60 * 1000;
       if (ageMs > maxAgeMs) {
@@ -531,6 +654,19 @@ export async function auditGovernance(root: string, options: AuditOptions) {
     }
 
     findings.push(...(await validateCopyInstallAsset(root, capability)));
+  }
+
+  for (const capability of repo.capabilities.filter(
+    (item) => item.lifecycleState === "deprecated" && item.install.sourcePath
+  )) {
+    const sourcePath = capability.install.sourcePath!;
+    if (sourcePath.startsWith("assets/")) {
+      findings.push(
+        `${capability.id}: deprecated payload remains under the active assets tree (${sourcePath}).`
+      );
+    } else if (!(await pathExists(path.resolve(root, sourcePath)))) {
+      findings.push(`${capability.id}: archived deprecated payload is missing (${sourcePath}).`);
+    }
   }
 
   findings.push(...[...repo.runtimes.values()].flatMap((runtime) => validateRuntimeConfig(repo, runtime)));
@@ -721,6 +857,7 @@ function buildRenderedRuntimeState(args: {
   bootstrap: BootstrapRecord;
   lock: AnyResolutionLock;
   vars: Record<string, string>;
+  projectScope?: string;
 }) {
   const machineTarget = args.machine.runtimeTargets[args.runtime.runtimeId];
   const nativeFiles = Object.fromEntries(
@@ -736,6 +873,12 @@ function buildRenderedRuntimeState(args: {
     ])
   );
 
+  if (args.projectScope) {
+    nativeFiles.config = path.join(args.projectScope, ".codex", "config.toml");
+    delete nativeFiles.globalAgents;
+    delete nativeFiles.userSkillsDir;
+  }
+
   const baseState = {
     machineId: args.machine.machineId,
     runtimeId: args.runtime.runtimeId,
@@ -743,7 +886,9 @@ function buildRenderedRuntimeState(args: {
     profileMode: args.runtime.profileMode,
     nativeFiles,
     cacheBindings,
-    ownedStateFile: renderTemplate(args.runtime.ownedStateFile, args.vars),
+    ownedStateFile: args.projectScope
+      ? projectOwnedStateFile(args.runtime.runtimeId, args.projectScope, args.vars)
+      : renderTemplate(args.runtime.ownedStateFile, args.vars),
     skills: [] as RenderedRuntimeState["skills"],
     plugins: [] as RenderedRuntimeState["plugins"],
     mcps: [] as RenderedRuntimeState["mcps"],
@@ -752,7 +897,15 @@ function buildRenderedRuntimeState(args: {
   if (isLegacyResolutionLock(args.lock)) {
     populateRenderedRuntimeStateFromLegacy(baseState, args.runtime.runtimeId, args.lock, args.vars);
   } else {
-    populateRenderedRuntimeStateFromBindings(baseState, args.repo, args.machine, args.runtime, args.lock, args.vars);
+    populateRenderedRuntimeStateFromBindings(
+      baseState,
+      args.repo,
+      args.machine,
+      args.runtime,
+      args.lock,
+      args.vars,
+      args.projectScope
+    );
   }
 
   baseState.skills.sort((left, right) => left.id.localeCompare(right.id));
@@ -762,15 +915,44 @@ function buildRenderedRuntimeState(args: {
   return baseState;
 }
 
+function hasManagedRuntimeEntries(state: RenderedRuntimeState) {
+  return state.skills.length > 0 || state.plugins.length > 0 || state.mcps.length > 0;
+}
+
+function projectOwnedStateFile(runtimeId: string, projectScope: string, vars: Record<string, string>) {
+  const digest = createHash("sha256").update(path.resolve(projectScope)).digest("hex").slice(0, 16);
+  return path.join(
+    vars.HOME!,
+    ".config",
+    "agent-governance",
+    "state",
+    vars.MACHINE_ID!,
+    `${runtimeId}-projects`,
+    `${digest}.json`
+  );
+}
+
+function projectRuntimeIndexFile(runtimeId: string, vars: Record<string, string>) {
+  return path.join(
+    vars.HOME!,
+    ".config",
+    "agent-governance",
+    "state",
+    vars.MACHINE_ID!,
+    `${runtimeId}-projects.json`
+  );
+}
+
 function populateRenderedRuntimeStateFromBindings(
   baseState: RenderedRuntimeState,
   repo: RepoState,
   machine: MachineRecord,
   runtime: RuntimeRecord,
   lock: ResolutionLock,
-  vars: Record<string, string>
+  vars: Record<string, string>,
+  projectScope?: string
 ) {
-  const enabledCapabilities = getEffectiveEnabledCapabilityIds(repo, runtime, machine);
+  const enabledCapabilities = getEffectiveEnabledCapabilityIds(repo, runtime, machine, projectScope);
 
   for (const capability of lock.capabilities) {
     if (!enabledCapabilities.has(capability.id)) {
@@ -780,7 +962,7 @@ function populateRenderedRuntimeStateFromBindings(
       continue;
     }
 
-    const selectedBinding = resolveBindingForRuntime(runtime, capability);
+    const selectedBinding = resolveBindingForRuntime(runtime, capability, Boolean(projectScope));
     if (!selectedBinding) {
       continue;
     }
@@ -791,7 +973,7 @@ function populateRenderedRuntimeStateFromBindings(
         bindingId: selectedBinding.bindingId,
         artifactName: capability.install.artifactName,
         cacheRelativePath: path.join("skills", capability.install.artifactName),
-        syncMode: selectedBinding.binding.skill.syncMode,
+        syncMode: projectScope ? "config-path" : selectedBinding.binding.skill.syncMode,
       });
       continue;
     }
@@ -963,6 +1145,11 @@ function getMachineEnabledCapabilityIds(repo: RepoState, machine: MachineRecord)
     for (const capabilityId of getEffectiveEnabledCapabilityIds(repo, runtime, machine)) {
       enabled.add(capabilityId);
     }
+    for (const projectScope of getActiveProjectScopes(repo, runtime, machine)) {
+      for (const capabilityId of getEffectiveEnabledCapabilityIds(repo, runtime, machine, projectScope)) {
+        enabled.add(capabilityId);
+      }
+    }
   }
   return enabled;
 }
@@ -970,14 +1157,22 @@ function getMachineEnabledCapabilityIds(repo: RepoState, machine: MachineRecord)
 function getEffectiveEnabledCapabilityIds(
   repo: RepoState,
   runtime: RuntimeRecord,
-  machine: MachineRecord
+  machine: MachineRecord,
+  projectScope?: string
 ) {
-  const enabled = new Set(runtime.enabledCapabilities);
+  const enabled = new Set(projectScope ? [] : runtime.enabledCapabilities);
   const blocked = new Set<string>();
 
   for (const profileId of machine.activeProfiles) {
     const profile = repo.profiles.get(profileId);
     if (!profile || profile.runtimeId !== runtime.runtimeId) {
+      continue;
+    }
+    if (projectScope) {
+      if (!profile.projectScopes.some((scope) => pathIsWithinOrEqual(projectScope, scope))) {
+        continue;
+      }
+    } else if (profile.projectScopes.length > 0) {
       continue;
     }
     for (const capabilityId of profile.enabledCapabilities) {
@@ -995,7 +1190,25 @@ function getEffectiveEnabledCapabilityIds(
   return enabled;
 }
 
-function resolveBindingForRuntime(runtime: RuntimeRecord, capability: ResolutionLock["capabilities"][number]) {
+function getActiveProjectScopes(repo: RepoState, runtime: RuntimeRecord, machine: MachineRecord) {
+  const scopes = new Set<string>();
+  for (const profileId of machine.activeProfiles) {
+    const profile = repo.profiles.get(profileId);
+    if (!profile || profile.runtimeId !== runtime.runtimeId) {
+      continue;
+    }
+    for (const projectScope of profile.projectScopes) {
+      scopes.add(path.resolve(projectScope));
+    }
+  }
+  return [...scopes].sort();
+}
+
+function resolveBindingForRuntime(
+  runtime: RuntimeRecord,
+  capability: ResolutionLock["capabilities"][number],
+  preferProjectBinding = false
+) {
   const policyKey = bindingPolicyKeyForAssetKind(capability.assetKind);
   if (!policyKey) {
     return null;
@@ -1008,7 +1221,9 @@ function resolveBindingForRuntime(runtime: RuntimeRecord, capability: Resolution
 
   const candidateBindingIds = override
     ? [override]
-    : runtime.bindingPolicy.defaults[policyKey];
+    : preferProjectBinding && policyKey === "skill" && capability.bindings["user-dir"]
+      ? ["user-dir", ...runtime.bindingPolicy.defaults[policyKey].filter((id) => id !== "user-dir")]
+      : runtime.bindingPolicy.defaults[policyKey];
 
   for (const bindingId of candidateBindingIds) {
     const binding = capability.bindings[bindingId];
@@ -1337,6 +1552,11 @@ function validateRuntimeConfig(repo: RepoState, runtime: RuntimeRecord) {
         `${runtime.runtimeId}: enabled capability ${capabilityId} has unsupported assetKind ${capability.assetKind}.`
       );
     }
+    if (capability.activation.projectScopes.length > 0) {
+      errors.push(
+        `${runtime.runtimeId}: global enabledCapabilities cannot include project-scoped capability ${capabilityId}.`
+      );
+    }
   }
 
   for (const [capabilityId, bindingId] of Object.entries(runtime.bindingPolicy.overrides)) {
@@ -1374,6 +1594,11 @@ function validateProfiles(repo: RepoState) {
       ...profile.referenceCapabilities.map((id) => ({ id, field: "referenceCapabilities" })),
       ...profile.blockedCapabilities.map((id) => ({ id, field: "blockedCapabilities" })),
     ];
+    for (const projectScope of profile.projectScopes) {
+      if (!path.isAbsolute(projectScope)) {
+        errors.push(`${profile.profileId}: projectScopes must use absolute paths, got ${projectScope}.`);
+      }
+    }
     for (const { id, field } of profileCapabilities) {
       const capability = repo.capabilities.find((item) => item.id === id);
       if (!capability) {
@@ -1385,10 +1610,40 @@ function validateProfiles(repo: RepoState) {
           `${profile.profileId}: enabled capability ${id} has unsupported assetKind ${capability.assetKind} for ${profile.runtimeId}.`
         );
       }
+      if (field !== "enabledCapabilities") {
+        continue;
+      }
+      if (profile.projectScopes.length === 0 && capability.activation.projectScopes.length > 0) {
+        errors.push(
+          `${profile.profileId}: global profile cannot enable project-scoped capability ${id}.`
+        );
+        continue;
+      }
+      if (
+        profile.projectScopes.length > 0 &&
+        capability.activation.projectScopes.length > 0
+      ) {
+        for (const profileScope of profile.projectScopes) {
+          if (
+            !capability.activation.projectScopes.some((capabilityScope) =>
+              pathIsWithinOrEqual(profileScope, capabilityScope)
+            )
+          ) {
+            errors.push(
+              `${profile.profileId}: project scope ${profileScope} is outside ${id} activation scopes.`
+            );
+          }
+        }
+      }
     }
   }
 
   return errors;
+}
+
+function pathIsWithinOrEqual(candidate: string, root: string) {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate));
+  return relative === "" || (!relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative));
 }
 
 function validateMachineConfig(repo: RepoState, machine: MachineRecord) {

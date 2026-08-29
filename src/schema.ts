@@ -125,7 +125,7 @@ export const hashSchema = z.object({
 });
 
 export const runtimeSkillBindingSchema = z.object({
-  syncMode: z.enum(["cache-only", "user-skill-dir"]).default("cache-only"),
+  syncMode: z.enum(["cache-only", "user-skill-dir", "config-path"]).default("cache-only"),
 });
 
 export const runtimePluginBindingSchema = z.object({
@@ -270,6 +270,14 @@ export const machineRuntimeTargetSchema = z.object({
   cacheBindings: z.record(z.string(), z.string()).default({}),
 });
 
+export const runtimeAuditAllowlistSchema = z.object({
+  plugins: z.array(z.string().min(1)).default([]),
+  mcpServers: z.array(z.string().min(1)).default([]),
+  userSkills: z.array(z.string().min(1)).default([]),
+  remotePlugins: z.array(z.string().min(1)).default([]),
+  auditRemotePlugins: z.boolean().default(false),
+});
+
 export const machineSchema = z.object({
   machineId: z.string().min(1),
   description: z.string().min(1).optional(),
@@ -279,6 +287,7 @@ export const machineSchema = z.object({
   pathVars: z.record(z.string(), z.string()).default({}),
   runtimeTargets: z.record(z.string(), machineRuntimeTargetSchema).default({}),
   runtimeOverrides: z.record(z.string(), jsonValueSchema).default({}),
+  runtimeAuditAllowlist: z.record(z.string(), runtimeAuditAllowlistSchema).default({}),
 });
 
 export const bootstrapSchema = z.object({
@@ -355,7 +364,7 @@ export const renderedSkillStateSchema = z.object({
   bindingId: z.string().min(1),
   artifactName: z.string().min(1),
   cacheRelativePath: z.string().min(1),
-  syncMode: z.enum(["cache-only", "user-skill-dir"]),
+  syncMode: z.enum(["cache-only", "user-skill-dir", "config-path"]),
 });
 
 export const renderedPluginStateSchema = z.object({
@@ -387,15 +396,36 @@ export const renderedRuntimeStateSchema = z.object({
   mcps: z.array(renderedMcpStateSchema).default([]),
 });
 
+export const renderedProjectRuntimeStateSchema = z.object({
+  projectScope: z.string().min(1),
+  state: renderedRuntimeStateSchema,
+});
+
+export const renderedProjectRuntimeStatesSchema = z
+  .array(renderedProjectRuntimeStateSchema)
+  .default([]);
+
 export const runtimeAuditSnapshotSchema = z.object({
   machineId: z.string().min(1),
   runtimeId: z.string().min(1),
   generatedAt: z.string().nullable(),
   actual: z.object({
     configPath: z.string().min(1),
+    globalAgentsPath: z.string().min(1),
+    globalAgentsDigest: z.string().min(1).optional(),
     userSkillsDir: z.string().min(1),
     pluginCacheDir: z.string().min(1),
     plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
+    remotePlugins: z.record(
+      z.string(),
+      z.object({
+        installed: z.boolean(),
+        enabled: z.boolean(),
+        displayName: z.string().optional(),
+        version: z.string().optional(),
+      })
+    ),
+    remotePluginAuditError: z.string().optional(),
     mcpServers: z.array(z.string()).default([]),
     userSkills: z.array(z.string()).default([]),
     pluginSkills: z.array(
@@ -407,10 +437,33 @@ export const runtimeAuditSnapshotSchema = z.object({
     ),
   }),
   desired: z.object({
+    globalAgentsSourcePath: z.string().min(1),
+    globalAgentsDigest: z.string().min(1),
     plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
     mcpServers: z.array(z.string()).default([]),
     userSkills: z.array(z.string()).default([]),
+    remotePlugins: z.array(z.string()).default([]),
   }),
+  projects: z
+    .array(
+      z.object({
+        projectScope: z.string().min(1),
+        actual: z.object({
+          configPath: z.string().min(1),
+          trusted: z.boolean(),
+          plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
+          mcpServers: z.array(z.string()).default([]),
+          skills: z.record(z.string(), z.object({ enabled: z.boolean() })),
+        }),
+        desired: z.object({
+          trusted: z.boolean(),
+          plugins: z.record(z.string(), z.object({ enabled: z.boolean() })),
+          mcpServers: z.array(z.string()).default([]),
+          skills: z.record(z.string(), z.object({ enabled: z.boolean() })),
+        }),
+      })
+    )
+    .default([]),
   findings: z.array(z.string()).default([]),
 });
 
@@ -447,5 +500,6 @@ export type ResolutionLock = z.infer<typeof resolutionLockSchema>;
 export type LegacyResolutionLock = z.infer<typeof legacyResolutionLockSchema>;
 export type AnyResolutionLock = ResolutionLock | LegacyResolutionLock;
 export type RenderedRuntimeState = z.infer<typeof renderedRuntimeStateSchema>;
+export type RenderedProjectRuntimeState = z.infer<typeof renderedProjectRuntimeStateSchema>;
 export type RuntimeAuditSnapshot = z.infer<typeof runtimeAuditSnapshotSchema>;
 export type SharedCacheManifest = z.infer<typeof sharedCacheManifestSchema>;

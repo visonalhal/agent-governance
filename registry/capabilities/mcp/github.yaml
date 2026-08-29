@@ -1,7 +1,21 @@
 id: mcp.github
 name: github
 assetKind: mcp
+bindings:
+  stdio-command:
+    mcp:
+      serverName: github
+      config:
+        args:
+          - -y
+          - "@modelcontextprotocol/server-github"
+        command: npx
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}
+      adoptExisting: false
 discoverySources: []
+includes: []
+exposes: []
 canonicalSource:
   sourceId: governance-repo
   url: https://github.com/visonalhal/agent-governance
@@ -30,7 +44,17 @@ review:
   filesystemSideEffects: runtime MCP process access
   notes:
     - Seeded from cursor runtime MCP configuration.
-lifecycleState: published
+lifecycleState: deprecated
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
@@ -40,14 +64,5 @@ hash:
 tags:
   - bootstrap-seeded
   - cursor-mcp
-bindings:
-  stdio-command:
-    mcp:
-      serverName: github
-      config:
-        args:
-          - -y
-          - "@modelcontextprotocol/server-github"
-        command: npx
-        env:
-          GITHUB_PERSONAL_ACCESS_TOKEN: ${SECRET:SEEDED_CURSOR_MCP_GITHUB_ENV_GITHUB_PERSONAL_ACCESS_TOKEN}
+statusReason: Retired legacy @modelcontextprotocol/server-github configuration; any future GitHub
+  MCP adoption must use GitHub's official github-mcp-server with a fresh scoped review.

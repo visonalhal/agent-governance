@@ -4,11 +4,12 @@ supportedAssetKinds:
   - plugin
   - mcp
 enabledCapabilities:
-  - plugin.openai-curated.build-web-apps
-  - plugin.openai-curated.superpowers
+  - plugin.policy.disable-build-web-apps
+  - plugin.policy.disable-superpowers
 bindingPolicy:
   defaults:
     skill:
+      - user-dir
       - cache
     mcp:
       - remote-http
@@ -21,6 +22,10 @@ bindingPolicy:
 nativeFiles:
   - name: config
     template: ${HOME}/.codex/config.toml
+  - name: globalAgents
+    template: ${HOME}/.codex/AGENTS.md
+  - name: userSkillsDir
+    template: ${HOME}/.agents/skills
 cacheBindings:
   - name: skillsDir
     template: ${CACHE_ROOT}/skills
@@ -32,7 +37,8 @@ mergeStrategy: codex-toml
 ownedStateFile: ${HOME}/.config/agent-governance/state/${MACHINE_ID}/codex.json
 profileMode: managed
 notes:
-  - Codex discovers governed and personal user skills directly from ~/.agents/skills.
+  - policies/codex/global-AGENTS.md is the versioned source for ~/.codex/AGENTS.md.
+  - Only global governed skills sync into ~/.agents/skills; project-scoped skills use project config paths into the independent governance cache.
   - ~/.codex/skills is reserved for Codex-managed system skills; no user-skill mirror is generated there.
   - Governed plugin and MCP entries are merged into ~/.codex/config.toml.
   - Non-governed model and reasoning settings remain untouched.

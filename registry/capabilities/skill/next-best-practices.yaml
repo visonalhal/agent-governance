@@ -33,7 +33,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-04-03T07:43:08Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: UNKNOWN
   executesScripts: true
   networkAccess: true
@@ -41,13 +41,25 @@ review:
   filesystemSideEffects: none
   notes:
     - Recovered from the local shared skill cache and normalized into governance-managed assets.
+    - Compressed into a project-first App Router router with generic React/CSS anti-trigger and
+      selective references.
 lifecycleState: published
+activation:
+  phase: implementation
+  triggerMode: explicit
+  maxChainDepth: 1
+  conflictsWith: []
+  replaces: []
+  projectScopes: []
+  subagentRole: none
+  activationExamples: []
+  antiTriggers: []
 versionPolicy:
   strategy: pin-ref-and-hash
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 964b654986d68ad1b050b33ac40806ce6724ce42f456f3f722c0285edd9b9470
+  digest: 83d1dd38081338d3b8187b73c453dbd15a887587015f09dfe8acd2825fa53e8a
 tags:
   - bootstrap-seeded
   - shared-skill

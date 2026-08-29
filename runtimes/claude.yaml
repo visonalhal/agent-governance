@@ -3,8 +3,7 @@ supportedAssetKinds:
   - skill
   - plugin
   - mcp
-enabledCapabilities:
-  - plugin.impeccable
+enabledCapabilities: []
 bindingPolicy:
   defaults:
     skill:
@@ -39,3 +38,4 @@ notes:
   - Governed plugin enablement is merged into Claude settings.
   - Marketplace and installed-plugin records are merged into Claude plugin manifests.
   - Sync never downloads artifacts from the network; it only references repo or shared-cache content.
+  - No global workflow plugin is enabled by default.

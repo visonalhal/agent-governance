@@ -30,7 +30,7 @@ permissions:
 review:
   status: approved
   reviewer: Halvin Shen
-  reviewedAt: 2026-05-22T00:00:00.000Z
+  reviewedAt: 2026-08-29T00:00:00.000Z
   license: MIT
   executesScripts: false
   networkAccess: false
@@ -38,6 +38,9 @@ review:
   filesystemSideEffects: none
   notes:
     - Self-owned governance skill for evaluating external and internal skills.
+    - Disable implicit invocation; capability audits must be explicitly requested.
+    - Narrowed to capability lifecycle, permission, overlap, and runtime-scope decisions; prompt
+      wording and trigger tests route to prompt-master.
 lifecycleState: published
 activation:
   phase: governance
@@ -60,7 +63,7 @@ versionPolicy:
   allowUpdates: manual
 hash:
   algorithm: sha256
-  digest: 2b0d5f201e51b1534ef2ee9de8984803d373e7578130148ec332bebb1fc72efa
+  digest: 5371c54a2e96a8c35cf8ed8653fea1eccefbf2e683c65da58833577d7e90ae63
 tags:
   - governance
   - skills
